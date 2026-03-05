@@ -1,0 +1,36 @@
+.DashSideMenu{
+    background-color:rgb(39,190,175) ;
+    color:white;
+    width: 100%;
+    z-index: 1;
+    position: absolute;
+    height:1000%;
+}
+#content{
+  margin-left:15%;
+  background-color:white ;
+  position:absolute;
+  z-index: 3;
+  width:85%;
+  border-bottom-left-radius:60px;
+}
+
+#DashNavbar{
+  width:85%;
+  margin-left:15%;
+  border-top-left-radius:60px;
+  z-index: 1;
+}
+
+
+#sideExtButtons{
+  margin-left: 5%;
+  margin-top: 8%;
+}
+
+.dateFilter{
+  background-color:rgb(39,190,175) ;
+  color: white;
+  padding: 5px;
+}
+

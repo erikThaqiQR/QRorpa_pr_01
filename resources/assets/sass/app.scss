@@ -1,0 +1,37 @@
+
+// Fonts
+@import url("https://fonts.googleapis.com/css?family=Raleway:300,400,600");
+
+// Variables
+@import "variables";
+@import "menu";
+
+
+@import "costume";
+@import "cart";
+@import "checkout";
+
+
+
+@import "logIn";
+
+
+
+// Admin panel
+// @import "admin02";
+@import "admin01";
+@import "owlcss";
+@import "owlcssanim";
+
+
+
+@import "search01";
+
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+.navbar-laravel {
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
