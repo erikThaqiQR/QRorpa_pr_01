@@ -441,6 +441,9 @@ use Illuminate\Support\Facades\Auth;
               },
               error: (error) => { console.log(error); }
             });
+          }else if($('#splitTheBillInitiateModal').hasClass('show') && $('#splitTheBillInitiateModal').hasClass('modal')){
+            // splitTheBillInitiateModal is open
+            $('body').addClass('modal-open');
           }
         }
       </script>
