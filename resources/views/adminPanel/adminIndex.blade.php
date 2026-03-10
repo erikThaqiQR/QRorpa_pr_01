@@ -38,8 +38,8 @@
   <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
 
-  <!-- <script src="https://kit.fontawesome.com/d40577511e.js" crossorigin="anonymous"></script> -->
-   @include('fontawesome')
+  <script src="https://kit.fontawesome.com/d40577511e.js" crossorigin="anonymous"></script>
+   <!-- @include('fontawesome') -->
 
   <script src="https://js.pusher.com/6.0/pusher.min.js"></script>
   
@@ -115,8 +115,10 @@
   <!-- modalet -->
   @if($agent->isMobile())
     @include('adminPanel.indexParts.optionsModalTel')
+    <input type="hidden" id="isDeviceMobile" value="1">
   @else 
     @include('adminPanel.indexParts.optionsModal')
+    <input type="hidden" id="isDeviceMobile" value="0">
   @endif
 
   @include('adminPanel.indexParts.orderQRCodeTel')
@@ -136,8 +138,6 @@
   @endif
 
 
-
-  
 
 <div style="position:absolute; top:20%; left:30%; right:30%; width:40%; z-index:999999; background-color:rgba(212,237,218,255); border-radius:10px;
     font-size:1.4rem; color:rgb(72,81,87); display:none;" class="text-center p-4" id="alertClWantsToPay">
@@ -166,10 +166,12 @@
   <hr>
   <strong>Stellen Sie sicher, dass Sie ihre Bestellungen bestätigen, damit sie fortfahren können</strong>
 </div>
+
 <script>
   function exitAlertClWantsToPayTel(){
     $('#alertClWantsToPayTel').hide(50);
   }
+
 </script>
 
 
@@ -795,36 +797,350 @@
       <input type="hidden" value="{{Auth::user()->sFor}}" id="theResId">
 
 
+       
 
         <!-- dash.sendActiveMSG CODE HERE-->
 
-
           <!-- paraqitet QRkodi per faktur ne rast te RECHNUNG pageses nga admini kamarieri -->
-          @if (isset($_GET["orId"]) && isset($_GET["ptn"]))
+          @if (isset($_GET["orId"]) && isset($_GET["splitBillIn"]))
+          <!-- splitBillTheFinalPay -->
+            @if($agent->isMobile())
             <script>
-                $.ajax({
-                    url: '{{ route("receipt.getTheReceiptQrCodePic") }}',
-                    method: 'post',
-                    data: {
-                        id: '{{$_GET["orId"]}}',
-                        _token: '{{csrf_token()}}'
-                    },
-                    success: (res) => {
-                        res = $.trim(res);
-                        res2D = res.split('-8-8-');
-                        $('#orderQRCodePicIdTel').html('{{__("adminP.orderId")}}: '+res2D[2]);
-                        $('#orderQRCodePicImgTel').attr('src','storage/digitalReceiptQRK/'+res2D[0]);
-                        $('#orderQRCodePicDownloadOI').val('{{$_GET["orId"]}}');
-                        $('#orderQRCodePicTel').modal('show');
+              $.ajax({
+                url: '{{ route("splitBill.displaysplitBillAfterRechnung") }}',
+                method: 'post',
+                data: {
+                  splitBillIn: "{{$_GET['splitBillIn']}}",
+                  splitBillPayLog: "{{$_GET['splitBillPayLogId']}}",
+                  _token: '{{csrf_token()}}'
+                },
+                success: (response) => {
+                  response = $.trim(response);
+                  if(response == 'invalideTable'){
 
-                        $('#OrQRCodePayIsSelective').val('1');
-                        $('#OrQRCodePayIsSelectiveTNr').val('{{$_GET["ptn"]}}');
-                    },
-                    error: (error) => { console.log(error); }
-                });
+                  }else if(response == 'modalAlreadyShown'){
+
+                  }else{
+                    respo2D = response.split('|||');
+                    if( respo2D[9] == 2){
+
+                    }else{
+                      $('#tabOrder'+respo2D[1]).modal('hide');
+                      $('#splitTheBillInitiateModal').modal('show');
+                      $('#splitTheBillInitiateModalTableNr').html(respo2D[1]);
+                      $('#splitTheBillInitiateModalClientsNr').html(respo2D[2]);
+
+                      $('#splitTheBillInitiateModalCancelBtn').remove();
+
+                      $('#splitTheBillInitiateModalBody').html('');
+
+                      $('body').addClass('modal-open');
+
+                      var rechReturnPayM = respo2D[6];
+                      var rechReturnPayM2D = rechReturnPayM.split('--88--');
+                      var rechReturntips = respo2D[7];
+                      var rechReturntips2D = rechReturntips.split('--88--');
+                      var rechReturnGCId = respo2D[10];
+                      var rechReturnGCId2D = rechReturnGCId.split('--88--');
+                      var rechReturnGCAmt = respo2D[11];
+                      var rechReturnGCAmt2D = rechReturnGCAmt.split('--88--');
+                      var newClientLineShow = "";
+                      console.log(respo2D[10]);
+                      console.log(respo2D[11]);
+                      for(var i = 0; i < respo2D[2]; i++) {
+                        if(rechReturnPayM2D[i] !== undefined) {
+                          newClientLineShow = '<div id="splitBillClientDiv1'+i+'" class="d-flex flex-wrap justify-content-between pt-2 alert-success">'+
+                                                  '<div style="width:100%;">'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Kunde '+(i + 1)+'</strong></p>'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Bezahlen <span id="splitBillModalPayValueClient'+i+'">'+parseFloat(parseFloat(respo2D[8]) + parseFloat(rechReturntips2D[i])).toFixed(2)+'</span> CHF</strong></p>'+
+                                                  '</div>'+
+                                                  '<div id="splitBillClientDiv1_2'+i+'" style="width:100%;" class="d-flex flex-wrap justify-content-between">';
+                                                    if(rechReturnPayM2D[i] == 'Barzahlungen'){
+                          newClientLineShow +=       '<button id="splitBillBtn1'+i+'" style="width:33%;" class="btn btn-dark shadow-none" onclick="splitBillPayBarInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Bar</button>';
+                                                    }else{
+                          newClientLineShow +=        '<button id="splitBillBtn1'+i+'" style="width:33%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayBarInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Bar</button>';
+                                                    }
+                                                    if(rechReturnPayM2D[i] == 'Kartenzahlung'){
+                          newClientLineShow +=       '<button id="splitBillBtn2'+i+'" style="width:33%;" class="btn btn-dark shadow-none" onclick="splitBillPayKarteInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\',\'none\')" disabled>Karte</button>';
+                                                    }else{
+                          newClientLineShow +=        '<button id="splitBillBtn2'+i+'" style="width:33%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayKarteInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\',\'none\')" disabled>Karte</button>';
+                                                    }
+
+                          newClientLineShow +=        '<button id="splitBillBtn3'+i+'" style="width:33%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayOnline(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Online</button>';
+                                                    
+                                                    if(rechReturnPayM2D[i] == 'Auf rechnung'){
+                          newClientLineShow +=       '<button id="splitBillBtn4'+i+'" style="width:49.5%;" class="btn btn-dark shadow-none" onclick="splitBillPrepPayAufRechnung(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Auf Rechnung</button>';
+                                                    }else{
+                          newClientLineShow +=        '<button id="splitBillBtn4'+i+'" style="width:49.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayAufRechnung(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Auf Rechnung</button>';
+                                                    }
+                          newClientLineShow +=        '<button id="splitBillBtn5'+i+'" style="width:49.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillOpenGCPay(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Geschenkkarte</button>'+
+                                                  '</div>'+
+                                              '</div>'+
+                                              '<div id="splitBillClientDiv2'+i+'" style="border-bottom:2px solid black;" class="d-flex flex-wrap justify-content-between pt-1 pb-2 alert-success">'+
+                                                  '<div style="width:100%;" id="splitBillClientDiv2_1'+i+'">'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Tipp: <span id="splitBillModalTippValueClient'+i+'">'+parseFloat(parseFloat(rechReturntips2D[i]).toFixed(2)).toFixed(2)+'</span> CHF</strong></p>';
+                                                      if(rechReturnGCAmt2D[i] > 0){
+                          newClientLineShow +=        '<p id="showGCApplyP'+i+'" style="margin-bottom: 3px; font-size:1.2rem;"><strong>Geschenkkarte: <span id="splitBillModalGCValueClientShow'+i+'">'+parseFloat(rechReturnGCAmt2D[i]).toFixed(2)+'</span> CHF</strong></p>';
+                                                      }
+                          newClientLineShow +=    '</div>'+
+                                                  '<div style="width:100%;" class="d-flex flex-wrap justify-content-between">'+
+                                                      '<input type="hidden" id="splitBillTippType'+i+'" value="0">'+
+                                                  '</div>'+
+                                                  '<input type="hidden" id="splitBillnitiateId'+i+'" value="'+respo2D[5]+'">'+
+                                                  '<input type="hidden" id="splitBillGCAppliedId'+i+'" value="'+rechReturnGCId2D[i]+'">'+
+                                                  '<input type="hidden" id="splitBillGCAppliedCHFVal'+i+'" value="'+rechReturnGCAmt2D[i]+'">'+
+                                              '</div>';
+                        }else{
+                          newClientLineShow = '<div id="splitBillClientDiv1'+i+'" class="d-flex flex-wrap justify-content-between pt-2">'+
+                                                  '<div style="width:100%;">'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Kunde '+(i + 1)+'</strong></p>'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Bezahlen <span id="splitBillModalPayValueClient'+i+'">'+parseFloat(respo2D[0]).toFixed(2)+'</span> CHF</strong></p>'+
+                                                  '</div>'+
+                                                  '<div id="splitBillClientDiv1_2'+i+'" style="width:100%;" class="d-flex flex-wrap justify-content-between">'+
+                                                      '<button id="splitBillBtn1'+i+'" style="width:33%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayBarInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')">Bar</button>'+
+                                                      '<button id="splitBillBtn2'+i+'" style="width:33%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayKarteInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\',\'none\')">Karte</button>'+
+                                                      '<button id="splitBillBtn3'+i+'" style="width:33%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayOnline(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Online</button>'+
+                                                      '<button id="splitBillBtn4'+i+'" style="width:49.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayAufRechnung(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')">Auf Rechnung</button>'+
+                                                      '<button id="splitBillBtn5'+i+'" style="width:49.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillOpenGCPay(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')">Geschenkkarte</button>'+
+                                                  '</div>'+
+                                              '</div>'+
+                                              '<div id="splitBillClientDiv2'+i+'" style="border-bottom:2px solid black;" class="d-flex flex-wrap justify-content-between pt-1 pb-2">'+
+                                                  '<div style="width:100%;" id="splitBillClientDiv2_1'+i+'">'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong><i style="color:red;" class="fa-solid fa-circle-xmark" id="cancelTippApplyBtn'+i+'" onclick="cancelTippApply(\''+i+'\')"></i> Tipp: <span id="splitBillModalTippValueClient'+i+'">'+parseFloat(0).toFixed(2)+'</span> CHF</strong></p>'+
+                                                  '</div>'+
+                                                  '<div style="width:100%;" class="d-flex flex-wrap justify-content-between">'+
+                                                      '<button id="splitBillTippBtn1'+i+'" style="width:24.8%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+0.5+'\')">'+parseFloat(0.5).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtn2'+i+'" style="width:24.8%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+1+'\')">'+parseFloat(1).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtn3'+i+'" style="width:24.8%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+2+'\')">'+parseFloat(2).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtn4'+i+'" style="width:24.8%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+5+'\')">'+parseFloat(5).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtn5'+i+'" style="width:24.8%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+10+'\')">'+parseFloat(10).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtnCostume'+i+'" style="width:74.4%; margin:0px;" type="button" class="btn btn-outline-dark shadow-none">'+
+                                                          '<input id="splitBillTippInputCostume'+i+'" step="0.05" min="0" id="tipWaiterCosVal" type="number" onkeyup="setCostumeTipStafSplitBill(\''+i+'\',this.value)" style="width:95%; border:none;" placeholder="Gesamt mit Tipp">'+
+                                                      '</button>'+
+                                                      '<input type="hidden" id="splitBillTippType'+i+'" value="0">'+
+                                                  '</div>'+
+                                                  '<div style="width: 100%; display:none;" class="mt-1 alert alert-danger text-center" id="splitTheBillError01'+i+'">'+
+                                                      '<strong>Geben Sie zuerst einen gültigen Wert ein!, Gesamtpreis nach dem Trinkgeld</strong>'+
+                                                  '</div>'+
+                                                  '<div id="splitTheBillPayAtPOS'+i+'" class="alert alert-info text-center mt-1" style="display:none; width:100%;">'+
+                                                      '<strong>Schließen Sie die Zahlung am POS-Terminal ab!</strong>'+
+                                                  '</div>'+
+                                                  '<input type="hidden" id="splitBillnitiateId'+i+'" value="'+respo2D[5]+'">'+
+                                                  '<input type="hidden" id="splitBillGCAppliedId'+i+'" value="0">'+
+                                                  '<input type="hidden" id="splitBillGCAppliedCHFVal'+i+'" value="0">'+
+                                              '</div>';
+                        }
+                          $('#splitTheBillInitiateModalBody').append(newClientLineShow);
+                      }
+
+                      $('#splitTheBillInitiateModalOriginalPriceShow').html(parseFloat(respo2D[3]).toFixed(2));
+                      $('#splitTheBillInitiateModalPayPriceShow').html(parseFloat(respo2D[4]).toFixed(2));
+                    }
+
+
+
+                    $.ajax({
+                      url: '{{ route("receipt.getTheReceiptQrCodePic") }}',
+                      method: 'post',
+                      data: {
+                          id: '{{$_GET["orId"]}}',
+                          _token: '{{csrf_token()}}'
+                      },
+                      success: (res) => {
+                          res = $.trim(res);
+                          res2D = res.split('-8-8-');
+                          $('#orderQRCodePicIdTel').html('{{__("adminP.orderId")}}: '+res2D[2]);
+                          $('#orderQRCodePicImgTel').attr('src','storage/digitalReceiptQRK/'+res2D[0]);
+                          $('#orderQRCodePicDownloadOI').val('{{$_GET["orId"]}}');
+                          $('#orderQRCodePicTel').modal('show');
+
+                          if(respo2D[9] == 1 || respo2D[9] == 0){
+                              $('#OrQRCodeModalStillOpen').val(1);
+                          }
+                      },
+                      error: (error) => { console.log(error); }
+                    });
+
+
+
+
+                  }
+                },error: (error) => { console.log(error); }
+				      });
             </script>
-          @elseif (isset($_GET["orId"]))
+
+
+            @else
+            <!-- Desktop version -->
+            <!-- Desktop version -->
+            <!-- Desktop version -->
             <script>
+              $.ajax({
+                url: '{{ route("splitBill.displaysplitBillAfterRechnung") }}',
+                method: 'post',
+                data: {
+                  splitBillIn: "{{$_GET['splitBillIn']}}",
+                  splitBillPayLog: "{{$_GET['splitBillPayLogId']}}",
+                  _token: '{{csrf_token()}}'
+                },
+                success: (response) => {
+                  response = $.trim(response);
+                  if(response == 'invalideTable'){
+
+                  }else if(response == 'modalAlreadyShown'){
+
+                  }else{
+                    respo2D = response.split('|||');
+                    if( respo2D[9] == 2){
+
+                    }else{
+                      $('#tabOrder'+respo2D[1]).modal('hide');
+                      $('#splitTheBillInitiateModal').modal('show');
+                      $('#splitTheBillInitiateModalTableNr').html(respo2D[1]);
+                      $('#splitTheBillInitiateModalClientsNr').html(respo2D[2]);
+
+                      $('#splitTheBillInitiateModalCancelBtn').remove();
+
+                      $('#splitTheBillInitiateModalBody').html('');
+
+                      $('body').addClass('modal-open');
+
+                      var rechReturnPayM = respo2D[6];
+                      var rechReturnPayM2D = rechReturnPayM.split('--88--');
+                      var rechReturntips = respo2D[7];
+                      var rechReturntips2D = rechReturntips.split('--88--');
+                      var rechReturnGCId = respo2D[10];
+                      var rechReturnGCId2D = rechReturnGCId.split('--88--');
+                      var rechReturnGCAmt = respo2D[11];
+                      var rechReturnGCAmt2D = rechReturnGCAmt.split('--88--');
+                      var newClientLineShow = "";
+                      console.log(respo2D[10]);
+                      console.log(respo2D[11]);
+                      for(var i = 0; i < respo2D[2]; i++) {
+                        if(rechReturnPayM2D[i] !== undefined) {
+                          newClientLineShow = '<div id="splitBillClientDiv1'+i+'" class="d-flex justify-content-between pt-2 alert-success">'+
+                                                  '<div style="width:30%;">'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Kunde '+(i + 1)+'</strong></p>'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Bezahlen <span id="splitBillModalPayValueClient'+i+'">'+parseFloat(parseFloat(respo2D[8]) + parseFloat(rechReturntips2D[i])).toFixed(2)+'</span> CHF</strong></p>'+
+                                                  '</div>'+
+                                                  '<div id="splitBillClientDiv1_2'+i+'" style="width:70%;" class="d-flex flex-wrap justify-content-between">';
+                                                    if(rechReturnPayM2D[i] == 'Barzahlungen'){
+                          newClientLineShow +=       '<button id="splitBillBtn1'+i+'" style="width:19.5%;" class="btn btn-dark shadow-none" onclick="splitBillPayBarInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Bar</button>';
+                                                    }else{
+                          newClientLineShow +=        '<button id="splitBillBtn1'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayBarInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Bar</button>';
+                                                    }
+                                                    if(rechReturnPayM2D[i] == 'Kartenzahlung'){
+                          newClientLineShow +=       '<button id="splitBillBtn2'+i+'" style="width:19.5%;" class="btn btn-dark shadow-none" onclick="splitBillPayKarteInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\',\'none\')" disabled>Karte</button>';
+                                                    }else{
+                          newClientLineShow +=        '<button id="splitBillBtn2'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayKarteInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\',\'none\')" disabled>Karte</button>';
+                                                    }
+
+                          newClientLineShow +=        '<button id="splitBillBtn3'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayOnline(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Online</button>';
+                                                    
+                                                    if(rechReturnPayM2D[i] == 'Auf rechnung'){
+                          newClientLineShow +=       '<button id="splitBillBtn4'+i+'" style="width:19.5%;" class="btn btn-dark shadow-none" onclick="splitBillPrepPayAufRechnung(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Auf Rechnung</button>';
+                                                    }else{
+                          newClientLineShow +=        '<button id="splitBillBtn4'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayAufRechnung(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Auf Rechnung</button>';
+                                                    }
+                          newClientLineShow +=        '<button id="splitBillBtn5'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillOpenGCPay(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Geschenkkarte</button>'+
+                                                  '</div>'+
+                                              '</div>'+
+                                              '<div id="splitBillClientDiv2'+i+'" style="border-bottom:2px solid black;" class="d-flex flex-wrap justify-content-between pt-1 pb-2 alert-success">'+
+                                                  '<div style="width:30%;" id="splitBillClientDiv2_1'+i+'">'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Tipp: <span id="splitBillModalTippValueClient'+i+'">'+parseFloat(parseFloat(rechReturntips2D[i]).toFixed(2)).toFixed(2)+'</span> CHF</strong></p>';
+                                                      if(rechReturnGCAmt2D[i] > 0){
+                          newClientLineShow +=        '<p id="showGCApplyP'+i+'" style="margin-bottom: 3px; font-size:1.2rem;"><strong>Geschenkkarte: <span id="splitBillModalGCValueClientShow'+i+'">'+parseFloat(rechReturnGCAmt2D[i]).toFixed(2)+'</span> CHF</strong></p>';
+                                                      }
+                          newClientLineShow +=    '</div>'+
+                                                  '<div style="width:70%;" class="d-flex flex-wrap justify-content-between">'+
+                                                      '<input type="hidden" id="splitBillTippType'+i+'" value="0">'+
+                                                  '</div>'+
+                                                  '<input type="hidden" id="splitBillnitiateId'+i+'" value="'+respo2D[5]+'">'+
+                                                  '<input type="hidden" id="splitBillGCAppliedId'+i+'" value="'+rechReturnGCId2D[i]+'">'+
+                                                  '<input type="hidden" id="splitBillGCAppliedCHFVal'+i+'" value="'+rechReturnGCAmt2D[i]+'">'+
+                                              '</div>';
+                        }else{
+                          newClientLineShow = '<div id="splitBillClientDiv1'+i+'" class="d-flex justify-content-between pt-2">'+
+                                                  '<div style="width:30%;">'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Kunde '+(i + 1)+'</strong></p>'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Bezahlen <span id="splitBillModalPayValueClient'+i+'">'+parseFloat(respo2D[0]).toFixed(2)+'</span> CHF</strong></p>'+
+                                                  '</div>'+
+                                                  '<div id="splitBillClientDiv1_2'+i+'" style="width:70%;" class="d-flex flex-wrap justify-content-between">'+
+                                                      '<button id="splitBillBtn1'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayBarInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')">Bar</button>'+
+                                                      '<button id="splitBillBtn2'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayKarteInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\',\'none\')">Karte</button>'+
+                                                      '<button id="splitBillBtn3'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayOnline(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Online</button>'+
+                                                      '<button id="splitBillBtn4'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayAufRechnung(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')">Auf Rechnung</button>'+
+                                                      '<button id="splitBillBtn5'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillOpenGCPay(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')">Geschenkkarte</button>'+
+                                                  '</div>'+
+                                              '</div>'+
+                                              '<div id="splitBillClientDiv2'+i+'" style="border-bottom:2px solid black;" class="d-flex flex-wrap justify-content-between pt-1 pb-2">'+
+                                                  '<div style="width:30%;" id="splitBillClientDiv2_1'+i+'">'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong><i style="color:red;" class="fa-solid fa-circle-xmark" id="cancelTippApplyBtn'+i+'" onclick="cancelTippApply(\''+i+'\')"></i> Tipp: <span id="splitBillModalTippValueClient'+i+'">'+parseFloat(0).toFixed(2)+'</span> CHF</strong></p>'+
+                                                  '</div>'+
+                                                  '<div style="width:70%;" class="d-flex flex-wrap justify-content-between">'+
+                                                      '<button id="splitBillTippBtn1'+i+'" style="width:16.6%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+0.5+'\')">'+parseFloat(0.5).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtn2'+i+'" style="width:16.6%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+1+'\')">'+parseFloat(1).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtn3'+i+'" style="width:16.6%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+2+'\')">'+parseFloat(2).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtn4'+i+'" style="width:16.6%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+5+'\')">'+parseFloat(5).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtn5'+i+'" style="width:16.6%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+10+'\')">'+parseFloat(10).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtnCostume'+i+'" style="width:16.6%; margin:0px;" type="button" class="btn btn-outline-dark shadow-none">'+
+                                                          '<input id="splitBillTippInputCostume'+i+'" step="0.05" min="0" id="tipWaiterCosVal" type="number" onkeyup="setCostumeTipStafSplitBill(\''+i+'\',this.value)" style="width:95%; border:none;" placeholder="Gesamt mit Tipp">'+
+                                                      '</button>'+
+                                                      '<input type="hidden" id="splitBillTippType'+i+'" value="0">'+
+                                                  '</div>'+
+                                                  '<div style="width: 100%; display:none;" class="mt-1 alert alert-danger text-center" id="splitTheBillError01'+i+'">'+
+                                                      '<strong>Geben Sie zuerst einen gültigen Wert ein!, Gesamtpreis nach dem Trinkgeld</strong>'+
+                                                  '</div>'+
+                                                  '<div id="splitTheBillPayAtPOS'+i+'" class="alert alert-info text-center mt-1" style="display:none; width:100%;">'+
+                                                      '<strong>Schließen Sie die Zahlung am POS-Terminal ab!</strong>'+
+                                                  '</div>'+
+                                                  '<input type="hidden" id="splitBillnitiateId'+i+'" value="'+respo2D[5]+'">'+
+                                                  '<input type="hidden" id="splitBillGCAppliedId'+i+'" value="0">'+
+                                                  '<input type="hidden" id="splitBillGCAppliedCHFVal'+i+'" value="0">'+
+                                              '</div>';
+                        }
+                          $('#splitTheBillInitiateModalBody').append(newClientLineShow);
+                      }
+
+                      $('#splitTheBillInitiateModalOriginalPriceShow').html(parseFloat(respo2D[3]).toFixed(2));
+                      $('#splitTheBillInitiateModalPayPriceShow').html(parseFloat(respo2D[4]).toFixed(2));
+                    }
+
+
+
+                    $.ajax({
+                      url: '{{ route("receipt.getTheReceiptQrCodePic") }}',
+                      method: 'post',
+                      data: {
+                          id: '{{$_GET["orId"]}}',
+                          _token: '{{csrf_token()}}'
+                      },
+                      success: (res) => {
+                          res = $.trim(res);
+                          res2D = res.split('-8-8-');
+                          $('#orderQRCodePicIdTel').html('{{__("adminP.orderId")}}: '+res2D[2]);
+                          $('#orderQRCodePicImgTel').attr('src','storage/digitalReceiptQRK/'+res2D[0]);
+                          $('#orderQRCodePicDownloadOI').val('{{$_GET["orId"]}}');
+                          $('#orderQRCodePicTel').modal('show');
+
+                          if(respo2D[9] == 1 || respo2D[9] == 0){
+                              $('#OrQRCodeModalStillOpen').val(1);
+                          }
+                      },
+                      error: (error) => { console.log(error); }
+                    });
+
+
+
+
+                  }
+                },error: (error) => { console.log(error); }
+				      });
+            </script>
+            @endif
+          @else
+            @if (isset($_GET["orId"]) && isset($_GET["ptn"]))
+              <script>
                   $.ajax({
                       url: '{{ route("receipt.getTheReceiptQrCodePic") }}',
                       method: 'post',
@@ -840,12 +1156,358 @@
                           $('#orderQRCodePicDownloadOI').val('{{$_GET["orId"]}}');
                           $('#orderQRCodePicTel').modal('show');
 
-                          $('#OrQRCodePayIsSelective').val('0');
-                          $('#OrQRCodePayIsSelectiveTNr').val('0');
+                          $('#OrQRCodePayIsSelective').val('1');
+                          $('#OrQRCodePayIsSelectiveTNr').val('{{$_GET["ptn"]}}');
                       },
                       error: (error) => { console.log(error); }
                   });
               </script>
+            @elseif (isset($_GET["orId"]))
+              <script>
+                    $.ajax({
+                        url: '{{ route("receipt.getTheReceiptQrCodePic") }}',
+                        method: 'post',
+                        data: {
+                            id: '{{$_GET["orId"]}}',
+                            _token: '{{csrf_token()}}'
+                        },
+                        success: (res) => {
+                            res = $.trim(res);
+                            res2D = res.split('-8-8-');
+                            $('#orderQRCodePicIdTel').html('{{__("adminP.orderId")}}: '+res2D[2]);
+                            $('#orderQRCodePicImgTel').attr('src','storage/digitalReceiptQRK/'+res2D[0]);
+                            $('#orderQRCodePicDownloadOI').val('{{$_GET["orId"]}}');
+                            $('#orderQRCodePicTel').modal('show');
+
+                            $('#OrQRCodePayIsSelective').val('0');
+                            $('#OrQRCodePayIsSelectiveTNr').val('0');
+                        },
+                        error: (error) => { console.log(error); }
+                    });
+                </script>
+            @endif
           @endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <script>
+          
+					$.ajax({
+						url: '{{ route("splitBill.splitBillCallUnfinishedBill") }}',
+						method: 'post',
+						data: {
+							_token: '{{csrf_token()}}'
+						},
+						success: (response) => {
+              response = $.trim(response);
+              if(response == 'InstanceIsCanceled'){
+              }else if(response == 'InstanceNotFound'){
+              }else if(response == 'LastPaymentComplete'){
+              }else{
+                if($('#isDeviceMobile').val() == 1){
+                  if(response == 'invalideTable'){
+
+                  }else if(response == 'modalAlreadyShown'){
+
+                  }else{
+                    respo2D = response.split('|||');
+                    if( respo2D[9] == 2){
+
+                    }else{
+                      $('#tabOrder'+respo2D[1]).modal('hide');
+                      $('#splitTheBillInitiateModal').modal('show');
+                      $('#splitTheBillInitiateModalTableNr').html(respo2D[1]);
+                      $('#splitTheBillInitiateModalClientsNr').html(respo2D[2]);
+
+                      if( respo2D[9] == 0){
+                        $('#splitTheBillInitiateModalCancelBtn').remove();
+                      }else{
+                        $('#splitTheBillInitiateModalCancelBtn').attr('onclick','splitTheBillInitiateModalCancel("'+respo2D[5]+'")');
+                      }
+                      
+                      $('#splitTheBillInitiateModalBody').html('');
+
+                      $('body').addClass('modal-open');
+
+                      var rechReturnPayM = respo2D[6];
+                      var rechReturnPayM2D = rechReturnPayM.split('--88--');
+                      var rechReturntips = respo2D[7];
+                      var rechReturntips2D = rechReturntips.split('--88--');
+                      var rechReturnGCId = respo2D[10];
+                      var rechReturnGCId2D = rechReturnGCId.split('--88--');
+                      var rechReturnGCAmt = respo2D[11];
+                      var rechReturnGCAmt2D = rechReturnGCAmt.split('--88--');
+                      var newClientLineShow = "";
+                      console.log(respo2D[10]);
+                      console.log(respo2D[11]);
+                      for(var i = 0; i < respo2D[2]; i++) {
+                        if(respo2D[6] != '' && rechReturnPayM2D[i] !== undefined) {
+                          newClientLineShow = '<div id="splitBillClientDiv1'+i+'" class="d-flex flex-wrap justify-content-between pt-2 alert-success">'+
+                                                  '<div style="width:100%;">'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Kunde '+(i + 1)+'</strong></p>'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Bezahlen <span id="splitBillModalPayValueClient'+i+'">'+parseFloat(parseFloat(respo2D[8]) + parseFloat(rechReturntips2D[i])).toFixed(2)+'</span> CHF</strong></p>'+
+                                                  '</div>'+
+                                                  '<div id="splitBillClientDiv1_2'+i+'" style="width:100%;" class="d-flex flex-wrap justify-content-between">';
+                                                    if(rechReturnPayM2D[i] == 'Barzahlungen'){
+                          newClientLineShow +=       '<button id="splitBillBtn1'+i+'" style="width:33%;" class="btn btn-dark shadow-none" onclick="splitBillPayBarInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Bar</button>';
+                                                    }else{
+                          newClientLineShow +=        '<button id="splitBillBtn1'+i+'" style="width:33%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayBarInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Bar</button>';
+                                                    }
+                                                    if(rechReturnPayM2D[i] == 'Kartenzahlung'){
+                          newClientLineShow +=       '<button id="splitBillBtn2'+i+'" style="width:33%;" class="btn btn-dark shadow-none" onclick="splitBillPayKarteInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\',\'none\')" disabled>Karte</button>';
+                                                    }else{
+                          newClientLineShow +=        '<button id="splitBillBtn2'+i+'" style="width:33%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayKarteInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\',\'none\')" disabled>Karte</button>';
+                                                    }
+
+                          newClientLineShow +=        '<button id="splitBillBtn3'+i+'" style="width:33%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayOnline(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Online</button>';
+                                                    
+                                                    if(rechReturnPayM2D[i] == 'Auf rechnung'){
+                          newClientLineShow +=       '<button id="splitBillBtn4'+i+'" style="width:49.5%;" class="btn btn-dark shadow-none" onclick="splitBillPrepPayAufRechnung(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Auf Rechnung</button>';
+                                                    }else{
+                          newClientLineShow +=        '<button id="splitBillBtn4'+i+'" style="width:49.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayAufRechnung(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Auf Rechnung</button>';
+                                                    }
+                          newClientLineShow +=        '<button id="splitBillBtn5'+i+'" style="width:49.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillOpenGCPay(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Geschenkkarte</button>'+
+                                                  '</div>'+
+                                              '</div>'+
+                                              '<div id="splitBillClientDiv2'+i+'" style="border-bottom:2px solid black;" class="d-flex flex-wrap justify-content-between pt-1 pb-2 alert-success">'+
+                                                  '<div style="width:100%;" id="splitBillClientDiv2_1'+i+'">'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Tipp: <span id="splitBillModalTippValueClient'+i+'">'+parseFloat(parseFloat(rechReturntips2D[i]).toFixed(2)).toFixed(2)+'</span> CHF</strong></p>';
+                                                      if(rechReturnGCAmt2D[i] > 0){
+                          newClientLineShow +=        '<p id="showGCApplyP'+i+'" style="margin-bottom: 3px; font-size:1.2rem;"><strong>Geschenkkarte: <span id="splitBillModalGCValueClientShow'+i+'">'+parseFloat(rechReturnGCAmt2D[i]).toFixed(2)+'</span> CHF</strong></p>';
+                                                      }
+                          newClientLineShow +=    '</div>'+
+                                                  '<div style="width:100%;" class="d-flex flex-wrap justify-content-between">'+
+                                                      '<input type="hidden" id="splitBillTippType'+i+'" value="0">'+
+                                                  '</div>'+
+                                                  '<input type="hidden" id="splitBillnitiateId'+i+'" value="'+respo2D[5]+'">'+
+                                                  '<input type="hidden" id="splitBillGCAppliedId'+i+'" value="'+rechReturnGCId2D[i]+'">'+
+                                                  '<input type="hidden" id="splitBillGCAppliedCHFVal'+i+'" value="'+rechReturnGCAmt2D[i]+'">'+
+                                              '</div>';
+                        }else{
+                          newClientLineShow = '<div id="splitBillClientDiv1'+i+'" class="d-flex flex-wrap justify-content-between pt-2">'+
+                                                  '<div style="width:100%;">'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Kunde '+(i + 1)+'</strong></p>'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Bezahlen <span id="splitBillModalPayValueClient'+i+'">'+parseFloat(respo2D[0]).toFixed(2)+'</span> CHF</strong></p>'+
+                                                  '</div>'+
+                                                  '<div id="splitBillClientDiv1_2'+i+'" style="width:100%;" class="d-flex flex-wrap justify-content-between">'+
+                                                      '<button id="splitBillBtn1'+i+'" style="width:33%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayBarInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')">Bar</button>'+
+                                                      '<button id="splitBillBtn2'+i+'" style="width:33%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayKarteInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\',\'none\')">Karte</button>'+
+                                                      '<button id="splitBillBtn3'+i+'" style="width:33%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayOnline(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Online</button>'+
+                                                      '<button id="splitBillBtn4'+i+'" style="width:49.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayAufRechnung(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')">Auf Rechnung</button>'+
+                                                      '<button id="splitBillBtn5'+i+'" style="width:49.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillOpenGCPay(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')">Geschenkkarte</button>'+
+                                                  '</div>'+
+                                              '</div>'+
+                                              '<div id="splitBillClientDiv2'+i+'" style="border-bottom:2px solid black;" class="d-flex flex-wrap justify-content-between pt-1 pb-2">'+
+                                                  '<div style="width:100%;" id="splitBillClientDiv2_1'+i+'">'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong><i style="color:red;" class="fa-solid fa-circle-xmark" id="cancelTippApplyBtn'+i+'" onclick="cancelTippApply(\''+i+'\')"></i> Tipp: <span id="splitBillModalTippValueClient'+i+'">'+parseFloat(0).toFixed(2)+'</span> CHF</strong></p>'+
+                                                  '</div>'+
+                                                  '<div style="width:100%;" class="d-flex flex-wrap justify-content-between">'+
+                                                      '<button id="splitBillTippBtn1'+i+'" style="width:24.8%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+0.5+'\')">'+parseFloat(0.5).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtn2'+i+'" style="width:24.8%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+1+'\')">'+parseFloat(1).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtn3'+i+'" style="width:24.8%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+2+'\')">'+parseFloat(2).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtn4'+i+'" style="width:24.8%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+5+'\')">'+parseFloat(5).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtn5'+i+'" style="width:24.8%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+10+'\')">'+parseFloat(10).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtnCostume'+i+'" style="width:74.4%; margin:0px;" type="button" class="btn btn-outline-dark shadow-none">'+
+                                                          '<input id="splitBillTippInputCostume'+i+'" step="0.05" min="0" id="tipWaiterCosVal" type="number" onkeyup="setCostumeTipStafSplitBill(\''+i+'\',this.value)" style="width:95%; border:none;" placeholder="Gesamt mit Tipp">'+
+                                                      '</button>'+
+                                                      '<input type="hidden" id="splitBillTippType'+i+'" value="0">'+
+                                                  '</div>'+
+                                                  '<div style="width: 100%; display:none;" class="mt-1 alert alert-danger text-center" id="splitTheBillError01'+i+'">'+
+                                                      '<strong>Geben Sie zuerst einen gültigen Wert ein!, Gesamtpreis nach dem Trinkgeld</strong>'+
+                                                  '</div>'+
+                                                  '<div id="splitTheBillPayAtPOS'+i+'" class="alert alert-info text-center mt-1" style="display:none; width:100%;">'+
+                                                      '<strong>Schließen Sie die Zahlung am POS-Terminal ab!</strong>'+
+                                                  '</div>'+
+                                                  '<input type="hidden" id="splitBillnitiateId'+i+'" value="'+respo2D[5]+'">'+
+                                                  '<input type="hidden" id="splitBillGCAppliedId'+i+'" value="0">'+
+                                                  '<input type="hidden" id="splitBillGCAppliedCHFVal'+i+'" value="0">'+
+                                              '</div>';
+                        }
+                          $('#splitTheBillInitiateModalBody').append(newClientLineShow);
+                      }
+
+                      $('#splitTheBillInitiateModalOriginalPriceShow').html(parseFloat(respo2D[3]).toFixed(2));
+                      $('#splitTheBillInitiateModalPayPriceShow').html(parseFloat(respo2D[4]).toFixed(2));
+                    }
+                  }
+
+
+
+
+
+                }else{
+                  if(response == 'invalideTable'){
+
+                  }else if(response == 'modalAlreadyShown'){
+
+                  }else{
+                    respo2D = response.split('|||');
+                    if( respo2D[9] == 2){
+
+                    }else{
+                      $('#tabOrder'+respo2D[1]).modal('hide');
+                      $('#splitTheBillInitiateModal').modal('show');
+                      $('#splitTheBillInitiateModalTableNr').html(respo2D[1]);
+                      $('#splitTheBillInitiateModalClientsNr').html(respo2D[2]);
+
+                      if( respo2D[9] == 0){
+                        $('#splitTheBillInitiateModalCancelBtn').remove();
+                      }else{
+                        $('#splitTheBillInitiateModalCancelBtn').attr('onclick','splitTheBillInitiateModalCancel("'+respo2D[5]+'")');
+                      }
+
+                      $('#splitTheBillInitiateModalBody').html('');
+
+                      $('body').addClass('modal-open');
+
+                      var rechReturnPayM = respo2D[6];
+                      var rechReturnPayM2D = rechReturnPayM.split('--88--');
+                      var rechReturntips = respo2D[7];
+                      var rechReturntips2D = rechReturntips.split('--88--');
+                      var rechReturnGCId = respo2D[10];
+                      var rechReturnGCId2D = rechReturnGCId.split('--88--');
+                      var rechReturnGCAmt = respo2D[11];
+                      var rechReturnGCAmt2D = rechReturnGCAmt.split('--88--');
+                      var newClientLineShow = "";
+                      console.log(respo2D[10]);
+                      console.log(respo2D[11]);
+                      for(var i = 0; i < respo2D[2]; i++) {
+                        if(respo2D[6] != '' && rechReturnPayM2D[i] !== undefined) {
+                          newClientLineShow = '<div id="splitBillClientDiv1'+i+'" class="d-flex justify-content-between pt-2 alert-success">'+
+                                                  '<div style="width:30%;">'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Kunde '+(i + 1)+'</strong></p>'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Bezahlen <span id="splitBillModalPayValueClient'+i+'">'+parseFloat(parseFloat(respo2D[8]) + parseFloat(rechReturntips2D[i])).toFixed(2)+'</span> CHF</strong></p>'+
+                                                  '</div>'+
+                                                  '<div id="splitBillClientDiv1_2'+i+'" style="width:70%;" class="d-flex flex-wrap justify-content-between">';
+                                                    if(rechReturnPayM2D[i] == 'Barzahlungen'){
+                          newClientLineShow +=       '<button id="splitBillBtn1'+i+'" style="width:19.5%;" class="btn btn-dark shadow-none" onclick="splitBillPayBarInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Bar</button>';
+                                                    }else{
+                          newClientLineShow +=        '<button id="splitBillBtn1'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayBarInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Bar</button>';
+                                                    }
+                                                    if(rechReturnPayM2D[i] == 'Kartenzahlung'){
+                          newClientLineShow +=       '<button id="splitBillBtn2'+i+'" style="width:19.5%;" class="btn btn-dark shadow-none" onclick="splitBillPayKarteInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\',\'none\')" disabled>Karte</button>';
+                                                    }else{
+                          newClientLineShow +=        '<button id="splitBillBtn2'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayKarteInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\',\'none\')" disabled>Karte</button>';
+                                                    }
+
+                          newClientLineShow +=        '<button id="splitBillBtn3'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayOnline(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Online</button>';
+                                                    
+                                                    if(rechReturnPayM2D[i] == 'Auf rechnung'){
+                          newClientLineShow +=       '<button id="splitBillBtn4'+i+'" style="width:19.5%;" class="btn btn-dark shadow-none" onclick="splitBillPrepPayAufRechnung(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Auf Rechnung</button>';
+                                                    }else{
+                          newClientLineShow +=        '<button id="splitBillBtn4'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayAufRechnung(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Auf Rechnung</button>';
+                                                    }
+                          newClientLineShow +=        '<button id="splitBillBtn5'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillOpenGCPay(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Geschenkkarte</button>'+
+                                                  '</div>'+
+                                              '</div>'+
+                                              '<div id="splitBillClientDiv2'+i+'" style="border-bottom:2px solid black;" class="d-flex flex-wrap justify-content-between pt-1 pb-2 alert-success">'+
+                                                  '<div style="width:30%;" id="splitBillClientDiv2_1'+i+'">'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Tipp: <span id="splitBillModalTippValueClient'+i+'">'+parseFloat(parseFloat(rechReturntips2D[i]).toFixed(2)).toFixed(2)+'</span> CHF</strong></p>';
+                                                      if(rechReturnGCAmt2D[i] > 0){
+                          newClientLineShow +=        '<p id="showGCApplyP'+i+'" style="margin-bottom: 3px; font-size:1.2rem;"><strong>Geschenkkarte: <span id="splitBillModalGCValueClientShow'+i+'">'+parseFloat(rechReturnGCAmt2D[i]).toFixed(2)+'</span> CHF</strong></p>';
+                                                      }
+                          newClientLineShow +=    '</div>'+
+                                                  '<div style="width:70%;" class="d-flex flex-wrap justify-content-between">'+
+                                                      '<input type="hidden" id="splitBillTippType'+i+'" value="0">'+
+                                                  '</div>'+
+                                                  '<input type="hidden" id="splitBillnitiateId'+i+'" value="'+respo2D[5]+'">'+
+                                                  '<input type="hidden" id="splitBillGCAppliedId'+i+'" value="'+rechReturnGCId2D[i]+'">'+
+                                                  '<input type="hidden" id="splitBillGCAppliedCHFVal'+i+'" value="'+rechReturnGCAmt2D[i]+'">'+
+                                              '</div>';
+                        }else{
+                          newClientLineShow = '<div id="splitBillClientDiv1'+i+'" class="d-flex justify-content-between pt-2">'+
+                                                  '<div style="width:30%;">'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Kunde '+(i + 1)+'</strong></p>'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong>Bezahlen <span id="splitBillModalPayValueClient'+i+'">'+parseFloat(respo2D[0]).toFixed(2)+'</span> CHF</strong></p>'+
+                                                  '</div>'+
+                                                  '<div id="splitBillClientDiv1_2'+i+'" style="width:70%;" class="d-flex flex-wrap justify-content-between">'+
+                                                      '<button id="splitBillBtn1'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayBarInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')">Bar</button>'+
+                                                      '<button id="splitBillBtn2'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayKarteInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\',\'none\')">Karte</button>'+
+                                                      '<button id="splitBillBtn3'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayOnline(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled>Online</button>'+
+                                                      '<button id="splitBillBtn4'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayAufRechnung(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')">Auf Rechnung</button>'+
+                                                      '<button id="splitBillBtn5'+i+'" style="width:19.5%;" class="btn btn-outline-dark shadow-none" onclick="splitBillOpenGCPay(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')">Geschenkkarte</button>'+
+                                                  '</div>'+
+                                              '</div>'+
+                                              '<div id="splitBillClientDiv2'+i+'" style="border-bottom:2px solid black;" class="d-flex flex-wrap justify-content-between pt-1 pb-2">'+
+                                                  '<div style="width:30%;" id="splitBillClientDiv2_1'+i+'">'+
+                                                      '<p style="margin-bottom: 3px; font-size:1.2rem;"><strong><i style="color:red;" class="fa-solid fa-circle-xmark" id="cancelTippApplyBtn'+i+'" onclick="cancelTippApply(\''+i+'\')"></i> Tipp: <span id="splitBillModalTippValueClient'+i+'">'+parseFloat(0).toFixed(2)+'</span> CHF</strong></p>'+
+                                                  '</div>'+
+                                                  '<div style="width:70%;" class="d-flex flex-wrap justify-content-between">'+
+                                                      '<button id="splitBillTippBtn1'+i+'" style="width:16.6%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+0.5+'\')">'+parseFloat(0.5).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtn2'+i+'" style="width:16.6%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+1+'\')">'+parseFloat(1).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtn3'+i+'" style="width:16.6%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+2+'\')">'+parseFloat(2).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtn4'+i+'" style="width:16.6%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+5+'\')">'+parseFloat(5).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtn5'+i+'" style="width:16.6%;" class="btn btn-outline-dark shadow-none" onclick="setTipStafSplitBill(\''+i+'\',\''+10+'\')">'+parseFloat(10).toFixed(2)+'</button>'+
+                                                      '<button id="splitBillTippBtnCostume'+i+'" style="width:16.6%; margin:0px;" type="button" class="btn btn-outline-dark shadow-none">'+
+                                                          '<input id="splitBillTippInputCostume'+i+'" step="0.05" min="0" id="tipWaiterCosVal" type="number" onkeyup="setCostumeTipStafSplitBill(\''+i+'\',this.value)" style="width:95%; border:none;" placeholder="Gesamt mit Tipp">'+
+                                                      '</button>'+
+                                                      '<input type="hidden" id="splitBillTippType'+i+'" value="0">'+
+                                                  '</div>'+
+                                                  '<div style="width: 100%; display:none;" class="mt-1 alert alert-danger text-center" id="splitTheBillError01'+i+'">'+
+                                                      '<strong>Geben Sie zuerst einen gültigen Wert ein!, Gesamtpreis nach dem Trinkgeld</strong>'+
+                                                  '</div>'+
+                                                  '<div id="splitTheBillPayAtPOS'+i+'" class="alert alert-info text-center mt-1" style="display:none; width:100%;">'+
+                                                      '<strong>Schließen Sie die Zahlung am POS-Terminal ab!</strong>'+
+                                                  '</div>'+
+                                                  '<input type="hidden" id="splitBillnitiateId'+i+'" value="'+respo2D[5]+'">'+
+                                                  '<input type="hidden" id="splitBillGCAppliedId'+i+'" value="0">'+
+                                                  '<input type="hidden" id="splitBillGCAppliedCHFVal'+i+'" value="0">'+
+                                              '</div>';
+                        }
+                          $('#splitTheBillInitiateModalBody').append(newClientLineShow);
+                      }
+
+                      $('#splitTheBillInitiateModalOriginalPriceShow').html(parseFloat(respo2D[3]).toFixed(2));
+                      $('#splitTheBillInitiateModalPayPriceShow').html(parseFloat(respo2D[4]).toFixed(2));
+                    }
+                  }
+                }
+              }
+						},
+						error: (error) => { console.log(error); }
+					});
+        </script>
+
+
+
+
+
+
+
   </body>
 </html>
