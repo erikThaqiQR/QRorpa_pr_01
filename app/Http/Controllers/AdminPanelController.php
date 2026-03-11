@@ -76,6 +76,7 @@ use App\tablesAccessToWaiters;
 use App\billsExpensesRecordRes;
 use App\rechnungClientForMonth;
 use App\accessControllForAdmins;
+use App\displayAddForUser;
 use App\Events\ActiveAdminPanel;
 use App\tabVerificationPNumbers;
 use App\Events\removePaidProduct;
@@ -6331,5 +6332,153 @@ EPD
         }else{
             return 'No';
         }
+    }
+
+
+
+    public function reRegisterProdsToTab(Request $req){
+        // tableNr: tNr,
+        // tabOrderSelected: $('#closeOrSelected'+tNr).val(),
+
+        // Add as a tab order 
+        $tableOfRes = TableQrcode::where([['tableNr',$req->tableNr],['Restaurant',Auth::user()->sFor]])->first();
+        if($tableOfRes->kaTab != 0 && $tableOfRes->kaTab != -1){
+            $tabCodeN = $tableOfRes->kaTab;
+        }else{
+            $tabCodeN = $this->genTheNewTabCode();
+            $tableOfRes->kaTab = $tabCodeN;
+            $tableOfRes->save();
+        }
+        // ---------------------------------------------
+
+        $showProdDataAll = "none";
+
+        // 1996-8-1||1997-8-1||1995-8-1||2000-8-3
+        foreach(explode('||',$req->tabOrderSelected) as $selTabOne){
+            // Process each selected tab order
+            $tabOrSelOne2D = explode('-8-',$selTabOne);
+            $thisTabOr = TabOrder::find($tabOrSelOne2D[0]);
+
+            $newTabOrder = new TabOrder;
+            $newTabOrder->tabCode = $thisTabOr->tabCode;
+            $newTabOrder->prodId = $thisTabOr->prodId;
+            $newTabOrder->OrderEmri = $thisTabOr->OrderEmri;
+            $newTabOrder->tableNr = $thisTabOr->tableNr;
+            $newTabOrder->toRes = $thisTabOr->toRes;
+            $newTabOrder->OrderPershkrimi= $thisTabOr->OrderPershkrimi;
+            $newTabOrder->OrderSasia = (int)$tabOrSelOne2D[1];
+            $newTabOrder->OrderSasiaDone = 0;
+            $newTabOrder->OrderQmimi = number_format($thisTabOr->OrderQmimi, 2, '.', '');
+            $newTabOrder->OrderExtra = $thisTabOr->OrderExtra;
+            $newTabOrder->OrderType = $thisTabOr->OrderType;
+            $newTabOrder->OrderKomenti = $thisTabOr->OrderKomenti;
+            $newTabOrder->status = 0;
+            $newTabOrder->toPlate = $thisTabOr->toPlate;
+            $newTabOrder->abrufenStat = 0;
+            $newTabOrder->usrPhNr = '0770000000';
+            $newTabOrder->save();
+
+            // waiter LOG
+            $waLog = new waiterActivityLog();
+            $waLog->waiterId = Auth::User()->id;
+            $waLog->actType = 'newProdWa';
+            $waLog->actId = $newTabOrder->id;
+            $waLog->save();
+            // ----------------------------------------------------
+
+            // Save the number ....
+            $newNrVerification = new tabVerificationPNumbers;
+            $newNrVerification->phoneNr = '0770000000';
+            $newNrVerification->tabCode = $tabCodeN;
+            $newNrVerification->tabOrderId = $newTabOrder->id;
+            $newNrVerification->status = 1;
+            $newNrVerification->save();
+            // ----------------------------------------------------
+
+            // Send Notifications for the Admin
+            foreach(User::where([['sFor',$thisTabOr->toRes],['role','5']])->get() as $user){
+                if($user->id != auth()->user()->id){
+                    $details = [
+                        'id' => $newTabOrder->id,
+                        'type' => 'AdminUpdateOrdersP',
+                        'tableNr' => $thisTabOr->tableNr
+                    ];
+                    $user->notify(new \App\Notifications\NewOrderNotification($details));
+
+                    if(newOrdersAdminAlert::where([['adminId',$user->id],['tableNr',$thisTabOr->tableNr],['tabOrderId',$newTabOrder->id],['statActive','1']])->first() == NULL){
+                        $newAdmAlert = new newOrdersAdminAlert();
+                        $newAdmAlert->adminId = $user->id;
+                        $newAdmAlert->tableNr = $thisTabOr->tableNr;
+                        $newAdmAlert->toRes = $thisTabOr->toRes;
+                        $newAdmAlert->tabOrderId = $newTabOrder->id;
+                        $newAdmAlert->statActive = 1;
+                        $newAdmAlert->save();
+                    }
+                }
+            }
+
+            foreach(User::where([['sFor',$thisTabOr->toRes],['role','55']])->get() as $oneWaiter){
+                if($oneWaiter->id != auth()->user()->id){
+                    $aToTable = tablesAccessToWaiters::where([['waiterId',$oneWaiter->id],['tableNr', $thisTabOr->tableNr]])->first();
+                    if($aToTable != NULL && $aToTable->statusAct == 1){
+                        // register the notification ...
+                        $details = [
+                            'id' => $newTabOrder->id,
+                            'type' => 'AdminUpdateOrdersP',
+                            'tableNr' => $thisTabOr->tableNr
+                        ];
+                        $oneWaiter->notify(new \App\Notifications\NewOrderNotification($details));
+
+                        if(newOrdersAdminAlert::where([['adminId',$oneWaiter->id],['tableNr',$thisTabOr->tableNr],['tabOrderId',$newTabOrder->id],['statActive','1']])->first() == NULL){
+                            $newAdmAlert = new newOrdersAdminAlert();
+                            $newAdmAlert->adminId = $oneWaiter->id;
+                            $newAdmAlert->tableNr = $thisTabOr->tableNr;
+                            $newAdmAlert->toRes = $thisTabOr->toRes;
+                            $newAdmAlert->tabOrderId = $newTabOrder->id;
+                            $newAdmAlert->statActive = 1;
+                            $newAdmAlert->save();
+                        }
+                    }
+                }
+            }
+
+            // build the order showing array
+
+            if($newTabOrder->OrderKomenti == Null){$tabOrComm = 'empty';
+            }else{ $tabOrComm = $newTabOrder->OrderKomenti; }
+
+            $waLog = waiterActivityLog::where([['actType','newProdWa'],['actId',$newTabOrder->id]])->first();
+            if($waLog != Null ){ $waiterDataName = User::find($waLog->waiterId)->name; }else{ $waiterDataName = 'Administrator'; }
+
+            $thePlateOfTO = resPlates::find($newTabOrder->toPlate);
+            if($thePlateOfTO != Null){ $thePlate = $thePlateOfTO->nameTitle;
+            }else{ $thePlate = 'none'; }
+
+            if($newTabOrder->OrderExtra != 'empty' && $newTabOrder->OrderExtra != Null){ $extraToShow = $newTabOrder->OrderExtra;
+            }else{ $extraToShow = 'empty'; }
+                                                                                                            
+            $showProdData = $thisTabOr->tableNr.'-||-'.$newTabOrder->id.'-||-'.$newTabOrder->TOstatus.'-||-'.$newTabOrder->OrderQmimi.'-||-'.
+            $newTabOrder->created_at.'-||-'.$newTabOrder->OrderSasia.'-||-'.$newTabOrder->OrderEmri.'-||-'.$newTabOrder->OrderPershkrimi.'-||-'.
+            $newTabOrder->OrderType.'-||-'.$tabOrComm.'-||-'.$waiterDataName.'-||-'.$thePlate.'-||-'.$newTabOrder->tabCode.'-||-'.$extraToShow.'-||-'.
+            $newTabOrder->OrderSasiaDone.'-||-'.$newTabOrder->usrPhNr.'-||-'.$newTabOrder->toPlate.'-||-'.$newTabOrder->abrufenStat;
+
+            if($showProdDataAll == 'none'){
+                $showProdDataAll = $showProdData;
+            }else{
+                $showProdDataAll .= '--|||--'.$showProdData;
+            }
+        }
+
+        return $showProdDataAll;
+    }
+
+
+
+    public function regNotShowVideoAd(Request $req){
+        $newIns = new displayAddForUser();
+        $newIns->toUser = Auth::user()->id;
+        $newIns->status = 0;
+        $newIns->forVideo = 'addReRegisterGifOptimize.gif';
+        $newIns->save();
     }
 }

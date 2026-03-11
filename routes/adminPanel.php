@@ -32,6 +32,10 @@ Route::get('recomendet', 'AdminPanelController@recomendet')->name('dash.recom');
 
 Route::get('Rechnungsverwaltung', 'AdminPanelController@RechnungsverwaltungPage')->name('dash.rechnungPage');
 
+Route::post('reRegisterProdsToTab', 'AdminPanelController@reRegisterProdsToTab')->name('dash.reRegisterProdsToTab');
+
+Route::post('regNotShowVideoAd', 'AdminPanelController@regNotShowVideoAd')->name('dash.regNotShowVideoAd');
+
 // Most Sales
 
 Route::get('generateMostSalesPDF', 'AdminPanelController@generateMostSalesPDF')->name('adminP.generateMostSalesPDF');

@@ -74,7 +74,7 @@ use App\waiterActivityLog;
                         <strong>Bezahlen</strong>
                     </button>
 
-                    <button style="width:24.6%;" class="btn btn-success shadow-none" data-toggle="modal" data-target="#newTabOrderModal" onclick="openNewTabOrderModalFromATOM('{{$tabelOne->tableNr}}')">
+                    <button style="width:24.6%;" class="btn btn-success shadow-none" onclick="openNewTabOrderModalFromATOM('{{$tabelOne->tableNr}}')">
                         <strong><i class="fa-solid fa-plus"></i></strong>
                     </button>
 

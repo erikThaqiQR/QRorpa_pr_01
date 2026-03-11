@@ -1234,7 +1234,7 @@ EPD
 
 
     public function splitBillCallUnfinishedBill(Request $req){
-        $sbInitiate = splitBillLogInitiate::where('workerId',Auth::user()->id)->orderByDesc('id')->first();
+        $sbInitiate = splitBillLogInitiate::where('workerId',Auth::user()->id)->whereDate('created_at', Carbon::today())->orderByDesc('id')->first();
         if($sbInitiate == Null){
             return 'InstanceNotFound';
         }else if($sbInitiate->cancelStatus == 1){

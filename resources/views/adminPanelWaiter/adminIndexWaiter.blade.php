@@ -11,6 +11,7 @@
     use Carbon\Carbon;
     use App\accessControllForAdmins;
     use App\tablesAccessToWaiters;
+    use App\displayAddForUser;
     
     use Jenssegers\Agent\Agent;
     $agent = new Agent();
@@ -322,6 +323,52 @@
             </div>
 
         @elseif($agent->isMobile() && !$agent->isTablet())
+
+                                        <!-- MMobile & Tablet -->
+                                        <div class="modal" id="showNewsVideoModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog .modal-sm" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                            <h5 class="modal-title" id="exampleModalLabel"></h5>
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="registerVideoNotShow()">
+                                                <span aria-hidden="true" style="color: red;"><strong>Mach s'Video zue</strong></span>
+                                            </button>
+                                            </div>
+                                            <div class="modal-body">
+                                            <img style="width:100%; height:auto;" src="storage/gifs/addReRegisterGifOptimize.gif" alt="">
+                                            </div>
+                                        
+                                        </div>
+                                        </div>
+                                    </div>
+                                    <script>
+                                        function registerVideoNotShow(){
+                                        $.ajax({
+                                            method: 'post',
+                                            url: '{{ route("dash.regNotShowVideoAd") }}',
+                                            data: {
+                                            _token: '{{csrf_token()}}'
+                                            },
+                                            success: (response) => {
+                                            // console.log(response);
+                                            },
+                                            error: (error) => { console.log(error); }
+                                        });
+                                        }
+                                    </script>
+                                    @if(displayAddForUser::where('toUser',Auth::user()->id)->first() == Null)
+                                        <script>
+                                        $(document).ready(function(){
+                                            $('#showNewsVideoModal').modal('show');
+                                        });
+                                        </script>
+                                    @endif
+
+
+
+
+
+
             <div id="allTel">
                 <!-- New order alert for other pages TEL -->
                 <div class="alert alert-success p-2 mt-4" role="alert" style="position:fixed; width:96%; left:2%; z-index:100; border: 2px solid rgb(39,190,175); display:none;" id="adminPAlertWindowTel">
