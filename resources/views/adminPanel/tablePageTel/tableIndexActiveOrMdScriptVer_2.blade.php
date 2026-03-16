@@ -955,6 +955,8 @@
 
                             $("#tabOrderBody"+tNr).load(location.href+" #tabOrderBody"+tNr+">*","");
                             $("#tabOrderTopBar1"+tNr).load(location.href+" #tabOrderTopBar1"+tNr+">*","");
+
+                            $('#closeOrSelected'+tNr).val('0');
                         // -------------------------------------------------------------
                     },
 					error: (error) => { console.log(error); }
