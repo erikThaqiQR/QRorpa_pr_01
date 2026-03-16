@@ -7,7 +7,7 @@
     use Illuminate\Support\Facades\Auth;
     use App\TableQrcode;
     use Carbon\Carbon;
-use PhpParser\Node\Stmt\Break_;
+    use PhpParser\Node\Stmt\Break_;
 
     if (session_status() == PHP_SESSION_NONE) {session_start();}
     if(isset($_SESSION['ResRez'])){
@@ -29,6 +29,27 @@ use PhpParser\Node\Stmt\Break_;
     else{ $yearCountAdd2 = $yearCountAdd1; $monthCountAdd2 = $monthCountAdd1 + 1; }
 
 ?>
+
+
+
+    @if ($theResId == 58)
+        <!-- Modal -->
+        <div class="modal fade mt-5" id="res58BlockReservationsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content" style="border:2px solid rgb(39,190,175); border-radius:20px;">
+                    <div class="modal-body text-center">
+                        <p class="text-center" style="font-size:1.2rem;"><strong>Zurzeit haben wir geschlossen!</strong></p>
+                        <p class="text-center" style="color:rgb(39,190,175); font-size:1.2rem;"><strong>Vielen Dank für Ihr Verständnis.</strong></p>
+                        <i style="color:rgb(39,190,175);" class="text-center fas fa-3x fa-store-alt-slash"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            $('#res58BlockReservationsModal').modal('show');
+        </script>
+    @endif
 
 
 <input type="hidden" value="{{$theResId}}" id="theResId">
