@@ -80,74 +80,77 @@
     }
 
     function prepPaySelProds(tNr,resId){
-        $('#payAllBtn1Sel').prop('disabled', true);
-        $('#payAllBtn2Sel').prop('disabled', true);
-        $('#payAllBtn3Sel').prop('disabled', true);
-        $('#payAllBtn4Sel').prop('disabled', true);
+       
+            $('#payAllPhaseOneSel').modal('toggle');
+            $('#payAllBtn1Sel').prop('disabled', true);
+            $('#payAllBtn2Sel').prop('disabled', true);
+            $('#payAllBtn3Sel').prop('disabled', true);
+            $('#payAllBtn4Sel').prop('disabled', true);
 
-        $('#tabOrder'+tNr).modal('toggle');
-        $('#tabOrder'+tNr).removeClass('show');
-        $('body').attr('class','modal-open');
-        $('#payAllTableNrSel').val(tNr);
-        $('#prodsSelPaySel').val($('#closeOrSelected'+tNr).val());
+            $('#tabOrder'+tNr).modal('toggle');
+            $('#tabOrder'+tNr).removeClass('show');
+            $('body').attr('class','modal-open');
+            $('#payAllTableNrSel').val(tNr);
+            $('#prodsSelPaySel').val($('#closeOrSelected'+tNr).val());
 
-        $.ajax({
-			url: '{{ route("admin.paySelFetchOrders") }}',
-            dataType: 'json',
-			method: 'post',
-			data: {
-				tNr: tNr,
-				resId: resId,
-                selProds : $('#prodsSelPaySel').val(),
-				_token: '{{csrf_token()}}'
-			},
-			success: (respo) => {
-                var totPay = parseFloat(0);
-                var sasiaSelected = 0;
-                var selectedItems = $('#closeOrSelected'+tNr).val();
-                $.each(respo, function(index, value){
-                    $.each(selectedItems.split('||'), function( index2, selectedItemsOne ) {
-                        var selectedItemsOne2D = selectedItemsOne.split('-8-');
-                        if(value.id == selectedItemsOne2D[0]){
-                            sasiaSelected = selectedItemsOne2D[1];
-                        }
+            $.ajax({
+                url: '{{ route("admin.paySelFetchOrders") }}',
+                dataType: 'json',
+                method: 'post',
+                data: {
+                    tNr: tNr,
+                    resId: resId,
+                    selProds : $('#prodsSelPaySel').val(),
+                    _token: '{{csrf_token()}}'
+                },
+                success: (respo) => {
+                    var totPay = parseFloat(0);
+                    var sasiaSelected = 0;
+                    var selectedItems = $('#closeOrSelected'+tNr).val();
+                    $.each(respo, function(index, value){
+                        $.each(selectedItems.split('||'), function( index2, selectedItemsOne ) {
+                            var selectedItemsOne2D = selectedItemsOne.split('-8-');
+                            if(value.id == selectedItemsOne2D[0]){
+                                sasiaSelected = selectedItemsOne2D[1];
+                            }
+                        });
+                        var priceForOne = parseFloat(parseFloat(value.OrderQmimi)/parseFloat(value.OrderSasia)).toFixed(2);
+                        var thisOrQmimi = parseFloat(parseFloat(priceForOne)*parseFloat(sasiaSelected)).toFixed(2)
+
+                        $('#payAllPhaseOneDiv1Sel').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-left">'+sasiaSelected+'x '+value.OrderEmri+'</p>');
+                        $('#payAllPhaseOneDiv1Sel').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-right">CHF '+parseFloat(thisOrQmimi).toFixed(2)+'</p>');
+                        totPay += parseFloat(thisOrQmimi);
                     });
-                    var priceForOne = parseFloat(parseFloat(value.OrderQmimi)/parseFloat(value.OrderSasia)).toFixed(2);
-                    var thisOrQmimi = parseFloat(parseFloat(priceForOne)*parseFloat(sasiaSelected)).toFixed(2)
-
-                    $('#payAllPhaseOneDiv1Sel').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-left">'+sasiaSelected+'x '+value.OrderEmri+'</p>');
-                    $('#payAllPhaseOneDiv1Sel').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-right">CHF '+parseFloat(thisOrQmimi).toFixed(2)+'</p>');
-                    totPay += parseFloat(thisOrQmimi);
-                });
-                if($('#resTvshInput').val() == 0){
-                    var mwst = parseFloat(0);
-                }else{
-                    var mwst = parseFloat(totPay * 0.074930619);
-                }
-                $('#payAllPhaseOneDiv1Sel').append('<p style="width: 70%; margin-bottom:8px;" class="text-left"><strong>Total inkl.</strong></p>');
-                $('#payAllPhaseOneDiv1Sel').append('<p style="width: 30%; margin-bottom:8px;" class="text-right"><strong>CHF <span id="totAmProdsSel">'+parseFloat(totPay).toFixed(2)+'</span></strong></p>');
-                $('#payAllPhaseOneDiv1Sel').append('<p id="payAllPhaseOneDiv1TippPSel11" style="width: 70%; margin-top:-8px; margin-bottom:8px;" class="text-left"><strong>Tipp.</strong></p>');
-                $('#payAllPhaseOneDiv1Sel').append('<p id="payAllPhaseOneDiv1TippPSel12" style="width: 30%; margin-top:-8px; margin-bottom:8px;" class="text-right"><strong>CHF <span id="tippAmProdsSel">0.00</span></strong></p>');
-                $('#payAllPhaseOneDiv1Sel').append('<p id="payAllstaffDiscountShowSel01" style="width: 70%; margin-top:-8px; margin-bottom:8px;" class="text-left"><strong>Rabatt vom Personal.</strong></p>');
-                $('#payAllPhaseOneDiv1Sel').append('<p id="payAllstaffDiscountShowSel02" style="width: 30%; margin-top:-8px; margin-bottom:8px;" class="text-right"><strong>CHF <span id="staffDiscSpanSel">0.00</span></strong></p>');
-                $('#payAllPhaseOneDiv1Sel').append('<p id="payAllgiftCardDiscountShowSel01" style="width: 70%; margin-top:-8px; margin-bottom:8px;" class="text-left"><strong>Rabatt von der Geschenkkarte.</strong></p>');
-                $('#payAllPhaseOneDiv1Sel').append('<p id="payAllgiftCardDiscountShowSel02" style="width: 30%; margin-top:-8px; margin-bottom:8px;" class="text-right"><strong>CHF <span id="giftCardDiscSpanSel">0.00</span></strong></p>');
-                $('#payAllPhaseOneDiv1Sel').append('<p style="width: 70%; margin-top:-8px; margin-bottom:8px;" class="text-left"><strong>MwSt.</strong></p>');
-                if($('#resTvshInput').val() == 0){
-                    $('#payAllPhaseOneDiv1Sel').append('<p style="width: 30%; margin-top:-8px; margin-bottom:8px;" class="text-right"><strong>CHF <span id="tvshAmProdsSel">'+parseFloat(0).toFixed(2)+'</span> (<span id="tvshAmProdsPerventageSel">0.00</span> %)</strong></p>');
-                }else{
-                    $('#payAllPhaseOneDiv1Sel').append('<p style="width: 30%; margin-top:-8px; margin-bottom:8px;" class="text-right"><strong>CHF <span id="tvshAmProdsSel">'+parseFloat(mwst).toFixed(2)+'</span> (<span id="tvshAmProdsPerventageSel">8.10</span> %)</strong></p>');
-                }
-                $('#payAllPhaseOneDiv1Sel').append('<p id="payAllFinalPayShowSel01" style="width: 70%; margin-top:-8px; margin-bottom:8px; font-size:1.1rem;" class="text-left"><strong>Letzte Bezahlung.</strong></p>');
-                $('#payAllPhaseOneDiv1Sel').append('<p id="payAllFinalPayShowSel02" style="width: 30%; margin-top:-8px; margin-bottom:8px; font-size:1.1rem;" class="text-right"><strong>CHF <span id="finalPaySpanSel">'+parseFloat(totPay).toFixed(2)+'</span></strong></p>');
-                
-                $('#payAllBtn1Sel').prop('disabled', false);
-                $('#payAllBtn2Sel').prop('disabled', false);
-                $('#payAllBtn3Sel').prop('disabled', false);
-                $('#payAllBtn4Sel').prop('disabled', false);
-            },
-			error: (error) => { console.log(error); }
-		});
+                    if($('#resTvshInput').val() == 0){
+                        var mwst = parseFloat(0);
+                    }else{
+                        var mwst = parseFloat(totPay * 0.074930619);
+                    }
+                    $('#payAllPhaseOneDiv1Sel').append('<p style="width: 70%; margin-bottom:8px;" class="text-left"><strong>Total inkl.</strong></p>');
+                    $('#payAllPhaseOneDiv1Sel').append('<p style="width: 30%; margin-bottom:8px;" class="text-right"><strong>CHF <span id="totAmProdsSel">'+parseFloat(totPay).toFixed(2)+'</span></strong></p>');
+                    $('#payAllPhaseOneDiv1Sel').append('<p id="payAllPhaseOneDiv1TippPSel11" style="width: 70%; margin-top:-8px; margin-bottom:8px;" class="text-left"><strong>Tipp.</strong></p>');
+                    $('#payAllPhaseOneDiv1Sel').append('<p id="payAllPhaseOneDiv1TippPSel12" style="width: 30%; margin-top:-8px; margin-bottom:8px;" class="text-right"><strong>CHF <span id="tippAmProdsSel">0.00</span></strong></p>');
+                    $('#payAllPhaseOneDiv1Sel').append('<p id="payAllstaffDiscountShowSel01" style="width: 70%; margin-top:-8px; margin-bottom:8px;" class="text-left"><strong>Rabatt vom Personal.</strong></p>');
+                    $('#payAllPhaseOneDiv1Sel').append('<p id="payAllstaffDiscountShowSel02" style="width: 30%; margin-top:-8px; margin-bottom:8px;" class="text-right"><strong>CHF <span id="staffDiscSpanSel">0.00</span></strong></p>');
+                    $('#payAllPhaseOneDiv1Sel').append('<p id="payAllgiftCardDiscountShowSel01" style="width: 70%; margin-top:-8px; margin-bottom:8px;" class="text-left"><strong>Rabatt von der Geschenkkarte.</strong></p>');
+                    $('#payAllPhaseOneDiv1Sel').append('<p id="payAllgiftCardDiscountShowSel02" style="width: 30%; margin-top:-8px; margin-bottom:8px;" class="text-right"><strong>CHF <span id="giftCardDiscSpanSel">0.00</span></strong></p>');
+                    $('#payAllPhaseOneDiv1Sel').append('<p style="width: 70%; margin-top:-8px; margin-bottom:8px;" class="text-left"><strong>MwSt.</strong></p>');
+                    if($('#resTvshInput').val() == 0){
+                        $('#payAllPhaseOneDiv1Sel').append('<p style="width: 30%; margin-top:-8px; margin-bottom:8px;" class="text-right"><strong>CHF <span id="tvshAmProdsSel">'+parseFloat(0).toFixed(2)+'</span> (<span id="tvshAmProdsPerventageSel">0.00</span> %)</strong></p>');
+                    }else{
+                        $('#payAllPhaseOneDiv1Sel').append('<p style="width: 30%; margin-top:-8px; margin-bottom:8px;" class="text-right"><strong>CHF <span id="tvshAmProdsSel">'+parseFloat(mwst).toFixed(2)+'</span> (<span id="tvshAmProdsPerventageSel">8.10</span> %)</strong></p>');
+                    }
+                    $('#payAllPhaseOneDiv1Sel').append('<p id="payAllFinalPayShowSel01" style="width: 70%; margin-top:-8px; margin-bottom:8px; font-size:1.1rem;" class="text-left"><strong>Letzte Bezahlung.</strong></p>');
+                    $('#payAllPhaseOneDiv1Sel').append('<p id="payAllFinalPayShowSel02" style="width: 30%; margin-top:-8px; margin-bottom:8px; font-size:1.1rem;" class="text-right"><strong>CHF <span id="finalPaySpanSel">'+parseFloat(totPay).toFixed(2)+'</span></strong></p>');
+                    
+                    $('#payAllBtn1Sel').prop('disabled', false);
+                    $('#payAllBtn2Sel').prop('disabled', false);
+                    $('#payAllBtn3Sel').prop('disabled', false);
+                    $('#payAllBtn4Sel').prop('disabled', false);
+                },
+                error: (error) => { console.log(error); }
+            });
+    
     }
 
     function selectDiv2Sel(type){

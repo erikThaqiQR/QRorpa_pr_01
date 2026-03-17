@@ -31,6 +31,8 @@
 
                     // cancel orders selected -----------------------------------------------------
                     var selectedTOrs = $('#closeOrSelected'+tNr).val();
+                    $('#payAllProd'+tNr).show(1);
+                    $('#paySelProd'+tNr).hide(1);
                     $.each(selectedTOrs.split('||'), function( index, value ) {
                         if(value != ''){
                             var tOId = value.split('-')[0];

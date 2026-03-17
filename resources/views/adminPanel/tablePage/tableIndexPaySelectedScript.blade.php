@@ -92,16 +92,16 @@
         $('#prodsSelPaySel').val($('#closeOrSelected'+tNr).val());
 
         $.ajax({
-			url: '{{ route("admin.paySelFetchOrders") }}',
+            url: '{{ route("admin.paySelFetchOrders") }}',
             dataType: 'json',
-			method: 'post',
-			data: {
-				tNr: tNr,
-				resId: resId,
+            method: 'post',
+            data: {
+                tNr: tNr,
+                resId: resId,
                 selProds : $('#prodsSelPaySel').val(),
-				_token: '{{csrf_token()}}'
-			},
-			success: (respo) => {
+                _token: '{{csrf_token()}}'
+            },
+            success: (respo) => {
                 var totPay = parseFloat(0);
                 var sasiaSelected = 0;
                 var selectedItems = $('#closeOrSelected'+tNr).val();
@@ -147,8 +147,8 @@
                 $('#payAllBtn3Sel').prop('disabled', false);
                 $('#payAllBtn4Sel').prop('disabled', false);
             },
-			error: (error) => { console.log(error); }
-		});
+            error: (error) => { console.log(error); }
+        });
     }
 
     function selectDiv2Sel(type){
