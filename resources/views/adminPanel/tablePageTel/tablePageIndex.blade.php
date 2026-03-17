@@ -97,8 +97,15 @@ use App\restorantTablesToRoom;
 
 
 <div id="allTablePageDiv" style="width:100%; background-color:whitesmoke;" class="d-flex flex-wrap justify-content-start mt-3">
-  
-    @if(Auth::user()->sFor == 68)
+    @if(Auth::user()->sFor == 26 || Auth::user()->sFor == 44 || Auth::user()->sFor == 49)
+        @if($ri == 16 || $ri == 19 || $ri == 22 || $ri == 0)
+            @include('adminPanel.svgMap.res44_room16')
+        @elseif($ri == 17 || $ri == 20 || $ri == 23)
+            @include('adminPanel.svgMap.res44_room17')
+        @elseif($ri == 18 || $ri == 21 || $ri == 24)
+            @include('adminPanel.svgMap.res44_room18')
+        @endif
+    @elseif(Auth::user()->sFor == 68)
         @if($ri == 8 || $ri == 0)
             @include('adminPanel.svgMap.res68_room8')
         @elseif($ri == 9)
