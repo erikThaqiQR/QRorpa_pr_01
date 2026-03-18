@@ -8,11 +8,22 @@
         $dt = Carbon::now();
         $date = explode('-',$dt->toDateString());
     ?>
-    <p class="text-center mb-1" style="font-size:20px; color:rgb(72,81,87); font-weight:bold; width:33%;" id="oraTel">{{$dt->toTimeString()}}</p>
-
+   
+    <div style="width: 33%;">
+        <p class="text-center mb-1 mt-1" style="font-size:20px; color:rgb(72,81,87); font-weight:bold;" id="oraTel">{{$dt->toTimeString()}}</p>
+        <p class="text-center mb-1" style="font-size:20px; color:rgb(72,81,87); font-weight:bold;" id="dataTel">{{$date[2]}}.{{$date[1]}}</p>
+    </div>
+    
     <button style="width:33%;" data-toggle="modal" data-target="#PosPairModal" class="btn btn-outline-secondary shadow-none mt-2 mb-2" type="button">PayTec POS</button>
 
-    <p class="text-center mb-1" style="font-size:20px; color:rgb(72,81,87); font-weight:bold; width:33%;" id="dataTel">{{$date[2]}}.{{$date[1]}}</p>
+    <div style="width:33%; text-align:center;">
+        <p style="margin:0;">Automatisch bestätigen</p>
+        @if(Auth::user()->tableOrAutoConfirm == 1)
+        <input checked type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="xs" data-on="Ja" data-off="Nein" onchange="changeAutoConfOrStat()" id="autoAcceptOrdersToggle">
+        @else   
+        <input type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="xs" data-on="Ja" data-off="Nein" onchange="changeAutoConfOrStat()" id="autoAcceptOrdersToggle">
+        @endif
+    </div>
 </div>
 
 <div style="width:100%;" class="d-flex flex-wrap justify-content-between pl-2 pr-2">
@@ -143,6 +154,16 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:1%;">
                 $('#DisconnectToPaytecBtn').html('Beenden Sie die POD-Verbindung');
                 $('#DisconnectToPaytecBtn').prop('disabled', false);
             }
+        });
+    }
+
+    function changeAutoConfOrStat(){
+        $.ajax({
+            url: '{{ route("dash.changeAutoConfOrdTableStatus") }}',
+            method: 'post',
+            data: { _token: '{{csrf_token()}}' },
+            success: (res) => {},
+            error: (error) => { console.log(error); }
         });
     }
 </script>

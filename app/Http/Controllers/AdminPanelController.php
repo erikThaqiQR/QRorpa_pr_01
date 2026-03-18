@@ -576,7 +576,7 @@ EPD
             $newTabOrder->OrderExtra = $newExtraRegister;
             $newTabOrder->OrderType = ($req->types == '' ? 'empty' : $req->types);
             $newTabOrder->OrderKomenti = $req->komm;
-            $newTabOrder->status = 0;
+            $newTabOrder->status = Auth::user()->tableOrAutoConfirm;
             $newTabOrder->toPlate = $req->plate;
             $newTabOrder->abrufenStat = $abrufenStat;
 
@@ -689,15 +689,18 @@ EPD
                 }
             }
         }
-        // COOK NOTIFICATION
-        // foreach(User::where([['sFor',$req->resN],['role','54']])->get() as $oneCook){
-        //     $details = [
-        //         'id' => $newTabOrder->id,
-        //         'type' => 'AdminUpdateOrdersP',
-        //         'tableNr' => $req->tableN
-        //     ];
-        //     $oneCook->notify(new \App\Notifications\NewOrderNotification($details));   
-        // }
+
+        if(Auth::user()->tableOrAutoConfirm == 1){
+            // Send Notifications for the Cooks
+            foreach(User::where([['sFor',$newTabOrder->toRes],['role','54']])->get() as $oneCook){
+                $details = [
+                    'id' => $newTabOrder->id,
+                    'type' => 'AdminUpdateOrdersP',
+                    'tableNr' => $newTabOrder->tableNr
+                ];
+                $oneCook->notify(new \App\Notifications\NewOrderNotification($details));
+            }
+        }
 
         if($newTabOrder->OrderKomenti == Null){$tabOrComm = 'empty';
         }else{ $tabOrComm = $newTabOrder->OrderKomenti; }
@@ -712,7 +715,7 @@ EPD
         if($newTabOrder->OrderExtra != 'empty' && $newTabOrder->OrderExtra != Null){ $extraToShow = $newTabOrder->OrderExtra;
         }else{ $extraToShow = 'empty'; }
                                                                                                 
-        $showProdData = $req->tableN.'-||-'.$newTabOrder->id.'-||-'.$newTabOrder->TOstatus.'-||-'.$newTabOrder->OrderQmimi.'-||-'.
+        $showProdData = $req->tableN.'-||-'.$newTabOrder->id.'-||-'.$newTabOrder->status.'-||-'.$newTabOrder->OrderQmimi.'-||-'.
         $newTabOrder->created_at.'-||-'.$newTabOrder->OrderSasia.'-||-'.$newTabOrder->OrderEmri.'-||-'.$newTabOrder->OrderPershkrimi.'-||-'.
         $newTabOrder->OrderType.'-||-'.$tabOrComm.'-||-'.$waiterDataName.'-||-'.$thePlate.'-||-'.$newTabOrder->tabCode.'-||-'.$extraToShow.'-||-'.
         $newTabOrder->OrderSasiaDone.'-||-'.$newTabOrder->usrPhNr.'-||-'.$newTabOrder->toPlate.'-||-'.$newTabOrder->abrufenStat;
@@ -2613,8 +2616,8 @@ EPD
         $newTabOrder->OrderQmimi= (Float)$addThPro->qmimi*$addThProSasia;
         $newTabOrder->OrderExtra= 'empty';
         $newTabOrder->OrderType= 'empty';
-        $newTabOrder->OrderKomenti= NULL;
-        $newTabOrder->status = 0;
+        $newTabOrder->OrderKomenti= NULL; 
+        $newTabOrder->status = Auth::user()->tableOrAutoConfirm;
 
         $theProduIns = Produktet::find($requ->pid);
         $theKategIns = kategori::find($theProduIns->kategoria);
@@ -2728,6 +2731,17 @@ EPD
                 }
             }
         }
+        if(Auth::user()->tableOrAutoConfirm == 1){
+            // Send Notifications for the Cooks
+            foreach(User::where([['sFor',$newTabOrder->toRes],['role','54']])->get() as $oneCook){
+                $details = [
+                    'id' => $newTabOrder->id,
+                    'type' => 'AdminUpdateOrdersP',
+                    'tableNr' => $newTabOrder->tableNr
+                ];
+                $oneCook->notify(new \App\Notifications\NewOrderNotification($details));
+            }
+        }
     
         // build the order showing array
 
@@ -2744,7 +2758,7 @@ EPD
         if($newTabOrder->OrderExtra != 'empty' && $newTabOrder->OrderExtra != Null){ $extraToShow = $newTabOrder->OrderExtra;
         }else{ $extraToShow = 'empty'; }
                                                                                                            
-        $showProdData = $requ->tNr.'-||-'.$newTabOrder->id.'-||-'.$newTabOrder->TOstatus.'-||-'.$newTabOrder->OrderQmimi.'-||-'.
+        $showProdData = $requ->tNr.'-||-'.$newTabOrder->id.'-||-'.$newTabOrder->status.'-||-'.$newTabOrder->OrderQmimi.'-||-'.
         $newTabOrder->created_at.'-||-'.$newTabOrder->OrderSasia.'-||-'.$newTabOrder->OrderEmri.'-||-'.$newTabOrder->OrderPershkrimi.'-||-'.
         $newTabOrder->OrderType.'-||-'.$tabOrComm.'-||-'.$waiterDataName.'-||-'.$thePlate.'-||-'.$newTabOrder->tabCode.'-||-'.$extraToShow.'-||-'.
         $newTabOrder->OrderSasiaDone.'-||-'.$newTabOrder->usrPhNr.'-||-'.$newTabOrder->toPlate.'-||-'.$newTabOrder->abrufenStat;
@@ -2807,7 +2821,7 @@ EPD
         $newTabOrder->OrderExtra= 'empty';
         $newTabOrder->OrderType= $theTypeToAdd->emri.'||'.$theTypeToAdd->vlera;
         $newTabOrder->OrderKomenti= NULL;
-        $newTabOrder->status = 0;
+        $newTabOrder->status = Auth::user()->tableOrAutoConfirm;
 
         $theProduIns = Produktet::find($requ->pid);
         $theKategIns = kategori::find($theProduIns->kategoria);
@@ -2923,15 +2937,17 @@ EPD
                 }
             }
         }
-        // COOK NOTIFICATION
-        // foreach(User::where([['sFor',$requ->res],['role','54']])->get() as $oneCook){
-        //     $details = [
-        //         'id' => $newTabOrder->id,
-        //         'type' => 'AdminUpdateOrdersP',
-        //         'tableNr' => $requ->tNr
-        //     ];
-        //     $oneCook->notify(new \App\Notifications\NewOrderNotification($details));
-        // }
+        if(Auth::user()->tableOrAutoConfirm == 1){
+            // Send Notifications for the Cooks
+            foreach(User::where([['sFor',$newTabOrder->toRes],['role','54']])->get() as $oneCook){
+                $details = [
+                    'id' => $newTabOrder->id,
+                    'type' => 'AdminUpdateOrdersP',
+                    'tableNr' => $newTabOrder->tableNr
+                ];
+                $oneCook->notify(new \App\Notifications\NewOrderNotification($details));
+            }
+        }
 
         if($newTabOrder->OrderKomenti == Null){$tabOrComm = 'empty';
         }else{ $tabOrComm = $newTabOrder->OrderKomenti; }
@@ -2946,7 +2962,7 @@ EPD
         if($newTabOrder->OrderExtra != 'empty' && $newTabOrder->OrderExtra != Null){ $extraToShow = $newTabOrder->OrderExtra;
         }else{ $extraToShow = 'empty'; }
                                                                                                            
-        $showProdData = $requ->tNr.'-||-'.$newTabOrder->id.'-||-'.$newTabOrder->TOstatus.'-||-'.$newTabOrder->OrderQmimi.'-||-'.
+        $showProdData = $requ->tNr.'-||-'.$newTabOrder->id.'-||-'.$newTabOrder->status.'-||-'.$newTabOrder->OrderQmimi.'-||-'.
         $newTabOrder->created_at.'-||-'.$newTabOrder->OrderSasia.'-||-'.$newTabOrder->OrderEmri.'-||-'.$newTabOrder->OrderPershkrimi.'-||-'.
         $newTabOrder->OrderType.'-||-'.$tabOrComm.'-||-'.$waiterDataName.'-||-'.$thePlate.'-||-'.$newTabOrder->tabCode.'-||-'.$extraToShow.'-||-'.
         $newTabOrder->OrderSasiaDone.'-||-'.$newTabOrder->usrPhNr.'-||-'.$newTabOrder->toPlate.'-||-'.$newTabOrder->abrufenStat;
@@ -6083,7 +6099,7 @@ EPD
     public function plateForAbrufenExecuteAbrufen(Request $req){
         $tabOrAll = TabOrder::where([['toRes',Auth::user()->sFor],['tableNr',$req->tableNr],['toPlate',$req->plateId],['tabCode','!=','0']])->get();
         foreach($tabOrAll as $tOrder){
-            if($tOrder->abrufenStat != 1){
+            if($tOrder->abrufenStat != 1 && $tOrder->status == 1){
                 $tOrder->abrufenStat = 1;
                 $tOrder->save();
 
@@ -6212,7 +6228,7 @@ EPD
 
         $tabOrAll = TabOrder::whereIn('id',$tabOrToAbrufen)->get();
         foreach($tabOrAll as $tabOrToAbrufenOne){
-            if($tabOrToAbrufenOne->abrufenStat != 1){
+            if($tabOrToAbrufenOne->abrufenStat != 1 && $tabOrToAbrufenOne->status == 1){
                 $tabOrToAbrufenOne->abrufenStat = 1;
                 $tabOrToAbrufenOne->save();
 
@@ -6368,11 +6384,14 @@ EPD
             $newTabOrder->OrderPershkrimi= $thisTabOr->OrderPershkrimi;
             $newTabOrder->OrderSasia = (int)$tabOrSelOne2D[1];
             $newTabOrder->OrderSasiaDone = 0;
-            $newTabOrder->OrderQmimi = number_format($thisTabOr->OrderQmimi, 2, '.', '');
+
+            $ordeQmimiforOne = number_format($thisTabOr->OrderQmimi / $thisTabOr->OrderSasia, 2, '.', '');
+            $newTabOrder->OrderQmimi = number_format($ordeQmimiforOne * (int)$tabOrSelOne2D[1], 2, '.', '');
+
             $newTabOrder->OrderExtra = $thisTabOr->OrderExtra;
             $newTabOrder->OrderType = $thisTabOr->OrderType;
             $newTabOrder->OrderKomenti = $thisTabOr->OrderKomenti;
-            $newTabOrder->status = 0;
+            $newTabOrder->status = Auth::user()->tableOrAutoConfirm;
             $newTabOrder->toPlate = $thisTabOr->toPlate;
             $newTabOrder->abrufenStat = 0;
             $newTabOrder->usrPhNr = '0770000000';
@@ -6442,6 +6461,19 @@ EPD
                 }
             }
 
+            if(Auth::user()->tableOrAutoConfirm == 1){
+                // Send Notifications for the Cooks
+                foreach(User::where([['sFor',$newTabOrder->toRes],['role','54']])->get() as $oneCook){
+                    $details = [
+                        'id' => $newTabOrder->id,
+                        'type' => 'AdminUpdateOrdersP',
+                        'tableNr' => $newTabOrder->tableNr
+                    ];
+                    $oneCook->notify(new \App\Notifications\NewOrderNotification($details));
+                }
+            }
+    
+
             // build the order showing array
 
             if($newTabOrder->OrderKomenti == Null){$tabOrComm = 'empty';
@@ -6457,7 +6489,7 @@ EPD
             if($newTabOrder->OrderExtra != 'empty' && $newTabOrder->OrderExtra != Null){ $extraToShow = $newTabOrder->OrderExtra;
             }else{ $extraToShow = 'empty'; }
                                                                                                             
-            $showProdData = $thisTabOr->tableNr.'-||-'.$newTabOrder->id.'-||-'.$newTabOrder->TOstatus.'-||-'.$newTabOrder->OrderQmimi.'-||-'.
+            $showProdData = $thisTabOr->tableNr.'-||-'.$newTabOrder->id.'-||-'.$newTabOrder->status.'-||-'.$newTabOrder->OrderQmimi.'-||-'.
             $newTabOrder->created_at.'-||-'.$newTabOrder->OrderSasia.'-||-'.$newTabOrder->OrderEmri.'-||-'.$newTabOrder->OrderPershkrimi.'-||-'.
             $newTabOrder->OrderType.'-||-'.$tabOrComm.'-||-'.$waiterDataName.'-||-'.$thePlate.'-||-'.$newTabOrder->tabCode.'-||-'.$extraToShow.'-||-'.
             $newTabOrder->OrderSasiaDone.'-||-'.$newTabOrder->usrPhNr.'-||-'.$newTabOrder->toPlate.'-||-'.$newTabOrder->abrufenStat;
@@ -6480,5 +6512,16 @@ EPD
         $newIns->status = 0;
         $newIns->forVideo = 'addReRegisterGifOptimize.gif';
         $newIns->save();
+    }
+
+
+    public function changeAutoConfOrdTableStatus(Request $req){
+        $user = User::find(Auth::user()->id);
+        if($user->tableOrAutoConfirm == 1){
+            $user->tableOrAutoConfirm = 0;
+        }else{
+            $user->tableOrAutoConfirm = 1;
+        }
+        $user->save();
     }
 }

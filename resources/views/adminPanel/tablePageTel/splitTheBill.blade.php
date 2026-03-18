@@ -508,6 +508,7 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:5px;">
     }
     function closeSplitBillCashModal(){
         $("#splitBillCashBody").load(location.href+" #splitBillCashBody>*","");
+        $('body').addClass('modal-open');
     }
     function splitBillCashDel(){
         $('#splitBillamByClient').html('0.00');

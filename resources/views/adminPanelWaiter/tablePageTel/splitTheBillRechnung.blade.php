@@ -236,6 +236,7 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:5px;">
 
     function closeSplitBillRechnungModal(){
         $("#splitBillRechnungModal").load(location.href+" #splitBillRechnungModal>*","");
+        $('body').addClass('modal-open');
     }
 
     function splitBillselectClRechnungAll(clId){

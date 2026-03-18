@@ -15,28 +15,34 @@
         <!-- <div style="width:7.5%;">
         </div> -->
 
-        <div style="width:12%;" class="text-center">
+        <div style="width:7.5%;" class="text-center">
             <img  style="width:20%;" src="storage/images/tableSt_red.PNG" alt="NotFound"> 
             <br>
             <span style="font-size: 12px; width:100%;"><strong>{{__('adminP.newOrder')}}</strong><span>
         </div>
-        <div style="width:12%;" class="text-center">
+        <div style="width:7.5%;" class="text-center">
             <img  style="width:20%;" src="storage/images/tableSt_yellow.PNG" alt="NotFound"> 
             <br>
             <span style="font-size: 12px; width:100%;"><strong>{{__('adminP.tableOccupied')}}</strong></span>
         </div>
-        <div style="width:12%;" class="text-center">
+        <div style="width:7.5%;" class="text-center">
             <img  style="width:20%;" src="storage/images/tableSt_green.PNG" alt="NotFound"> 
             <br>
             <span style="font-size: 12px; width:100%;"><strong>{{__('adminP.pay')}}</strong></span>
         </div>
-        <div style="width:12%;" class="text-center">
+        <div style="width:7.5%;" class="text-center">
             <img  style="width:20%;" src="storage/images/tableSt_qrorpa.PNG" alt="NotFound"> 
             <br>
             <span style="font-size: 12px; width:100%;"><strong>{{__('adminP.free')}}</strong></span>
         </div>
-        <!-- <div style="width:7.5%;">
-        </div> -->
+        <div style="width:15%; text-align:center;">
+            <p style="margin:0;">Bestellige automatisch bestätigen</p>
+            @if(Auth::user()->tableOrAutoConfirm == 1)
+            <input checked type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="xs" data-on="Ja" data-off="Nein" onchange="changeAutoConfOrStat()" id="autoAcceptOrdersToggle">
+            @else   
+            <input type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="xs" data-on="Ja" data-off="Nein" onchange="changeAutoConfOrStat()" id="autoAcceptOrdersToggle">
+            @endif
+        </div>
         <?php
             use Carbon\Carbon;
             use App\payTecPair;
@@ -159,6 +165,16 @@
                 $('#DisconnectToPaytecBtn').html('Beenden Sie die POD-Verbindung');
                 $('#DisconnectToPaytecBtn').prop('disabled', false);
             }
+        });
+    }
+
+    function changeAutoConfOrStat(){
+        $.ajax({
+            url: '{{ route("dash.changeAutoConfOrdTableStatus") }}',
+            method: 'post',
+            data: { _token: '{{csrf_token()}}' },
+            success: (res) => {},
+            error: (error) => { console.log(error); }
         });
     }
 

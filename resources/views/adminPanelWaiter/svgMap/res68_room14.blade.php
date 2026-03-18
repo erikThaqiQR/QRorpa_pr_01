@@ -28,7 +28,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="{{$svgBoxSize1}} {{$svgBoxSize2}} {{$svgBoxSize3}} {{$svgBoxSize4}}">
 
   @foreach($svgObjAllK as $svgObjOne)
-    @if($svgObjOne->tableNr != 1000)
+    @if($svgObjOne->tableNr != 5000)
       <g id="tableIconDiv{{$svgObjOne->tableNr}}">
         <?php 
           $tabelOne = TableQrcode::where([['Restaurant',$svgObjOne->toRes],['tableNr',$svgObjOne->tableNr]])->first(); 

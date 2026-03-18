@@ -96,13 +96,13 @@ class OnlinePayFromStafController313233 extends Controller
                 'LanguageCode' => "en"
             ),
             'ReturnUrls' => array(
-                'Success' => "https://demo.qrorpa.ch/oPayFStafPayAllResRegOrd313233/?OPR=".$OnlinePayRegister2,
-                'Fail' => "https://demo.qrorpa.ch/?Res=".$oPForCl->resId."&t=".$oPForCl->tableNr
+                'Success' => "https://qrorpa.ch/oPayFStafPayAllResRegOrd313233/?OPR=".$OnlinePayRegister2,
+                'Fail' => "https://qrorpa.ch/?Res=".$oPForCl->resId."&t=".$oPForCl->tableNr
             ),
             'Notification' => array(
                 'PayerEmail' => "clientOnlinePay@qrorpa.ch",
                 'MerchantEmail' => "checkout@qrorpa.ch",
-                'NotifyUrl' => "https://demo.qrorpa.ch/?Res=".$oPForCl->resId."&t=".$oPForCl->tableNr
+                'NotifyUrl' => "https://qrorpa.ch/?Res=".$oPForCl->resId."&t=".$oPForCl->tableNr
             ),
         );
 
@@ -472,13 +472,13 @@ class OnlinePayFromStafController313233 extends Controller
                 'LanguageCode' => "en"
             ),
             'ReturnUrls' => array(
-                'Success' => "https://demo.qrorpa.ch/oPayFStafPaySelectedResRegOrd313233/?OPR=".$OnlinePayRegister2,
-                'Fail' => "https://demo.qrorpa.ch/?Res=".$oPForCl->resId."&t=".$oPForCl->tableNr
+                'Success' => "https://qrorpa.ch/oPayFStafPaySelectedResRegOrd313233/?OPR=".$OnlinePayRegister2,
+                'Fail' => "https://qrorpa.ch/?Res=".$oPForCl->resId."&t=".$oPForCl->tableNr
             ),
             'Notification' => array(
                 'PayerEmail' => "clientOnlinePay@qrorpa.ch",
                 'MerchantEmail' => "checkout@qrorpa.ch",
-                'NotifyUrl' => "https://demo.qrorpa.ch/?Res=".$oPForCl->resId."&t=".$oPForCl->tableNr
+                'NotifyUrl' => "https://qrorpa.ch/?Res=".$oPForCl->resId."&t=".$oPForCl->tableNr
             ),
         );
 
@@ -799,7 +799,7 @@ class OnlinePayFromStafController313233 extends Controller
         $file = "storage/OnlinePayStaf/".$name.".png";
 
         $qrCHashname = substr(implode($word), 0, 64);
-        $newQrcode = QRCode::URL('https://demo.qrorpa.ch/oPayFStafOpenOrder?ops='.$newOPStaf->id.'&h='.$qrCHashname)
+        $newQrcode = QRCode::URL('https://qrorpa.ch/oPayFStafOpenOrder?ops='.$newOPStaf->id.'&h='.$qrCHashname)
                     ->setSize(64)
                     ->setMargin(0)
                     ->setOutfile($file)
@@ -907,13 +907,13 @@ class OnlinePayFromStafController313233 extends Controller
                 'LanguageCode' => "en"
             ),
             'ReturnUrls' => array(
-                'Success' => "https://demo.qrorpa.ch/oPayFStafPayTakeawayRegOrd313233/?OPR=".$OnlinePayRegister2,
-                'Fail' => "https://demo.qrorpa.ch/?Res=".$oPForCl->resId."&t=".$oPForCl->tableNr
+                'Success' => "https://qrorpa.ch/oPayFStafPayTakeawayRegOrd313233/?OPR=".$OnlinePayRegister2,
+                'Fail' => "https://qrorpa.ch/?Res=".$oPForCl->resId."&t=".$oPForCl->tableNr
             ),
             'Notification' => array(
                 'PayerEmail' => "clientOnlinePay@qrorpa.ch",
                 'MerchantEmail' => "checkout@qrorpa.ch",
-                'NotifyUrl' => "https://demo.qrorpa.ch/?Res=".$oPForCl->resId."&t=".$oPForCl->tableNr
+                'NotifyUrl' => "https://qrorpa.ch/?Res=".$oPForCl->resId."&t=".$oPForCl->tableNr
             ),
         );
 

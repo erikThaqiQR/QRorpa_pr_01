@@ -68,6 +68,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.10.0/js/bootstrap-datepicker.min.js"></script>
   <script src="https://unpkg.com/gijgo@1.9.14/js/gijgo.min.js" type="text/javascript"></script>
   <link href="https://unpkg.com/gijgo@1.9.14/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+
+  <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
   
 <style>
     html, body{
@@ -395,7 +398,7 @@
               </button>
             </div>
             <div class="modal-body">
-              <img style="width:100%; height:auto;" src="storage/gifs/addReRegisterGifOptimize.gif" alt="">
+              <img style="width:100%; height:auto;" src="storage/gifs/autoConfirmTableOrders.gif" alt="">
             </div>
           
           </div>

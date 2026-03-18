@@ -36,6 +36,8 @@ Route::post('reRegisterProdsToTab', 'AdminPanelController@reRegisterProdsToTab')
 
 Route::post('regNotShowVideoAd', 'AdminPanelController@regNotShowVideoAd')->name('dash.regNotShowVideoAd');
 
+Route::post('changeAutoConfOrdTableStatus', 'AdminPanelController@changeAutoConfOrdTableStatus')->name('dash.changeAutoConfOrdTableStatus');
+
 // Most Sales
 
 Route::get('generateMostSalesPDF', 'AdminPanelController@generateMostSalesPDF')->name('adminP.generateMostSalesPDF');
