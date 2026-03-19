@@ -9,19 +9,19 @@
 
   $notiActi = explode('--||--',Auth::user()->notifySet);
 
-  $svgObjAllK = svgTableMapData::where([['toRes','44'],['toRoom','16'],['formShape','k']])->get();
-  $svgObjAllRR = svgTableMapData::where([['toRes','44'],['toRoom','16'],['formShape','rr']])->get();
+  $svgObjAllK = svgTableMapData::where([['toRes','73'],['toRoom','27'],['formShape','k']])->get();
+  $svgObjAllRR = svgTableMapData::where([['toRes','73'],['toRoom','27'],['formShape','rr']])->get();
 
   if(!$agent->isMobile()){
     $svgBoxSize1 = 0;
     $svgBoxSize2 = 0;
-    $svgBoxSize3 = 1403.1;
-    $svgBoxSize4 = 822.7;
+    $svgBoxSize3 = 969.198;
+    $svgBoxSize4 = 967.435;
   }else{
     $svgBoxSize1 = 0;
     $svgBoxSize2 = 0;
-    $svgBoxSize3 = 1403.1;
-    $svgBoxSize4 = 822.7;
+    $svgBoxSize3 = 969.198;
+    $svgBoxSize4 = 967.435;
   }
 ?>
 
@@ -103,10 +103,10 @@
       </g>
   @endforeach  
 
-  <rect x="876.867" y="26.435" width="117.015" height="100.026" style="stroke: rgb(0, 0, 0); stroke-width: 1; fill: rgb(51, 51, 51);" id="door"/>
-  <text style="fill: rgb(255, 255, 255); font-family: Arial, sans-serif; font-size: 40px; white-space: pre;" x="901.397" y="90.439">Tür</text>
-  <rect x="519.606" y="17.442" width="39.067" height="305.889" style="stroke: rgb(0, 0, 0); stroke-width: 1; fill: rgb(51, 51, 51);" id="block1"/>
-
+  <rect x="-0.3" y="-0.036" width="61.758" height="744.368" style="stroke: rgb(0, 0, 0); fill: rgb(65, 169, 79); stroke-width: 0px;" id="block1"/>
+  <rect x="58.522" y="-0.021" width="644.994" height="61.8" style="stroke: rgb(0, 0, 0); fill: rgb(65, 169, 79); stroke-width: 0;" id="block2"/>
+  <rect x="658.342" y="-0.337" width="61.758" height="744.368" style="stroke: rgb(0, 0, 0); fill: rgb(65, 169, 79); stroke-width: 0;" id="block3"/>
+ 
   @foreach($svgObjAllRR as $svgObjOne)
       <g id="tableIconDiv{{$svgObjOne->tableNr}}">
         <?php 

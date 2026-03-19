@@ -28,7 +28,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="{{$svgBoxSize1}} {{$svgBoxSize2}} {{$svgBoxSize3}} {{$svgBoxSize4}}">
 
   @foreach($svgObjAllK as $svgObjOne)
-    @if($svgObjOne->tableNr != 5000)
       <g id="tableIconDiv{{$svgObjOne->tableNr}}">
         <?php 
           $tabelOne = TableQrcode::where([['Restaurant',Auth::user()->sFor],['tableNr',$svgObjOne->tableNr]])->first(); 
@@ -102,7 +101,6 @@
           x="{{$xtableNr}}" y="{{$ytableNr}}">{{$tabelOne->tableNr}}</text>
         @endif 
       </g>
-    @endif
   @endforeach  
 
   <rect x="876.867" y="26.435" width="117.015" height="100.026" style="stroke: rgb(0, 0, 0); stroke-width: 1; fill: rgb(51, 51, 51);" id="door"/>

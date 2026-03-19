@@ -9,17 +9,16 @@
 
   $notiActi = explode('--||--',Auth::user()->notifySet);
 
-  $svgObjAllK = svgTableMapData::where([['toRes','44'],['toRoom','17'],['formShape','k']])->get();
-
+  $svgObjAllK = svgTableMapData::where([['toRes','73'],['toRoom','26'],['formShape','k']])->get();
   if(!$agent->isMobile()){
     $svgBoxSize1 = 0;
     $svgBoxSize2 = 0;
-    $svgBoxSize3 = 1403.1;
+    $svgBoxSize3 = 1241.549;
     $svgBoxSize4 = 822.7;
   }else{
     $svgBoxSize1 = 0;
     $svgBoxSize2 = 0;
-    $svgBoxSize3 = 1403.1;
+    $svgBoxSize3 = 1241.549;
     $svgBoxSize4 = 822.7;
   }
 ?>
@@ -58,7 +57,7 @@
             style="stroke: color(a98-rgb 1 1 1); fill: rgb(227, 232, 71);"/>
 
             <text onclick="setTabStat('{{$tabelOne->tableNr}}','{{$tabelOne->id}}','0')"
-            style="white-space: pre; fill: rgb(51, 51, 51); font-family: Arial, sans-serif; font-size: 50px;" 
+            style="white-space: pre; fill: rgb(51, 51, 51); font-family: Arial, sans-serif; font-size: 40px;" 
             x="{{$xtableNr}}" y="{{$ytableNr}}">{{$tabelOne->tableNr}}</text>
           @elseif(TabOrder::where([['tabCode',$tabelOne->kaTab],['status',0]])->count() > 0)
 
@@ -68,7 +67,7 @@
             style="stroke: color(a98-rgb 1 1 1); fill: rgb(255, 0, 0);"/>
 
             <text data-toggle="modal" data-target="#tabOrder{{$tabelOne->tableNr}}" onclick="checkForRebuildTable('{{$tabelOne->tableNr}}')"
-            style="white-space: pre; fill: rgb(51, 51, 51); font-family: Arial, sans-serif; font-size: 50px;"
+            style="white-space: pre; fill: rgb(51, 51, 51); font-family: Arial, sans-serif; font-size: 40px;"
             x="{{$xtableNr}}" y="{{$ytableNr}}">{{$tabelOne->tableNr}}</text>
           @else
             <rect data-toggle="modal" data-target="#tabOrder{{$tabelOne->tableNr}}" class="pointTable {{$hasAlert ? 'table-glow-adminAlert' : ''}}"
@@ -77,7 +76,7 @@
             style="stroke: color(a98-rgb 1 1 1); fill: rgb(227, 232, 71);"/>
 
             <text data-toggle="modal" data-target="#tabOrder{{$tabelOne->tableNr}}" onclick="checkForRebuildTable('{{$tabelOne->tableNr}}')"
-            style="white-space: pre; fill: rgb(51, 51, 51); font-family: Arial, sans-serif; font-size: 50px;"
+            style="white-space: pre; fill: rgb(51, 51, 51); font-family: Arial, sans-serif; font-size: 40px;"
             x="{{$xtableNr}}" y="{{$ytableNr}}">{{$tabelOne->tableNr}}</text>
           @endif
         @elseif($statLess1 == 1 || $statLess2 == 1 )
@@ -87,7 +86,7 @@
           style="stroke: color(a98-rgb 1 1 1); fill: rgb(8, 224, 37);"/>
 
           <text data-toggle="modal" data-target="#tabOrder{{$tabelOne->tableNr}}" onclick="checkForRebuildTable('{{$tabelOne->tableNr}}')"
-          style="white-space: pre; fill: rgb(51, 51, 51); font-family: Arial, sans-serif; font-size: 50px;"
+          style="white-space: pre; fill: rgb(51, 51, 51); font-family: Arial, sans-serif; font-size: 40px;"
           x="{{$xtableNr}}" y="{{$ytableNr}}">{{$tabelOne->tableNr}}</text>
         @else
           <rect data-toggle="modal" data-target="#newTabOrderModal" 
@@ -96,14 +95,16 @@
           style="stroke: color(a98-rgb 1 1 1); fill: rgb(39, 190, 175);"/>
 
           <text data-toggle="modal" data-target="#newTabOrderModal" onclick="openNewTabOrderModal('{{$tabelOne->tableNr}}')"
-          style="white-space: pre; fill: rgb(51, 51, 51); font-family: Arial, sans-serif; font-size: 50px;"
+          style="white-space: pre; fill: rgb(51, 51, 51); font-family: Arial, sans-serif; font-size: 40px;"
           x="{{$xtableNr}}" y="{{$ytableNr}}">{{$tabelOne->tableNr}}</text>
         @endif 
       </g>
   @endforeach  
 
-  <rect x="303.152" y="714.831" width="117.015" height="100.026" style="stroke: rgb(0, 0, 0); stroke-width: 1; fill: rgb(51, 51, 51);" id="door"/>
-  <text style="fill: rgb(255, 255, 255); font-family: Arial, sans-serif; font-size: 40px; white-space: pre;" x="332.465" y="777.194">Tür</text>
+  <rect y="161.534" width="8.561" height="528.375" style="stroke: rgb(0, 0, 0); transform-box: fill-box; transform-origin: 50% 50%;" x="165.099" transform="matrix(-0.707107, 0.707107, -0.704782, -0.709432, 889.124814, -234.097973)" id="block1"/>
+  <rect x="819.434" y="-1.198" width="55.129" height="190.715" style="stroke: rgb(0, 0, 0); stroke-width: 0px;" id="block2"/>
+  <rect x="350.84" y="564.99" width="43.209" height="262.233" style="stroke: rgb(0, 0, 0); stroke-width: 0;" id="block3"/>
+  <rect x="692.042" y="565" width="43.209" height="262.233" style="stroke: rgb(0, 0, 0); stroke-width: 0;" id="block4"/>
 
 </svg>
 

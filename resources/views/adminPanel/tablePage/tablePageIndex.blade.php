@@ -96,49 +96,64 @@ use App\restorantTablesToRoom;
         $showTablesIns = TableQrcode::whereIn('id',$tableIdToShow)->orderBy('tableNr')->get();
     ?>
 @else
-    <?php $showTablesIns = $allTables; ?>
+    <?php $showTablesIns = $allTables;
+    $ri = 0;?>
 @endif
 
 
 <div id="allTablePageDiv" style="width:100%;" class="d-flex flex-wrap justify-content-start mt-3">
-    @if(Auth::user()->sFor == 26 || Auth::user()->sFor == 44 || Auth::user()->sFor == 49)
-        @if($ri == 16 || $ri == 19 || $ri == 22 || $ri == 0)
-            @include('adminPanel.svgMap.res44_room16')
-        @elseif($ri == 17 || $ri == 20 || $ri == 23)
-            @include('adminPanel.svgMap.res44_room17')
-        @elseif($ri == 18 || $ri == 21 || $ri == 24)
-            @include('adminPanel.svgMap.res44_room18')
-        @endif
-    @elseif(Auth::user()->sFor == 68)
-        @if($ri == 8 || $ri == 0)
-            @include('adminPanel.svgMap.res68_room8')
-        @elseif($ri == 9)
-            @include('adminPanel.svgMap.res68_room9')
-        @elseif($ri == 10)
-            @include('adminPanel.svgMap.res68_room10')
-        @elseif($ri == 14)  
-            @include('adminPanel.svgMap.res68_room14')
-        @elseif($ri == 15)
-            @include('adminPanel.svgMap.res68_room15')
-        @endif
-    @elseif(Auth::user()->sFor == 69)
-        @if($ri == 11 || $ri == 0)
-            @include('adminPanel.svgMap.res69_room11')
-        @elseif($ri == 12)
-            @include('adminPanel.svgMap.res69_room12')
-        @elseif($ri == 13)
-            @include('adminPanel.svgMap.res69_room13')
-        @endif
-    @elseif(Auth::user()->sFor == 72)
-        @if($ri == 4 || $ri == 0)
-            @include('adminPanel.svgMap.res72_room4')
-        @elseif($ri == 5)
-            @include('adminPanel.svgMap.res72_room5')
-        @elseif($ri == 6)
-            @include('adminPanel.svgMap.res72_room6')
-        @elseif($ri == 7)
-            @include('adminPanel.svgMap.res72_room7')
-        @endif
+
+    @php
+        $sFor = Auth::user()->sFor;
+
+        $map = [
+            26 => [
+                16 => 'res44_room16', 19 => 'res44_room16', 22 => 'res44_room16', 0 => 'res44_room16',
+                17 => 'res44_room17', 20 => 'res44_room17', 23 => 'res44_room17',
+                18 => 'res44_room18', 21 => 'res44_room18', 24 => 'res44_room18',
+            ],
+            44 => [], // same as 26 (we'll reuse below)
+            49 => [], // same as 26 (we'll reuse below)
+
+            68 => [
+                8 => 'res68_room8', 0 => 'res68_room8',
+                9 => 'res68_room9',
+                10 => 'res68_room10',
+                14 => 'res68_room14',
+                15 => 'res68_room15',
+            ],
+
+            69 => [
+                11 => 'res69_room11', 0 => 'res69_room11',
+                12 => 'res69_room12',
+                13 => 'res69_room13',
+            ],
+
+            72 => [
+                4 => 'res72_room4', 0 => 'res72_room4',
+                5 => 'res72_room5',
+                6 => 'res72_room6',
+                7 => 'res72_room7',
+            ],
+
+            73 => [
+                25 => 'res73_room25', 0 => 'res73_room25',
+                26 => 'res73_room26',
+                27 => 'res73_room27',
+                28 => 'res73_room28',
+            ],
+        ];
+
+        // Reuse mapping for 44 and 49 same as 26
+        if (in_array($sFor, [44, 49])) { $map[$sFor] = $map[26]; }
+
+        $view = $map[$sFor][$ri] ?? null;
+    @endphp
+
+
+
+    @if($view)
+        @include("adminPanel.svgMap.$view")
     @else
         @foreach($showTablesIns as $tabelOne)
             <div id="tableIconDiv{{$tabelOne->tableNr}}" class="allTablesDes mb-2" style="width:5.5%; margin-right:0.821%; margin-left:0.821%;">
