@@ -194,6 +194,12 @@
                 <div id="payAllPhaseOneError3Sel" class="alert alert-danger text-center mt-1" style="display:none;">
                     <strong>Aktualisieren Sie die Seite, etwas stimmt nicht mit dem Programm!</strong>
                 </div>
+                <div id="payAllPhaseOnePayAtPOSSel" class="alert alert-info text-center mt-1" style="display:none; width:100%;">
+                    <strong>Schließen Sie die Zahlung am POS-Terminal ab!</strong>
+                    <br>
+                    <strong style="color:red">Schliessed Sie das Fänschter nöd und laded Sie d'Site nöd neu, susch wird d'POS-Transaktion abbroche.</strong>
+                </div>
+                
                 
                 <input type="hidden" id="payAllTableNrSel" value="0">
 

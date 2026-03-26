@@ -4085,163 +4085,163 @@ EPD
                 }
             }
 
-            foreach(TabOrder::where('created_at', '>', Carbon::now()->subMinutes(10)->toDateTimeString())->get() as $mvTOOne){
-                if(tabOrdersPassive::find($mvTOOne->id) == Null){
-                    $TOPassive = new tabOrdersPassive();
-                    $TOPassive->id = $mvTOOne->id;
-                    $TOPassive->tabCode = $mvTOOne->tabCode;
-                    $TOPassive->tableNr = $mvTOOne->tableNr;
-                    $TOPassive->toRes = $mvTOOne->toRes;
-                    $TOPassive->prodId = $mvTOOne->prodId;
-                    $TOPassive->OrderEmri = $mvTOOne->OrderEmri;
-                    $TOPassive->OrderPershkrimi = $mvTOOne->OrderPershkrimi;
-                    $TOPassive->OrderSasia = $mvTOOne->OrderSasia;
-                    $TOPassive->OrderSasiaDone = $mvTOOne->OrderSasiaDone;
-                    $TOPassive->OrderQmimi = $mvTOOne->OrderQmimi;
-                    $TOPassive->OrderExtra = $mvTOOne->OrderExtra;
-                    $TOPassive->OrderType = $mvTOOne->OrderType;
-                    $TOPassive->OrderKomenti = $mvTOOne->OrderKomenti;
-                    $TOPassive->status = $mvTOOne->status;
-                    $TOPassive->specStat = $mvTOOne->specStat;
-                    $TOPassive->toPlate = $mvTOOne->toPlate;
-                    $TOPassive->abrufenStat = $mvTOOne->abrufenStat;
-                    $TOPassive->orderServed = $mvTOOne->orderServed;
-                    $TOPassive->created_at = $mvTOOne->created_at;
-                    $TOPassive->updated_at = $mvTOOne->updated_at;
-                    $TOPassive->save();
-                }
-            }
-            foreach(TabOrder::where('created_at', '>', Carbon::now()->subMinutes(600)->toDateTimeString())->get() as $TOChange){
-                if(tabOrdersPassive::find($TOChange->id) != Null){
-                    $TabOrderPassive = tabOrdersPassive::find($TOChange->id);
-                    $TabOrderPassive->tabCode = $TOChange->tabCode;
-                    $TabOrderPassive->OrderSasiaDone = $TOChange->OrderSasiaDone;
-                    $TabOrderPassive->status = $TOChange->status;
-                    $TabOrderPassive->specStat = $TOChange->specStat;
-                    $TabOrderPassive->updated_at = $TOChange->updated_at;
-                    $TabOrderPassive->save();
-                }
-            }
-            foreach(TabOrder::all() as $TODelete){
-                if(tabOrdersPassive::find($TODelete->id) != Null && $TODelete->tabCode == 0){
-                    $TODelete->delete();
-                }
-            }
+            // foreach(TabOrder::where('created_at', '>', Carbon::now()->subMinutes(10)->toDateTimeString())->get() as $mvTOOne){
+            //     if(tabOrdersPassive::find($mvTOOne->id) == Null){
+            //         $TOPassive = new tabOrdersPassive();
+            //         $TOPassive->id = $mvTOOne->id;
+            //         $TOPassive->tabCode = $mvTOOne->tabCode;
+            //         $TOPassive->tableNr = $mvTOOne->tableNr;
+            //         $TOPassive->toRes = $mvTOOne->toRes;
+            //         $TOPassive->prodId = $mvTOOne->prodId;
+            //         $TOPassive->OrderEmri = $mvTOOne->OrderEmri;
+            //         $TOPassive->OrderPershkrimi = $mvTOOne->OrderPershkrimi;
+            //         $TOPassive->OrderSasia = $mvTOOne->OrderSasia;
+            //         $TOPassive->OrderSasiaDone = $mvTOOne->OrderSasiaDone;
+            //         $TOPassive->OrderQmimi = $mvTOOne->OrderQmimi;
+            //         $TOPassive->OrderExtra = $mvTOOne->OrderExtra;
+            //         $TOPassive->OrderType = $mvTOOne->OrderType;
+            //         $TOPassive->OrderKomenti = $mvTOOne->OrderKomenti;
+            //         $TOPassive->status = $mvTOOne->status;
+            //         $TOPassive->specStat = $mvTOOne->specStat;
+            //         $TOPassive->toPlate = $mvTOOne->toPlate;
+            //         $TOPassive->abrufenStat = $mvTOOne->abrufenStat;
+            //         $TOPassive->orderServed = $mvTOOne->orderServed;
+            //         $TOPassive->created_at = $mvTOOne->created_at;
+            //         $TOPassive->updated_at = $mvTOOne->updated_at;
+            //         $TOPassive->save();
+            //     }
+            // }
+            // foreach(TabOrder::where('created_at', '>', Carbon::now()->subMinutes(600)->toDateTimeString())->get() as $TOChange){
+            //     if(tabOrdersPassive::find($TOChange->id) != Null){
+            //         $TabOrderPassive = tabOrdersPassive::find($TOChange->id);
+            //         $TabOrderPassive->tabCode = $TOChange->tabCode;
+            //         $TabOrderPassive->OrderSasiaDone = $TOChange->OrderSasiaDone;
+            //         $TabOrderPassive->status = $TOChange->status;
+            //         $TabOrderPassive->specStat = $TOChange->specStat;
+            //         $TabOrderPassive->updated_at = $TOChange->updated_at;
+            //         $TabOrderPassive->save();
+            //     }
+            // }
+            // foreach(TabOrder::all() as $TODelete){
+            //     if(tabOrdersPassive::find($TODelete->id) != Null && $TODelete->tabCode == 0){
+            //         $TODelete->delete();
+            //     }
+            // }
 
 
-            foreach(tabVerificationPNumbers::where('created_at', '>', Carbon::now()->subMinutes(10)->toDateTimeString())->get() as $mvTVerNrOne){
-                if(tabVerificationPNumbersPassive::find($mvTVerNrOne->id) == Null){
-                    $tVerNrPassive = new tabVerificationPNumbersPassive();
-                    $tVerNrPassive->id = $mvTVerNrOne->id;
-                    $tVerNrPassive->phoneNr = $mvTVerNrOne->phoneNr;
-                    $tVerNrPassive->tabCode = $mvTVerNrOne->tabCode;
-                    $tVerNrPassive->tabOrderId = $mvTVerNrOne->tabOrderId;
-                    $tVerNrPassive->status = $mvTVerNrOne->status;
-                    $tVerNrPassive->specStat = $mvTVerNrOne->specStat;
-                    $tVerNrPassive->created_at = $mvTVerNrOne->created_at;
-                    $tVerNrPassive->updated_at = $mvTVerNrOne->updated_at;
-                    $tVerNrPassive->save();
-                }
-            }
-            foreach(tabVerificationPNumbers::where('created_at', '<', Carbon::now()->subDays(1)->toDateTimeString())->get() as $TVerNrDelete){
-                if(tabVerificationPNumbersPassive::find($TVerNrDelete->id) != Null){
-                    $TVerNrDelete->delete();
-                }
-            }
+            // foreach(tabVerificationPNumbers::where('created_at', '>', Carbon::now()->subMinutes(10)->toDateTimeString())->get() as $mvTVerNrOne){
+            //     if(tabVerificationPNumbersPassive::find($mvTVerNrOne->id) == Null){
+            //         $tVerNrPassive = new tabVerificationPNumbersPassive();
+            //         $tVerNrPassive->id = $mvTVerNrOne->id;
+            //         $tVerNrPassive->phoneNr = $mvTVerNrOne->phoneNr;
+            //         $tVerNrPassive->tabCode = $mvTVerNrOne->tabCode;
+            //         $tVerNrPassive->tabOrderId = $mvTVerNrOne->tabOrderId;
+            //         $tVerNrPassive->status = $mvTVerNrOne->status;
+            //         $tVerNrPassive->specStat = $mvTVerNrOne->specStat;
+            //         $tVerNrPassive->created_at = $mvTVerNrOne->created_at;
+            //         $tVerNrPassive->updated_at = $mvTVerNrOne->updated_at;
+            //         $tVerNrPassive->save();
+            //     }
+            // }
+            // foreach(tabVerificationPNumbers::where('created_at', '<', Carbon::now()->subDays(1)->toDateTimeString())->get() as $TVerNrDelete){
+            //     if(tabVerificationPNumbersPassive::find($TVerNrDelete->id) != Null){
+            //         $TVerNrDelete->delete();
+            //     }
+            // }
 
-            foreach(waiterActivityLog::all() as $waLoOne){
-                if(waiterActivityLogPassive::find($waLoOne->id) == Null){
-                    $waLoPass = new waiterActivityLogPassive();
-                    $waLoPass->id = $waLoOne->id;
-                    $waLoPass->waiterId = $waLoOne->waiterId;
-                    $waLoPass->actType = $waLoOne->actType;
-                    $waLoPass->actId = $waLoOne->actId;
-                    $waLoPass->sasia = $waLoOne->sasia;
-                    $waLoPass->save();
-                }
-            }
-            foreach(waiterActivityLog::where('created_at', '<', Carbon::now()->subMinutes(600)->toDateTimeString())->get() as $waLoOne){
-                if(waiterActivityLogPassive::find($waLoOne->id) != Null){
-                    $waLoOne->delete();
-                }
-            }
+            // foreach(waiterActivityLog::all() as $waLoOne){
+            //     if(waiterActivityLogPassive::find($waLoOne->id) == Null){
+            //         $waLoPass = new waiterActivityLogPassive();
+            //         $waLoPass->id = $waLoOne->id;
+            //         $waLoPass->waiterId = $waLoOne->waiterId;
+            //         $waLoPass->actType = $waLoOne->actType;
+            //         $waLoPass->actId = $waLoOne->actId;
+            //         $waLoPass->sasia = $waLoOne->sasia;
+            //         $waLoPass->save();
+            //     }
+            // }
+            // foreach(waiterActivityLog::where('created_at', '<', Carbon::now()->subMinutes(600)->toDateTimeString())->get() as $waLoOne){
+            //     if(waiterActivityLogPassive::find($waLoOne->id) != Null){
+            //         $waLoOne->delete();
+            //     }
+            // }
         }
     }
 
 
     public function checkForCopyOrdersToOrdersPassive(Request $req){
-        $changed = 0;
+        // $changed = 0;
 
-        $orders = Orders::where([['Restaurant',$req->resId],['created_at', '>', Carbon::now()->subMinutes(3)->toDateTimeString()]])->get();
-        foreach($orders as $orOne){
-            if(OrdersPassive::find($orOne->id) == Null){
-                $Orpassive = new OrdersPassive();
-                $Orpassive->id = $orOne->id;
-                $Orpassive->refId = $orOne->refId;
-                $Orpassive->Restaurant = $orOne->Restaurant;
-                $Orpassive->nrTable = $orOne->nrTable;
-                $Orpassive->statusi = $orOne->statusi;
-                $Orpassive->byId = $orOne->byId;
-                $Orpassive->userEmri = $orOne->userEmri;
-                $Orpassive->userEmail = $orOne->userEmail;
-                $Orpassive->userPhoneNr = $orOne->userPhoneNr;
-                $Orpassive->porosia = $orOne->porosia;
-                $Orpassive->freeProdId = $orOne->freeProdId;
-                $Orpassive->payM = $orOne->payM;
-                $Orpassive->shuma = $orOne->shuma;
-                $Orpassive->shifra = $orOne->shifra;
-                $Orpassive->tipPer = $orOne->tipPer;
-                $Orpassive->cuponOffVal = $orOne->cuponOffVal;
-                $Orpassive->cuponProduct = $orOne->cuponProduct;
-                $Orpassive->StatusBy = $orOne->StatusBy;
-                $Orpassive->cancelComm = $orOne->cancelComm;
-                $Orpassive->TAemri = $orOne->TAemri;
-                $Orpassive->TAmbiemri = $orOne->TAmbiemri;
-                $Orpassive->TAtime = $orOne->TAtime;
-                $Orpassive->TAplz = $orOne->TAplz;
-                $Orpassive->TAort = $orOne->TAort;
-                $Orpassive->TAaddress = $orOne->TAaddress;
-                $Orpassive->TAkoment = $orOne->TAkoment;
-                $Orpassive->inCashDiscount = $orOne->inCashDiscount;
-                $Orpassive->discReason = $orOne->discReason;
-                $Orpassive->inPercentageDiscount = $orOne->inPercentageDiscount;
-                $Orpassive->dicsountGcAmnt = $orOne->dicsountGcAmnt;
-                $Orpassive->mwstVal = $orOne->mwstVal;
-                $Orpassive->digitalReceiptQRK = $orOne->digitalReceiptQRK;
-                $Orpassive->digitalReceiptQRKHash = $orOne->digitalReceiptQRKHash;
-                $Orpassive->ebankqrcode = $orOne->ebankqrcode;
-                $Orpassive->orForWaiter = $orOne->orForWaiter;
-                $Orpassive->servedBy = $orOne->servedBy;
-                $Orpassive->created_at = $orOne->created_at;
-                $Orpassive->updated_at = $orOne->updated_at;
-                $Orpassive->save();
+        // $orders = Orders::where([['Restaurant',$req->resId],['created_at', '>', Carbon::now()->subMinutes(3)->toDateTimeString()]])->get();
+        // foreach($orders as $orOne){
+        //     if(OrdersPassive::find($orOne->id) == Null){
+        //         $Orpassive = new OrdersPassive();
+        //         $Orpassive->id = $orOne->id;
+        //         $Orpassive->refId = $orOne->refId;
+        //         $Orpassive->Restaurant = $orOne->Restaurant;
+        //         $Orpassive->nrTable = $orOne->nrTable;
+        //         $Orpassive->statusi = $orOne->statusi;
+        //         $Orpassive->byId = $orOne->byId;
+        //         $Orpassive->userEmri = $orOne->userEmri;
+        //         $Orpassive->userEmail = $orOne->userEmail;
+        //         $Orpassive->userPhoneNr = $orOne->userPhoneNr;
+        //         $Orpassive->porosia = $orOne->porosia;
+        //         $Orpassive->freeProdId = $orOne->freeProdId;
+        //         $Orpassive->payM = $orOne->payM;
+        //         $Orpassive->shuma = $orOne->shuma;
+        //         $Orpassive->shifra = $orOne->shifra;
+        //         $Orpassive->tipPer = $orOne->tipPer;
+        //         $Orpassive->cuponOffVal = $orOne->cuponOffVal;
+        //         $Orpassive->cuponProduct = $orOne->cuponProduct;
+        //         $Orpassive->StatusBy = $orOne->StatusBy;
+        //         $Orpassive->cancelComm = $orOne->cancelComm;
+        //         $Orpassive->TAemri = $orOne->TAemri;
+        //         $Orpassive->TAmbiemri = $orOne->TAmbiemri;
+        //         $Orpassive->TAtime = $orOne->TAtime;
+        //         $Orpassive->TAplz = $orOne->TAplz;
+        //         $Orpassive->TAort = $orOne->TAort;
+        //         $Orpassive->TAaddress = $orOne->TAaddress;
+        //         $Orpassive->TAkoment = $orOne->TAkoment;
+        //         $Orpassive->inCashDiscount = $orOne->inCashDiscount;
+        //         $Orpassive->discReason = $orOne->discReason;
+        //         $Orpassive->inPercentageDiscount = $orOne->inPercentageDiscount;
+        //         $Orpassive->dicsountGcAmnt = $orOne->dicsountGcAmnt;
+        //         $Orpassive->mwstVal = $orOne->mwstVal;
+        //         $Orpassive->digitalReceiptQRK = $orOne->digitalReceiptQRK;
+        //         $Orpassive->digitalReceiptQRKHash = $orOne->digitalReceiptQRKHash;
+        //         $Orpassive->ebankqrcode = $orOne->ebankqrcode;
+        //         $Orpassive->orForWaiter = $orOne->orForWaiter;
+        //         $Orpassive->servedBy = $orOne->servedBy;
+        //         $Orpassive->created_at = $orOne->created_at;
+        //         $Orpassive->updated_at = $orOne->updated_at;
+        //         $Orpassive->save();
 
-                $changed++; 
-            }
-        }
+        //         $changed++; 
+        //     }
+        // }
 
-        foreach(Orders::where('created_at', '>', Carbon::now()->subDays(2)->toDateTimeString())->get() as $orOneAll){
-            $pasOr = OrdersPassive::find($orOneAll->id);
-            if($pasOr != Null){
-                if($pasOr->statusi != $orOneAll->statusi || $pasOr->cancelComm != $orOneAll->cancelComm){
-                    $pasOr->statusi = $orOneAll->statusi;
-                    $pasOr->cancelComm = $orOneAll->cancelComm;
-                    $pasOr->save();
+        // foreach(Orders::where('created_at', '>', Carbon::now()->subDays(2)->toDateTimeString())->get() as $orOneAll){
+        //     $pasOr = OrdersPassive::find($orOneAll->id);
+        //     if($pasOr != Null){
+        //         if($pasOr->statusi != $orOneAll->statusi || $pasOr->cancelComm != $orOneAll->cancelComm){
+        //             $pasOr->statusi = $orOneAll->statusi;
+        //             $pasOr->cancelComm = $orOneAll->cancelComm;
+        //             $pasOr->save();
 
-                    $changed++; 
-                }
-                if($pasOr->servedBy != $orOneAll->servedBy || $pasOr->orForWaiter != $orOneAll->orForWaiter){
-                    $pasOr->servedBy = $orOneAll->servedBy;
-                    $pasOr->orForWaiter = $orOneAll->orForWaiter;
-                    $pasOr->save();
+        //             $changed++; 
+        //         }
+        //         if($pasOr->servedBy != $orOneAll->servedBy || $pasOr->orForWaiter != $orOneAll->orForWaiter){
+        //             $pasOr->servedBy = $orOneAll->servedBy;
+        //             $pasOr->orForWaiter = $orOneAll->orForWaiter;
+        //             $pasOr->save();
 
-                    $changed++; 
-                }
-            }
-        }
-        if($changed > 0){
-            return 'changesTrue';
-        }
+        //             $changed++; 
+        //         }
+        //     }
+        // }
+        // if($changed > 0){
+        //     return 'changesTrue';
+        // }
     }
 
 
@@ -5678,6 +5678,33 @@ EPD
             //         "OrderID": "Order1234"
             //     }
             // }
+        }
+    }
+
+    public function payTecAbortTransact(Request $req){
+        $payTecIns = payTecPair::where([['userId',Auth::user()->id],['toRes',Auth::user()->sFor]])->first();
+        if($payTecIns != Null){
+            $data =  [
+                "AccessToken" => $payTecIns->accessToken,
+                "AbortTrxFlags" => 1,
+            ];
+            $jsonData = json_encode($data);
+
+            $url = "https://kitrest.paytec.ch/api/v1/abort";
+            $crl = curl_init($url);
+
+            curl_setopt($crl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($crl, CURLOPT_POST, true);
+            curl_setopt($crl, CURLOPT_POSTFIELDS, $jsonData);
+            curl_setopt($crl, CURLOPT_HTTPHEADER, [
+                'Content-Type: application/json',
+            ]);
+
+            $result = curl_exec($crl);
+
+            curl_close($crl);
+
+            return $result;
         }
     }
 

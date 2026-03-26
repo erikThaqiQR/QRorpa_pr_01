@@ -77,6 +77,8 @@
 
         $('#payAllPhaseOne').modal('toggle');
         $('#tabOrder'+$("#payAllTableNr").val()).modal('toggle');
+
+        handleExitPOSPaytec();
     }
     function prepPayAllProds(tNr,resId){
         $('#payAllBtn1').prop('disabled', true);
@@ -552,7 +554,7 @@
 
 
     function payAllProds(extInfo){
-        $('#payAllPhaseOneDiv4').remove();
+        $('#payAllPhaseOneDiv4').html('');
         if($('#payAllTableNr').val() == 0){
             if($('#payAllPhaseOneError3').is(':hidden')){ $('#payAllPhaseOneError3').show(100).delay(4000).hide(100); }
         }else if($('#tvshAmProdsPerventage').html() == '--.--'){
@@ -562,14 +564,16 @@
         }else{
 
             if('{{Restorant::find(Auth::user()->sFor)->hasPOS}}' == 1  && extInfo == 'none'){
-          
+
+                POSStarted = true;
+                if($('#payAllPhaseOnePayAtPOS').is(':hidden')){ $('#payAllPhaseOnePayAtPOS').show(50); }
+
                 $.ajax({
                     url: '{{ route("payTec.Connect") }}',
                     method: 'post',
                     data: {_token: '{{csrf_token()}}'},
                     success: (res) => {
-
-                        if($('#payAllPhaseOnePayAtPOS').is(':hidden')){ $('#payAllPhaseOnePayAtPOS').show(50).delay(6000).hide(50); }
+                        
                         $.ajax({
                             url: '{{ route("payTec.Transact") }}',
                             method: 'post',
@@ -584,24 +588,21 @@
                                 if(resJSON.TrxResult == 0){
 
                                     payAllProdsFinishByCard(resTransact);
-
+                                    POSStarted = false;
                                 }else{
-                                    registerPayTecErrorData(resTransact);
-                                    alert('fail register  -- '+resJSON.CardholderText+' '+resJSON.AttendantText);
-                                    // alert('---------------------------------');
+                                    registerPayTecErrorDataAll(resTransact,'{{ Auth::user()->sFor }}');
                                 }
                             },error: (error) => {
-                                registerPayTecErrorData(error);
-                                alert(error);
+                                registerPayTecErrorDataAll(error,'{{ Auth::user()->sFor }}');
                             }
                         });
                     },error: (error) => {
-                        registerPayTecErrorData(error);
-                        alert(error);
+                        registerPayTecErrorDataAll(error,'{{ Auth::user()->sFor }}');
                     }
                 });
             }else{
                 payAllProdsFinishByCard('none');
+                POSStarted = false;
             }
              
         }
@@ -687,7 +688,22 @@
         });
     }
 
-    function registerPayTecErrorData(resTrx){
+    function registerPayTecErrorDataAll(resTrx, resId){
+
+        POSStarted = false;
+        $('#payAllPhaseOnePayAtPOS').hide(50);
+        var resetPayBtn =   '<p style="width: 100%;" class="text-center"><strong>Zahlungeart</strong></p>'+
+                            '<button id="payAllBtn1" style="width:24.5%; margin:0px;" class="btn btn-warning text-center shadow-none" onclick="prepPayAllProdsCash()"><strong>Bar</strong></button>'+
+                            '<button id="payAllBtn2" style="width:24.5%; margin:0px;" class="btn btn-warning text-center shadow-none" onclick="payAllProds(\'none\')"><strong>Karte</strong></button>';
+        if (resId == 40){
+        resetPayBtn +=      '<button id="payAllBtn3" style="width:24.5%; margin:0px;" class="btn btn-warning text-center shadow-none" disabled><strong>Online</strong></button>';
+        }else{
+        resetPayBtn +=      '<button id="payAllBtn3" style="width:24.5%; margin:0px;" class="btn btn-warning text-center shadow-none" onclick="prepOnlinePayPayAll()"><strong>Online</strong></button>';
+        }
+                    
+        resetPayBtn +=      '<button id="payAllBtn4" style="width:24.5%; margin:0px;" class="btn btn-warning text-center shadow-none" onclick="prepPayAllProdsRechnung()"><strong>Auf Rechnung</strong></button>';
+        $('#payAllPhaseOneDiv4').html(resetPayBtn);
+        
         $.ajax({
             url: '{{ route("payTec.collectErrorLog") }}',
             method: 'post',

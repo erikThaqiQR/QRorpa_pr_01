@@ -101,7 +101,7 @@ use App\restorantTablesToRoom;
     @php
         $sFor = Auth::user()->sFor;
 
-        $map = [
+        $svgMapCall = [
             26 => [
                 16 => 'res44_room16', 19 => 'res44_room16', 22 => 'res44_room16', 0 => 'res44_room16',
                 17 => 'res44_room17', 20 => 'res44_room17', 23 => 'res44_room17',
@@ -140,9 +140,9 @@ use App\restorantTablesToRoom;
         ];
 
         // Reuse mapping for 44 and 49 same as 26
-        if (in_array($sFor, [44, 49])) { $map[$sFor] = $map[26]; }
+        if (in_array($sFor, [44, 49])) { $svgMapCall[$sFor] = $svgMapCall[26]; }
 
-        $view = $map[$sFor][$ri] ?? null;
+        $view = $svgMapCall[$sFor][$ri] ?? null;
     @endphp
 
 
@@ -212,6 +212,53 @@ use App\restorantTablesToRoom;
     @endif
 
 </div>
+
+<script>
+    let POSStarted = false;
+    function handleExitPOSPaytec() {
+        if (POSStarted) {
+            $.ajax({
+                url: '{{ route("payTec.AbortTransact") }}',
+                method: 'post',
+                data: {_token: '{{csrf_token()}}'},
+                success: (res) => {
+                },error: (error) => {
+                }
+            });
+            registerPayTecErrorDataAll('User reloaded the page','{{ Auth::user()->sFor }}');
+            return "Wenn Sie die Seite aktualisieren, wird die POS-Zahlung abgebrochen.";
+        }
+    }
+
+    window.onbeforeunload = function () {
+        if (POSStarted) {
+            $.ajax({
+                url: '{{ route("payTec.AbortTransact") }}',
+                method: 'post',
+                data: {_token: '{{csrf_token()}}'},
+                success: (res) => {
+                    
+                },error: (error) => {
+
+                }
+            });
+            registerPayTecErrorDataAll('User reloaded the page','{{ Auth::user()->sFor }}');
+            return "Wenn Sie die Seite aktualisieren, wird die POS-Zahlung abgebrochen.";
+            
+        }
+    };
+
+    // 1. Page is being hidden
+    document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+        handleExitPOSPaytec();
+    }
+    });
+
+    // 2. Page is being unloaded (better on iOS than beforeunload)
+    window.addEventListener("pagehide", handleExitPOSPaytec);
+</script>
+
 @include('adminPanel.tablePageTel.newOrderRegEl')
 @if (1 == 0)
     @include('adminPanel.tablePageTel.tableIndexActiveOrMd')
