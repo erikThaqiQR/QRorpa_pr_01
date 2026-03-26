@@ -249,6 +249,11 @@ use App\payTecTransactionLog;
                             <td colspan="2"></td>
                         </tr>
                         <tr>
+                            @if($items->Restaurant == 81)
+                            <td style="font-size:12px; text-align:left; margin:0px; padding-left:0px; color:white;"> 
+                                -
+                            </td>
+                            @else
                             <td style="font-size:12px; text-align:left; margin:0px; padding-left:0px;"> 
                                 @if($items->nrTable == 500)
                                 <strong>Takeaway</strong>
@@ -258,6 +263,7 @@ use App\payTecTransactionLog;
                                 <strong>Tisch:</strong> {{$items->nrTable}}
                                 @endif
                             </td>
+                            @endif
                             <td  style="font-size:7px; text-align:right; margin:0px; padding-right:0px; margin-right:0px;" >Es bedient Sie: 
                                 @if ($items->servedBy != 0)
                                     @if (User::find($items->servedBy) != NULL)
@@ -274,7 +280,11 @@ use App\payTecTransactionLog;
                             <td colspan="2"></td>
                         </tr>
                         <tr>
+                            @if($items->Restaurant == 81)
+                            <td style="font-size:13px; margin:0px; padding:0px; color:white;"><strong></strong></td>
+                            @else
                             <td style="font-size:13px; margin:0px; padding:0px;"><strong>Restaurant Rechnung</strong></td>
+                            @endif
                             <td style="text-align: right; margin:0px; padding:0px;">Verkaufs-ID: {{$items->id}}</td>
                         </tr>
                         <tr>

@@ -345,9 +345,10 @@ Route::post('payTecPair', 'AdminPanelController@payTecPair')->name('payTec.Pair'
 Route::post('payTecConnect', 'AdminPanelController@payTecConnect')->name('payTec.Connect');
 Route::post('payTecDisconnect', 'AdminPanelController@payTecDisconnect')->name('payTec.Disconnect');
 Route::post('payTecTransact', 'AdminPanelController@payTecTransact')->name('payTec.Transact');
+Route::post('payTecAbortTransact', 'AdminPanelController@payTecAbortTransact')->name('payTec.AbortTransact');
 
 Route::post('payTeccollectErrorLog', 'payTecController@collectErrorLog')->name('payTec.collectErrorLog');
-//--------------------------------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------------------------}
 
 
 // Split the bill  
