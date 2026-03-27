@@ -628,77 +628,106 @@
 
 
     function printActiveOrdersOnTable(tableNrSend) {
-            const orId = $('#orderQRCodePicDownloadOI').val();
-            let resName = '';
-            let tableNr = '';
-            let tableNrShow = '';
-            let timePrint = '';
-            let theOrderShowProd = '';
-            let resAdrs = '';
-         
-            $.ajax({
-                url: '{{ route("print.callDataForPrintReceiptActiveTab") }}',
-                method: 'post',
-                data: {
-                    tableNrSend: tableNrSend,
-                    _token: '{{csrf_token()}}'
-                },
-                success: (printData) => {
+        const address = 'http://192.168.100.198/cgi-bin/epos/service.cgi?devid=local_printer&timeout=60000';
+
+        const epos = new epson.ePOSPrint(address);
+        const builder = new epson.ePOSBuilder();
+
+        epos.onreceive = function (res) {
+            console.log('Response from printer: ' + JSON.stringify(res));
+        };
+
+        $.ajax({
+            url: '{{ route("print.callDataForPrintReceiptActiveTab") }}',
+            method: 'post',
+            data: {
+                tableNrSend: tableNrSend,
+                _token: '{{csrf_token()}}'
+            },
+            success: (printData) => {
+
                 printData = $.trim(printData);
-                printData2D = printData.split('---88---');
-                        
-                resName = printData2D[0];
-                tableNr = printData2D[1];
-                if( tableNr == 500){ tableNrShow = 'Takeaway';      
-                }else{ tableNrShow = 'Tisch: '+printData2D[1]; }
-                timePrint = printData2D[2];
-                theOrderShowProd = printData2D[3];
-                totalToPay = parseFloat(printData2D[4]).toFixed(2);
-                resAdrs = printData2D[5];
-                resAdrs = printData2D[5];
+                let data = printData.split('---88---');
 
-                let printWindow = window.open('', '', 'height=500, width=1000');
-                
-                    printWindow.document.write(`
-                        <html>
-                        <head>
-                            <style>
-                                body { font-family: Arial, sans-serif; }
-                                h2 { color: #333;}
-                            </style>
-                        </head>
-                        <body>
-                            <h2 style="width:100%; text-align:center; margin-bottom:0px; margin-top:0;">`+resName+`<br>Zwischenrechnung</h2>
+                let resName          = data[0].trim();
+                let tableNr          = data[1].trim();
+                let tableNrShow      = (tableNr == 500) ? 'Takeaway' : 'Tisch: ' + tableNr;
+                let timePrint        = data[2].trim();
+                let theOrderShowProd = data[3].trim();
+                let totalToPay       = parseFloat(data[4]).toFixed(2);
+                let resAdrs          = data[5].trim();
 
-                            `+resAdrs+`
+                let totalWidth = 32; // 32 for 58mm paper, 42 for 80mm paper
 
-                            <div style="width:100%; display:flex; flex-wrap: wrap; justify-content: space-between;">
-                            <p style="width:40%; text-align:center; margin-bottom:0px; margin-top:6px; line-height:1.1;">`+tableNrShow+`</p>
-                            <p style="width:60%; text-align:center; margin-bottom:0px; margin-top:6px; line-height:1.1;">`+timePrint+`</p>
-                            </div>
+                // ─────────────────────────────
+                // HEADER
+                // ─────────────────────────────
+                builder.addTextAlign(builder.ALIGN_CENTER);
+                builder.addTextSize(2, 2);
+                builder.addText(resName + '\n');
+                builder.addTextSize(1, 1);
+                builder.addText('Zwischenrechnung\n');
 
-                            <hr style="width:100%; margin:4px 0 4px 0;">
+                // Address: each line already separated by \n from PHP
+                resAdrs.split('\n').forEach(line => {
+                    line = line.trim();
+                    if (line !== '') builder.addText(line + '\n');
+                });
 
-                            `+theOrderShowProd+`
+                builder.addText('------------------------------\n');
 
-                            <hr style="width:100%; margin:4px 0 4px 0;">
+                // ─────────────────────────────
+                // TABLE INFO
+                // ─────────────────────────────
+                builder.addTextAlign(builder.ALIGN_LEFT);
+                builder.addText(tableNrShow + '\n');
+                builder.addText(timePrint + '\n');
+                builder.addText('------------------------------\n');
 
-                            <div style="width:100%; display:flex; flex-wrap: wrap; justify-content: space-between;">
-                            
-                                <p style="width:50%; text-align:left; margin-bottom:0px; margin-top:0; line-height:1;"><strong>Summe: </strong></p>
-                                <p style="width:50%; text-align:RIGHT; margin-bottom:0px; margin-top:0; line-height:1;">`+totalToPay+` CHF</p>
+                // ─────────────────────────────
+                // ITEMS — format: "qty x name|price\n" per line
+                // ─────────────────────────────
+                if (theOrderShowProd !== '') {
+                    theOrderShowProd.split('\n').forEach(row => {
+                        row = row.trim();
+                        if (row === '') return;
 
-                            </div>
-                            <p style="color:white; width:100%;">-</p>
-                            <p style="color:white; width:100%;">-</p>
-                        </body>
-                        </html>
-                    `);
-                
-                                printWindow.document.close();
-                                printWindow.print();
-                },error: (error) => { console.log(error); }
-			});
-          // printWindow.window.close();
-        }
+                        let parts    = row.split('|');
+                        let nameCol  = (parts[0] || '').trim();
+                        let priceCol = (parts[1] || '').trim();
+
+                        // Truncate name if too long
+                        let maxNameLen = totalWidth - priceCol.length - 1;
+                        if (nameCol.length > maxNameLen) {
+                            nameCol = nameCol.substring(0, maxNameLen);
+                        }
+
+                        let gap = totalWidth - nameCol.length - priceCol.length;
+                        if (gap < 1) gap = 1;
+
+                        builder.addText(nameCol + ' '.repeat(gap) + priceCol + '\n');
+                    });
+                }
+
+                builder.addText('------------------------------\n');
+
+                // ─────────────────────────────
+                // TOTAL
+                // ─────────────────────────────
+                builder.addTextAlign(builder.ALIGN_LEFT);
+                builder.addTextStyle(false, false, true);  // bold on — no color param (fixes the error)
+                builder.addText('Summe: ' + totalToPay + ' CHF\n');
+                builder.addTextStyle(false, false, false); // bold off
+
+                builder.addFeedLine(2);
+                builder.addCut(builder.CUT_FEED);
+
+                // ─────────────────────────────
+                // SEND TO PRINTER
+                // ─────────────────────────────
+                epos.send(builder.toString());
+            },
+            error: (err) => console.log(err)
+        });
+    }
 </script>

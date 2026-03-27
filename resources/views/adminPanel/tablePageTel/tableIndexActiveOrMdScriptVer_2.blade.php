@@ -832,79 +832,127 @@
 
 
     function printActiveOrdersOnTable(tableNrSend) {
-            const orId = $('#orderQRCodePicDownloadOI').val();
-            let resName = '';
-            let tableNr = '';
-            let tableNrShow = '';
-            let timePrint = '';
-            let theOrderShowProd = '';
-            let resAdrs = '';
-         
-            $.ajax({
-                url: '{{ route("print.callDataForPrintReceiptActiveTab") }}',
-                method: 'post',
-                data: {
-                    tableNrSend: tableNrSend,
-                    _token: '{{csrf_token()}}'
-                },
-                success: (printData) => {
+
+        const address = 'https://192.168.100.198/cgi-bin/epos/service.cgi?devid=local_printer&timeout=60000';
+
+        const epos = new epson.ePOSPrint(address);
+        const builder = new epson.ePOSBuilder();
+
+        epos.onreceive = function (res) {
+            console.log('Response from printer: ' + res.success);
+        };
+
+        $.ajax({
+            url: '{{ route("print.callDataForPrintReceiptActiveTab") }}',
+            method: 'post',
+            data: {
+                tableNrSend: tableNrSend,
+                _token: '{{csrf_token()}}'
+            },
+            success: (printData) => {
+
                 printData = $.trim(printData);
-                printData2D = printData.split('---88---');
-                        
-                resName = printData2D[0];
-                tableNr = printData2D[1];
-                if( tableNr == 500){ tableNrShow = 'Takeaway';      
-                }else{ tableNrShow = 'Tisch: '+printData2D[1]; }
-                timePrint = printData2D[2];
-                theOrderShowProd = printData2D[3];
-                totalToPay = parseFloat(printData2D[4]).toFixed(2);
-                resAdrs = printData2D[5];
-                resAdrs = printData2D[5];
+                let data = printData.split('---88---');
 
-                let printWindow = window.open('', '', 'height=500, width=1000');
-                
-                    printWindow.document.write(`
-                        <html>
-                        <head>
-                            <style>
-                                body { font-family: Arial, sans-serif; }
-                                h2 { color: #333;}
-                            </style>
-                        </head>
-                        <body>
-                            <h2 style="width:100%; text-align:center; margin-bottom:0px; margin-top:0;">`+resName+`<br>Zwischenrechnung</h2>
+                let resName = data[0];
+                let tableNr = data[1];
+                let tableNrShow = (tableNr == 500) ? 'Takeaway' : 'Tisch: ' + tableNr;
+                let timePrint = data[2];
+                let theOrderShowProd = data[3];
+                let totalToPay = parseFloat(data[4]).toFixed(2);
+                let resAdrs = data[5];
 
-                            `+resAdrs+`
+                // ─────────────────────────────
+                // HEADER
+                // ─────────────────────────────
+                builder.addTextAlign(builder.ALIGN_CENTER);
+                builder.addTextSize(2, 2);
+                builder.addText(resName + '\n');
 
-                            <div style="width:100%; display:flex; flex-wrap: wrap; justify-content: space-between;">
-                            <p style="width:40%; text-align:center; margin-bottom:0px; margin-top:6px; line-height:1.1;">`+tableNrShow+`</p>
-                            <p style="width:60%; text-align:center; margin-bottom:0px; margin-top:6px; line-height:1.1;">`+timePrint+`</p>
-                            </div>
+                builder.addTextSize(1, 1);
+                builder.addTextStyle(false, false, true);
+                builder.addText('Zwischenrechnung\n');
+                builder.addTextStyle(false, false, false);
 
-                            <hr style="width:100%; margin:4px 0 4px 0;">
+                builder.addText(resAdrs + '\n');
+                builder.addText('--------------------------------\n');
 
-                            `+theOrderShowProd+`
+                // ─────────────────────────────
+                // TABLE + TIME
+                // ─────────────────────────────
+                builder.addTextAlign(builder.ALIGN_LEFT);
+                builder.addText(tableNrShow + '\n');
+                builder.addText(timePrint + '\n');
+                builder.addText('--------------------------------\n');
 
-                            <hr style="width:100%; margin:4px 0 4px 0;">
+                // ─────────────────────────────
+                // ITEMS (SMART PARSE HTML)
+                // ─────────────────────────────
+                let tempDiv = document.createElement("div");
+                tempDiv.innerHTML = theOrderShowProd;
 
-                            <div style="width:100%; display:flex; flex-wrap: wrap; justify-content: space-between;">
-                            
-                                <p style="width:50%; text-align:left; margin-bottom:0px; margin-top:0; line-height:1;"><strong>Summe: </strong></p>
-                                <p style="width:50%; text-align:RIGHT; margin-bottom:0px; margin-top:0; line-height:1;">`+totalToPay+` CHF</p>
+                // Try to preserve structure better
+                let rows = tempDiv.querySelectorAll('tr');
 
-                            </div>
-                            <p style="color:white; width:100%;">-</p>
-                            <p style="color:white; width:100%;">-</p>
-                        </body>
-                        </html>
-                    `);
-                
-                                printWindow.document.close();
-                                printWindow.print();
-                },error: (error) => { console.log(error); }
-			});
-          // printWindow.window.close();
-        }
+                if (rows.length > 0) {
+                    // If it's a table → better formatting
+                    rows.forEach(row => {
+                        let cols = row.querySelectorAll('td');
+
+                        if (cols.length > 0) {
+                            let line = '';
+
+                            cols.forEach((col, index) => {
+                                let text = col.innerText.trim();
+
+                                // basic column spacing
+                                if (index === 0) {
+                                    line += text.padEnd(18);
+                                } else if (index === 1) {
+                                    line += text.padEnd(6);
+                                } else {
+                                    line += text;
+                                }
+                            });
+
+                            builder.addText(line + '\n');
+                        }
+                    });
+                } else {
+                    // fallback (your current case probably)
+                    let lines = tempDiv.innerText
+                        .replace(/\n\s*\n/g, '\n')
+                        .split('\n');
+
+                    lines.forEach(line => {
+                        line = line.trim();
+                        if (line !== '') {
+                            builder.addText(line + '\n');
+                        }
+                    });
+                }
+
+                builder.addText('--------------------------------\n');
+
+                // ─────────────────────────────
+                // TOTAL (RIGHT ALIGNED LOOK)
+                // ─────────────────────────────
+                builder.addTextStyle(false, false, true);
+
+                let totalLine = 'Summe:'.padEnd(20) + totalToPay + ' CHF';
+                builder.addText(totalLine + '\n');
+
+                builder.addTextStyle(false, false, false);
+
+                builder.addFeedLine(3);
+                builder.addCut(builder.CUT_FEED);
+
+                // SEND TO PRINTER
+                epos.send(builder.toString());
+            },
+            error: (error) => console.log(error)
+        });
+    }
 
 
 
