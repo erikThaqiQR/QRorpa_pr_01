@@ -333,7 +333,7 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:4%;">
     margin-bottom: 4px !important;
 }
 #splitTheBillInitiateModal .split-bill-client-card .split-bill-summary-totals .fa-circle-xmark {
-    color: #ffcdd2 !important;
+    color: #ffffff !important;
 }
 #splitTheBillInitiateModal .split-bill-client-card .alert {
     width: 100%;
@@ -352,8 +352,16 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:4%;">
     color: inherit !important;
 }
 
+.split-bill-summary-tipp-value {
+    position: relative;
+}
+
+.split-bill-summary-tipp-value .fa-circle-xmark::before {
+    font-size: 30px;
+}
+
 .split-bill-summary-tipp-value, .split-bill-summary-pay-value {
-    border-radius: 50px;
+    border-radius: 18px;
     padding: 6px 14px;
     min-height: 38px;
     background: rgba(255, 255, 255, 0.22);
@@ -362,11 +370,19 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:4%;">
     font-size: 14px !important;
 }
 
-.split-bill-summary-tipp-value-text, .split-bill-summary-pay-value-text {
+.split-bill-summary-tipp-value-text {
     display: flex;
     align-items: center;
     justify-content: flex-start;
+    margin-left: 23px;
+    gap: 5px;
+}
 
+.split-bill-summary-pay-value-text {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
 }
 </style>
 
@@ -613,7 +629,7 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:5px;">
                                                             '<div class="split-bill-hand-icon"><i class="fa-solid fa-hand-holding-dollar fa-lg"></i></div>'+
                                                             '<div class="split-bill-costume-wrap">'+
                                                                 '<button id="splitBillTippBtnCostume'+i+'" style="width:100%; margin:0px;" type="button" class="btn btn-outline-dark shadow-none split-bill-tipp-btn-costume">'+
-                                                                    '<input id="splitBillTippInputCostume'+i+'" step="0.05" min="0" id="tipWaiterCosVal" type="number" onkeyup="setCostumeTipStafSplitBill(\''+i+'\',this.value)" style="width:95%; border:none;" placeholder="Gesamt mit Tipp">'+
+                                                                    '<input id="splitBillTippInputCostume'+i+'" step="0.05" min="0" id="tipWaiterCosVal" type="number" onkeyup="setCostumeTipStafSplitBill(\''+i+'\',this.value)" style="width:95%; border:none; font-size:12px;" placeholder="Gesamt mit Tipp">'+
                                                                 '</button>'+
                                                             '</div>'+
                                                             '<div style="width:30%;" class="text-right split-bill-summary-totals" id="splitBillClientDiv2_1'+i+'">'+
@@ -639,7 +655,6 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:5px;">
 
         }
     }
-
 
 
     function setTipStafSplitBill(clientNr,tipVal){

@@ -66,7 +66,7 @@
 <!-- Modal -->
 <div class="modal" id="splitTheBillInitiateModal" tabindex="-1" role="dialog" data-backdrop="false" 
 style="background-color: rgba(0, 0, 0, 0.5); padding-top:4%;">
-    <div class="modal-dialog modal-xl split-bill-tel-modal-dialog">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content split-bill-tel-modal-content">
             <div class="modal-header split-the-bill-initiate-header">
                 <div class="split-bill-header-left">
@@ -209,12 +209,6 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:4%;">
     top: -1px;
 }
 
-#splitTheBillInitiateModal .split-bill-tel-modal-dialog {
-    max-width: min(100%, 520px);
-    width: calc(100% - 16px);
-    margin-left: auto;
-    margin-right: auto;
-}
 #splitTheBillInitiateModal .split-bill-tel-modal-content {
     background: #eef1f2;
     border-radius: 16px;
@@ -352,13 +346,16 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:4%;">
     color: #fff !important;
 }
 #splitTheBillInitiateModal .split-bill-client-card .split-bill-tipp-btn-costume {
-    border-radius: 12px !important;
-    padding: 8px 12px !important;
-    min-height: 40px;
-    background: rgba(0, 0, 0, 0.14) !important;
+    width: 100%;
+    margin: 0;
+    max-height: 30px;
+    align-self: center;
+    border-radius: 50px !important;
+    padding: 6px 14px !important;
+    min-height: 38px;
+    background: rgba(255, 255, 255, 0.22) !important;
     color: rgba(255, 255, 255, 0.95) !important;
-    border: none !important;
-    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
 }
 #splitTheBillInitiateModal .split-bill-client-card .split-bill-tipp-btn-costume input {
     background: transparent !important;
@@ -399,23 +396,7 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:4%;">
     margin-bottom: 4px !important;
 }
 #splitTheBillInitiateModal .split-bill-client-card .split-bill-summary-totals .fa-circle-xmark {
-    color: #ffcdd2 !important;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-cancel-tipp-circle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    background: #4ebbb3;
-    margin-right: 6px;
-    vertical-align: middle;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-cancel-tipp-circle .fa-circle-xmark {
-    color: #fff !important;
-    font-size: 0.9rem !important;
+    color: #ffffff !important;
 }
 #splitTheBillInitiateModal .split-bill-client-card .alert {
     width: 100%;
@@ -434,20 +415,39 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:4%;">
     color: inherit !important;
 }
 
-.split-bill-summary-tipp-value, .split-bill-summary-pay-value {
-    border-radius: 50px;
-    padding: 0;
-    min-height: auto;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.95);
-    border: none;
-    font-size: 14px;
+.split-bill-summary-tipp-value {
+    position: relative;
 }
 
-.split-bill-summary-tipp-value-text, .split-bill-summary-pay-value-text {
+.split-bill-summary-tipp-value .fa-circle-xmark::before {
+    font-size: 30px;
+}
+
+.split-bill-summary-tipp-value, .split-bill-summary-pay-value {
+    margin-bottom: 3px;
+    font-size: 1.2rem;
+    border-radius: 18px;
+    padding: 6px 14px;
+    min-height: 38px;
+    background: rgba(255, 255, 255, 0.22);
+    color: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    font-size: 14px !important;
+}
+
+.split-bill-summary-tipp-value-text {
     display: flex;
     align-items: center;
     justify-content: flex-start;
+    margin-left: 23px;
+    gap: 5px;
+}
+
+.split-bill-summary-pay-value-text {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
 }
 @media (max-width: 420px) {
     #splitTheBillInitiateModal .split-bill-client-card .split-bill-summary-strip {
@@ -637,11 +637,7 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:5px;">
                                 newClientLineShow = '<div class="split-bill-client-card mb-3">'+
                                                     '<div id="splitBillClientDiv1'+i+'" class="d-flex justify-content-between pt-2 split-bill-client-card-head">'+
                                                         '<div class="w-100 split-bill-client-head">'+
-                                                            '<div class="split-bill-guest-row d-flex align-items-center">'+
-                                                                '<div class="split-bill-guest-avatar-wrap">'+
-                                                                    '<i class="fa-solid fa-user split-bill-guest-avatar-icon"></i>'+
-                                                                    '<span class="split-bill-guest-badge">'+(i + 1)+'</span>'+
-                                                                '</div>'+
+                                                            '<p style="margin-bottom: 8px; font-size:1.1rem;"><strong class="d-flex"><i class="fa-solid fa-user mr-1 d-flex"></i> '+(i + 1)+'</strong></p>'+
                                                             '</div>'+
                                                             '<p class="sr-only"><strong>Kunde '+(i + 1)+'</strong></p>'+
                                                             '<div id="splitBillClientDiv1_2'+i+'" style="width:100%;" class="d-flex flex-wrap justify-content-between align-content-start split-bill-client-card-body">'+
@@ -708,7 +704,7 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:5px;">
                                                                 '</button>'+
                                                             '</div>'+
                                                             '<div style="width:30%;" class="text-right split-bill-summary-totals" id="splitBillClientDiv2_1'+i+'">'+
-                                                                '<p style="margin-bottom: 3px; font-size:1.2rem;" class="split-bill-summary-tipp-value"><strong class="split-bill-summary-tipp-value-text"><span class="split-bill-cancel-tipp-circle"><i class="fa-solid fa-circle-xmark" id="cancelTippApplyBtn'+i+'" onclick="cancelTippApply(\''+i+'\')"></i></span> Tipp: <span id="splitBillModalTippValueClient'+i+'">'+parseFloat(0).toFixed(2)+'</span> CHF</strong></p>'+
+                                                                '<p style="margin-bottom: 3px; font-size:1.2rem;" class="split-bill-summary-tipp-value"><strong class="split-bill-summary-tipp-value-text"<i style="color:red;" class="fa-solid fa-circle-xmark" id="cancelTippApplyBtn'+i+'" onclick="cancelTippApply(\''+i+'\')"></i> Tipp: <span id="splitBillModalTippValueClient'+i+'">'+parseFloat(0).toFixed(2)+'</span> CHF</strong></p>'+
                                                                 '<p style="margin-bottom: 3px; font-size:1.2rem;" class="split-bill-summary-pay-value"><strong class="split-bill-summary-pay-value-text">Bezahlen: <span id="splitBillModalPayValueClient'+i+'">'+parseFloat(respo2D[0]).toFixed(2)+'</span> CHF</strong></p>'+
                                                             '</div>'+
                                                         '</div>'+
