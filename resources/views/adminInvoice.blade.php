@@ -359,7 +359,7 @@ use App\payTecTransactionLog;
                     if(isset($mappedProducts[$prod[0]])){
                         $mappedProducts[$prod[0]] = [
                             "productName" => $prod[0] ?? '',
-                            "quantity"    => ++$mappedProducts[$prod[0]]['quantity'],
+                            "quantity"    => $prod[3] ? $mappedProducts[$prod[0]]['quantity'] + $prod[3] : ++$mappedProducts[$prod[0]]['quantity'],
                             "price"       => $mappedProducts[$prod[0]]['price'] + $prod[4],
                             "type"        => $prod[5] ?? '',
                             "prod_id"     => $prod[7] ?? '',
@@ -368,7 +368,7 @@ use App\payTecTransactionLog;
                     } else {
                         $mappedProducts[$prod[0]] = [
                             "productName" => $prod[0] ?? '',
-                            "quantity"    => 1,
+                            "quantity"    => $prod[3] ?? 1,
                             "price"       => $prod[4],
                             "type"        => $prod[5] ?? '',
                             "prod_id"     => $prod[7] ?? '',
