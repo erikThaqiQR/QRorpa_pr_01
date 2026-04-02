@@ -5316,13 +5316,33 @@ EPD
             $time2D = explode(':',explode(' ',$theTime)[1]);
             $theTime = $date2D[2].'.'. $date2D[1].'.'. $date2D[0].' '.$time2D[0].':'.$time2D[1];
 
+            $orderedProducts = explode('---8---',$theOr->porosia);
+
+            $mappedOrderedProducts = [];
+            foreach($orderedProducts as $product){
+                $explodedProduct = explode('-8-', $product);
+
+                if(isset($mappedOrderedProducts[$explodedProduct[0]])){
+                    $mappedOrderedProducts[$explodedProduct[0]] = [
+                        "productName" => $explodedProduct[0],
+                        "quantity" => ++$mappedOrderedProducts[$explodedProduct[0]]['quantity'],
+                        "price" => $mappedOrderedProducts[$explodedProduct[0]]['price'] + $explodedProduct[4]
+                    ];
+                } else {
+                    $mappedOrderedProducts[$explodedProduct[0]] = [
+                        "productName" => $explodedProduct[0],
+                        "quantity" => 1,
+                        "price" => $explodedProduct[4]
+                    ];
+                }
+            }
+
             $theOrder = '<p style="width:100%; text-align:left; font-size:0.9rem; display:flex; flex-wrap: wrap; justify-content: space-between;">';
-            foreach(explode('---8---',$theOr->porosia) as $produkti){  
-                $prod = explode('-8-', $produkti);
-                $theOrder .= '<span style="width:80%;">'.$prod[3].'x '.$prod[0].' ';
+            foreach($mappedOrderedProducts as $product){
+                $theOrder .= '<span style="width:80%;">'.$product['quantity'].'x '.$product['productName'].' ';
 
                 $theOrder .= ' </span>';
-                $theOrder .= ' <span style="width:20%; text-align:right;">'.number_format($prod[4], 2, '.', '');
+                $theOrder .= ' <span style="width:20%; text-align:right;">'.number_format($product['price'], 2, '.', '');
                 $theOrder .= ' </span><br>';
             }
             $theOrder .= '</p>';
@@ -5491,51 +5511,52 @@ EPD
         $time2D = explode(':',explode(' ',$theTime)[1]);
         $theTime = $date2D[2].'.'. $date2D[1].'.'. $date2D[0].' '.$time2D[0].':'.$time2D[1];
 
-        $total_shuma = 0;
+        $total_shuma = number_format(0, 2, '.', '');
 
-        // ─────────────────────────────
-        // PRODUCTS — plain text, pipe-separated: "qty x name|price"
-        // ─────────────────────────────
-        $theProdsShow = '';
+        
+
         $theTable = TableQrcode::where([['Restaurant',Auth::user()->sFor],['tableNr',$req->tableNrSend]])->first();
-        if ($theTable != Null && $theTable->kaTab != 0) {
-            foreach(TabOrder::where('tabCode',$theTable->kaTab)->get() as $produkti) {
-                $name  = $produkti->OrderSasia.'x '.$produkti->OrderEmri;
-                $price = number_format($produkti->OrderQmimi, 2, '.', '');
-                $theProdsShow .= $name.'|'.$price."\n";
-                $total_shuma += $produkti->OrderQmimi;
+        if( $theTable != Null &&  $theTable->kaTab != 0){
+            $theProdsShow = '<p style="width:100%; text-align:left; font-size:0.9rem; display:flex; flex-wrap: wrap; justify-content: space-between;">';
+            foreach(TabOrder::where('tabCode',$theTable->kaTab)->get() as $produkti){  
+                $theProdsShow .= '<span style="width:80%;">'.$produkti->OrderSasia.'x '.$produkti->OrderEmri.' ';
+
+                $theProdsShow .= ' </span>';
+                $theProdsShow .= ' <span style="width:20%; text-align:right;">'.number_format($produkti->OrderQmimi, 2, '.', '');
+                $theProdsShow .= ' </span><br>';
+
+                $total_shuma += number_format($produkti->OrderQmimi, 2, '.', '');
             }
+            $theProdsShow .= '</p>';
+        }else{
+            $theProdsShow = '';
         }
 
-        // ─────────────────────────────
-        // ADDRESS — plain text, newline-separated
-        // ─────────────────────────────
-        $sdr2d = explode(',', $theRes->adresa);
-        $resAdr = '';
-        if (isset($sdr2d[0])) { $resAdr .= trim($sdr2d[0])."\n"; }
-        if (isset($sdr2d[1])) {
-            $line = trim($sdr2d[1]);
-            if (isset($sdr2d[2])) { $line .= ', '.trim($sdr2d[2]); }
-            $resAdr .= $line."\n";
+        $sdr2d = explode(',',$theRes->adresa);
+        $resAdr ='<p style="width:100%; font-size:0.7rem; text-align:center; margin-bottom:0px; margin-top:6px; line-height:1.1;">';
+        if (isset($sdr2d[0])){ $resAdr .= $sdr2d[0].'<br>';}
+        if (isset($sdr2d[1])){ $resAdr .= $sdr2d[1];}
+        if (isset($sdr2d[2])){ $resAdr .= ', '.$sdr2d[2];}
+        $resAdr .= '<br>';
+        if ($theRes != NULL && $theRes->resPhoneNr != 'empty'){
+            $resAdr .= 'Tel. '.$theRes->resPhoneNr;
+        }else{
+            $resAdr .= 'Tel. +41 XX XXX XX XX';
         }
-        if ($theRes != NULL && $theRes->resPhoneNr != 'empty') {
-            $resAdr .= 'Tel. '.$theRes->resPhoneNr."\n";
-        } else {
-            $resAdr .= 'Tel. +41 XX XXX XX XX'."\n";
-        }
-        if ($theRes != NULL && $theRes->chemwstForRes != 'empty') {
-            if (str_contains($theRes->chemwstForRes, 'CHE')) {
-                $resAdr .= $theRes->chemwstForRes.' MWST';
-            } else {
+        $resAdr .= '<br>';
+        if ($theRes != NULL && $theRes->chemwstForRes != 'empty'){
+            if (str_contains($theRes->chemwstForRes, 'CHE')){
+                 $resAdr .= $theRes->chemwstForRes.' MWST';
+            }else{
                 $resAdr .= $theRes->chemwstForRes;
             }
-        } else {
+        }else{
             $resAdr .= 'CHE-xxx.xxx.xxx MWST';
         }
+        $resAdr .= '</p>';
 
-        $total_shuma = number_format($total_shuma, 2, '.', '');
 
-        return $theRes->emri.'---88---'.$req->tableNrSend.'---88---'.$theTime.'---88---'.$theProdsShow.'---88---'.$total_shuma.'---88---'.$resAdr;
+        return $theRes->emri.'---88---'.$req->tableNrSend.'---88---'.$theTime.'---88---'. $theProdsShow.'---88---'.$total_shuma.'---88---'.$resAdr;
     }
 
 
