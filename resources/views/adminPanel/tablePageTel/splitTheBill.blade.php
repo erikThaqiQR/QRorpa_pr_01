@@ -115,356 +115,6 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:4%;">
         </div>
     </div>
 </div>
-<style>
-#splitTheBillInitiateModal .split-the-bill-initiate-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 12px 16px;
-    background-color: #f5f6f7;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-    padding: 14px 18px;
-}
-#splitTheBillInitiateModal .split-bill-header-left {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    min-width: 0;
-}
-#splitTheBillInitiateModal .split-bill-initiate-title {
-    margin: 0;
-    padding: 0;
-    font-size: 0.9rem;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    color: #69a6a5;
-    line-height: 1.2;
-}
-#splitTheBillInitiateModal .split-bill-bill-graphic {
-    margin-top: 6px;
-    line-height: 0;
-}
-#splitTheBillInitiateModal .split-bill-header-pills {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 10px;
-    flex: 1 1 auto;
-    justify-content: center;
-}
-#splitTheBillInitiateModal .split-bill-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 25px;
-    border-radius: 50px;
-    background: linear-gradient(to bottom, #76cfcf, #4db6ac);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    color: #fff;
-    font-weight: 600;
-    font-size: 0.95rem;
-    white-space: nowrap;
-}
-#splitTheBillInitiateModal .split-bill-pill-icon {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    color: #fff;
-    stroke: #fff;
-}
-#splitTheBillInitiateModal .split-bill-pill-text {
-    color: #fff;
-}
-#splitTheBillInitiateModal .split-bill-initiate-close {
-    float: none;
-    margin: 0;
-    padding: 0;
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    border-radius: 50%;
-    background-color: #e53935;
-    color: #fff;
-    opacity: 1;
-    font-size: 1.75rem;
-    font-weight: 300;
-    line-height: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-shadow: none;
-    border: none;
-    box-shadow: none;
-}
-#splitTheBillInitiateModal .split-bill-initiate-close:hover,
-#splitTheBillInitiateModal .split-bill-initiate-close:focus {
-    color: #fff;
-    opacity: 0.92;
-    outline: none;
-}
-#splitTheBillInitiateModal .split-bill-initiate-close span {
-    position: relative;
-    top: -1px;
-}
-
-#splitTheBillInitiateModal .split-bill-tel-modal-content {
-    background: #eef1f2;
-    border-radius: 16px;
-    overflow: hidden;
-}
-#splitTheBillInitiateModal #splitTheBillInitiateModalBody {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 14px;
-    align-items: stretch;
-    padding: 12px;
-    background: #eef1f2;
-}
-#splitTheBillInitiateModal .split-bill-tel-footer-prices {
-    background: #f5f6f7;
-    padding: 10px 8px;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
-}
-@media (max-width: 576px) {
-    #splitTheBillInitiateModal .split-bill-tel-footer-prices p {
-        width: 100% !important;
-        font-size: 1rem !important;
-    }
-}
-
-#splitTheBillInitiateModal .split-bill-client-card {
-    border-radius: 18px;
-    overflow: hidden;
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
-    background: linear-gradient(to bottom, #76c7c1, #3ba8a0);
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-client-card-head {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    padding: 12px 12px 6px !important;
-    border-bottom: none !important;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-client-card-body-2 {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    padding: 6px 12px 12px !important;
-    border-bottom: none !important;
-}
-
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-client-head {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-}
-
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-client-head p {
-    color: #fff;
-}
-#splitTheBillInitiateModal .split-bill-guest-row {
-    margin-bottom: 8px;
-}
-#splitTheBillInitiateModal .split-bill-guest-avatar-wrap {
-    position: relative;
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-    background: rgba(255, 255, 255, 0.22);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
-}
-#splitTheBillInitiateModal .split-bill-guest-avatar-icon {
-    color: #fff;
-    font-size: 1.35rem;
-}
-#splitTheBillInitiateModal .split-bill-guest-badge {
-    position: absolute;
-    bottom: -4px;
-    right: -4px;
-    min-width: 22px;
-    height: 22px;
-    padding: 0 5px;
-    border-radius: 50%;
-    background: #fff;
-    color: #3ba8a0;
-    font-size: 0.75rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid rgba(255, 255, 255, 0.95);
-    line-height: 1;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-client-card-body {
-    gap: 8px;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-client-card-body .split-bill-pay-row1 .btn,
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-client-card-body .split-bill-pay-row2 .btn {
-    flex: 1 1 auto;
-    min-width: 0;
-    font-size: 0.85rem;
-    padding: 6px 8px;
-    background-color: #fff !important;
-    color: #3ba8a0 !important;
-    border: none !important;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
-}
-.split-bill-pay-row1, .split-bill-pay-row2 {
-    gap: 8px;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-client-card-body .btn.btn-dark:not(:disabled) {
-    background-color: #2d8a82 !important;
-    color: #fff !important;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-client-card-body .btn:disabled {
-    opacity: 0.55;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-client-card-body .input-group,
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-client-card-body .btn-danger {
-    margin-top: 4px;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-tipp-amt-row {
-    gap: 6px;
-    margin-bottom: 4px;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-tipp-amt-row .btn {
-    flex: 1 1 15%;
-    min-width: 0;
-    font-size: 0.8rem;
-    padding: 5px 4px;
-    background-color: #fff !important;
-    color: #3ba8a0 !important;
-    border: none !important;
-    border-radius: 8px;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-tipp-amt-row .btn.btn-dark {
-    background-color: #2d8a82 !important;
-    color: #fff !important;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-tipp-btn-costume {
-    width: 100%;
-    margin: 0;
-    max-height: 30px;
-    align-self: center;
-    border-radius: 50px !important;
-    padding: 6px 14px !important;
-    min-height: 38px;
-    background: rgba(255, 255, 255, 0.22) !important;
-    color: rgba(255, 255, 255, 0.95) !important;
-    border: 1px solid rgba(255, 255, 255, 0.35) !important;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-tipp-btn-costume input {
-    background: transparent !important;
-    color: #fff !important;
-    text-align: center;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-tipp-btn-costume input::placeholder {
-    color: rgba(255, 255, 255, 0.72);
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-summary-strip {
-    display: flex;
-    align-items: stretch;
-    flex-wrap: wrap;
-    gap: 10px;
-    width: 100%;
-    margin-top: 6px;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-hand-icon {
-    color: #fff;
-    flex-shrink: 0;
-    display: flex;
-    align-items: center;
-    padding: 4px 0;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-costume-wrap {
-    flex: 1 1 140px;
-    display: flex;
-    justify-content: center;
-    min-width: 0;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-summary-totals {
-    flex: 1 1 160px;
-    min-width: 0;
-    text-align: right;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-summary-totals p {
-    color: #fff;
-    margin-bottom: 4px !important;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-summary-totals .fa-circle-xmark {
-    color: #ffffff !important;
-}
-#splitTheBillInitiateModal .split-bill-client-card .alert {
-    width: 100%;
-    margin-bottom: 6px;
-    font-size: 0.85rem;
-    padding: 6px 8px;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-client-card-head .alert-success,
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-client-card-body-2 .alert-success {
-    background-color: #d4edda !important;
-    color: #155724 !important;
-    border-radius: 0;
-}
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-client-card-head .alert-success .split-bill-client-head strong,
-#splitTheBillInitiateModal .split-bill-client-card .split-bill-client-card-head .alert-success .split-bill-client-card-body .btn {
-    color: inherit !important;
-}
-
-.split-bill-summary-tipp-value {
-    position: relative;
-}
-
-.split-bill-summary-tipp-value .fa-circle-xmark::before {
-    font-size: 30px;
-}
-
-.split-bill-summary-tipp-value, .split-bill-summary-pay-value {
-    margin-bottom: 3px;
-    font-size: 1.2rem;
-    border-radius: 18px;
-    padding: 6px 14px;
-    min-height: 38px;
-    background: rgba(255, 255, 255, 0.22);
-    color: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.35);
-    font-size: 14px !important;
-}
-
-.split-bill-summary-tipp-value-text {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    margin-left: 23px;
-    gap: 5px;
-}
-
-.split-bill-summary-pay-value-text {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 5px;
-}
-@media (max-width: 420px) {
-    #splitTheBillInitiateModal .split-bill-client-card .split-bill-summary-strip {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    #splitTheBillInitiateModal .split-bill-client-card .split-bill-costume-wrap {
-        flex: 1 1 auto;
-    }
-    #splitTheBillInitiateModal .split-bill-client-card .split-bill-summary-totals {
-        width: 100% !important;
-        flex: 1 1 auto;
-        text-align: left;
-    }
-}
-</style>
-
 
 
 
@@ -635,84 +285,81 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:5px;">
                             var newClientLineShow = "";
                             for(var i = 0; i < respo2D[2]; i++) {
                                 newClientLineShow = '<div class="split-bill-client-card mb-3">'+
-                                                    '<div id="splitBillClientDiv1'+i+'" class="d-flex justify-content-between pt-2 split-bill-client-card-head">'+
-                                                        '<div class="w-100 split-bill-client-head">'+
-                                                            '<p style="margin-bottom: 8px; font-size:1.1rem;"><strong class="d-flex"><i class="fa-solid fa-user mr-1 d-flex"></i> '+(i + 1)+'</strong></p>'+
-                                                            '</div>'+
-                                                            '<p class="sr-only"><strong>Kunde '+(i + 1)+'</strong></p>'+
-                                                            '<div id="splitBillClientDiv1_2'+i+'" style="width:100%;" class="d-flex flex-wrap justify-content-between align-content-start split-bill-client-card-body">'+
-                                                                '<div class="split-bill-pay-row1 w-100 d-flex justify-content-between mb-1">'+
-                                                                    '<button id="splitBillBtn1'+i+'" style="width:32%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayBarInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')"><i class="fa-solid fa-coins mr-1"></i>Bar</button>'+
-                                                                    '<button id="splitBillBtn2'+i+'" style="width:32%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayKarteInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\',\'none\')"><i class="fa-solid fa-credit-card mr-1"></i>Karte</button>'+
-                                                                    '<button id="splitBillBtn3'+i+'" style="width:32%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayOnline(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled><i class="fa-solid fa-mobile-alt mr-1"></i>Online</button>'+
+                                                        '<div id="splitBillClientDiv1'+i+'" class="d-flex justify-content-between pt-2 split-bill-client-card-head">'+
+                                                            '<div class="w-100 split-bill-client-head">'+
+                                                                '<p style="margin-bottom: 8px; font-size:1.1rem; color:#fff;"><strong class="d-flex"><i class="fa-solid fa-user mr-1 d-flex"></i> '+(i + 1)+'</strong></p>'+
+                                                                '<p style="color:#fff;" class="sr-only"><strong>Kunde '+(i + 1)+'</strong></p>'+
+                                                                '<div id="splitBillClientDiv1_2'+i+'" style="width:100%; gap:8px;" class="d-flex flex-wrap justify-content-between align-content-start split-bill-client-card-body">'+
+                                                                    '<div class="split-bill-pay-row1 w-100 d-flex justify-content-between mb-1" style="gap:8px;">'+
+                                                                        '<button id="splitBillBtn1'+i+'" style="width:32%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayBarInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')"><i class="fa-solid fa-coins mr-1"></i>Bar</button>'+
+                                                                        '<button id="splitBillBtn2'+i+'" style="width:32%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPayKarteInitiate(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\',\'none\')"><i class="fa-solid fa-credit-card mr-1"></i>Karte</button>'+
+                                                                        '<button id="splitBillBtn3'+i+'" style="width:32%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayOnline(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')" disabled><i class="fa-solid fa-mobile-alt mr-1"></i>Online</button>'+
+                                                                    '</div>'+
+                                                                    '<div class="split-bill-pay-row2 w-100 d-flex justify-content-between" style="gap:8px;">'+
+                                                                        '<button id="splitBillBtn4'+i+'" style="width:49%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayAufRechnung(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')"><i class="fa-solid fa-file-invoice mr-1"></i>Auf Rechnung</button>'+
+                                                                        '<button id="splitBillBtn5'+i+'" style="width:49%;" class="btn btn-outline-dark shadow-none" onclick="splitBillOpenGCPay(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')"><i class="fa-solid fa-gift mr-1"></i>Geschenkkarte</button>'+
+                                                                    '</div>'+
                                                                 '</div>'+
-                                                                '<div class="split-bill-pay-row2 w-100 d-flex justify-content-between">'+
-                                                                    '<button id="splitBillBtn4'+i+'" style="width:49%;" class="btn btn-outline-dark shadow-none" onclick="splitBillPrepPayAufRechnung(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')"><i class="fa-solid fa-file-invoice mr-1"></i>Auf Rechnung</button>'+
-                                                                    '<button id="splitBillBtn5'+i+'" style="width:49%;" class="btn btn-outline-dark shadow-none" onclick="splitBillOpenGCPay(\''+i+'\',\''+respo2D[1]+'\',\''+respo2D[2]+'\')"><i class="fa-solid fa-gift mr-1"></i>Geschenkkarte</button>'+
+                                                            '</div>'+
+                                                        '</div>'+
+                                                        '<div id="splitBillClientDiv2'+i+'" class="d-flex flex-wrap justify-content-between pt-1 pb-2 split-bill-client-card-body-2">'+
+                                                            '<div style="width: 100%; display:none;" class="mt-1 alert alert-danger text-center" id="splitTheBillError01'+i+'">'+
+                                                                '<strong>Geben Sie zuerst einen gültigen Wert ein!, Gesamtpreis nach dem Trinkgeld</strong>'+
+                                                            '</div>'+
+                                                            '<div id="splitTheBillPayAtPOS'+i+'" class="alert alert-info text-center mt-1" style="display:none; width:100%;">'+
+                                                                '<strong>Schließen Sie die Zahlung am POS-Terminal ab!</strong>'+
+                                                            '</div>'+
+                                                            '<div id="splitBillPhaseOneError51'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
+                                                                '<strong>Schreiben Sie zuerst den Code!</strong>'+
+                                                            '</div>'+
+                                                            '<div id="splitBillPhaseOneError52'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
+                                                                '<strong>Ihre Geschenkkarte wurde nicht gefunden!</strong>'+
+                                                            '</div>'+
+                                                            '<div id="splitBillPhaseOneError53'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
+                                                                '<strong>Diese Geschenkkarte ist nicht mehr gültig/Ausgeben!</strong>'+
+                                                            '</div>'+
+                                                            '<div id="splitBillPhaseOneError54'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
+                                                                '<strong>Tragen Sie zunächst einen gültigen Anwendungswert ein!</strong>'+
+                                                            '</div>'+
+                                                            '<div id="splitBillPhaseOneError55'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
+                                                                '<strong>Etwas ist schiefgelaufen. Bitte neu laden und erneut versuchen!</strong>'+
+                                                            '</div>'+
+                                                            '<div id="splitBillPhaseOneError56'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
+                                                                '<strong>Dieser Betrag ist zu hoch für diese Geschenkkarte!</strong>'+
+                                                            '</div>'+
+                                                            '<div id="splitBillPhaseOneError57'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
+                                                                '<strong>Versuchen Sie es mit einem kleineren Wert, dieser ist zu viel für die aktuelle Rechnung!</strong>'+
+                                                            '</div>'+
+                                                            '<div id="splitBillPhaseOneError58'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
+                                                                '<strong>Diese Geschenkkarte ist noch nicht bezahlt. Bezahlen Sie sie, bevor Sie sie verwenden!</strong>'+
+                                                            '</div>'+
+                                                            '<div id="splitBillPhaseOneError59'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
+                                                                '<strong>Diese Geschenkkarte ist abgelaufen!</strong>'+
+                                                            '</div>'+
+                                                            '<div id="splitBillPhaseOneError510'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
+                                                                '<strong>Diese Geschenkkarte ist nicht von diesem Restaurant und kann hier nicht eingelöst werden!</strong>'+
+                                                            '</div>'+
+                                                            '<div id="splitBillPhaseOneError511'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
+                                                                '<strong>Die Geschenkkarte, die Sie verwenden wollten, ist ungültig</strong>'+
+                                                            '</div>'+
+                                                            '<div id="splitBillPhaseOneError512'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
+                                                                '<strong>Die Geschenkkarte, die Sie anwenden wollten, ist noch nicht verkauft (aktiv)!</strong>'+
+                                                            '</div>'+
+                                                            '<div class="split-bill-summary-strip">'+
+                                                                '<div class="split-bill-hand-icon"><i class="fa-solid fa-hand-holding-dollar fa-lg"></i></div>'+
+                                                                '<div class="split-bill-costume-wrap">'+
+                                                                    '<input class="split-bill-tipp-btn-costume" id="splitBillTippInputCostume'+i+'" step="0.05" min="0" id="tipWaiterCosVal" type="number" onkeyup="setCostumeTipStafSplitBill(\''+i+'\',this.value)" style="width:95%; border:none;" placeholder="Gesamt mit tipp +">'+
+                                                                '</div>'+
+                                                                '<div style="width:30%;" class="text-right split-bill-summary-totals" id="splitBillClientDiv2_1'+i+'">'+
+                                                                    '<p style="margin-bottom: 4px; color:#fff; font-size:1.2rem; position:relative;" class="split-bill-summary-tipp-value"><strong class="split-bill-summary-tipp-value-text"<i style="color:#ffffff; position: absolute; left: 0;" class="fa-solid fa-circle-xmark" id="cancelTippApplyBtn'+i+'" onclick="cancelTippApply(\''+i+'\')"></i> Tipp: <span id="splitBillModalTippValueClient'+i+'">'+parseFloat(0).toFixed(2)+'</span> CHF</strong></p>'+
+                                                                    '<p style="margin-bottom: 4px; color:#fff; font-size:1.2rem;" class="split-bill-summary-pay-value"><strong class="split-bill-summary-pay-value-text">Bezahlen: <span id="splitBillModalPayValueClient'+i+'">'+parseFloat(respo2D[0]).toFixed(2)+'</span> CHF</strong></p>'+
                                                                 '</div>'+
                                                             '</div>'+
+                                                            '<input type="hidden" id="splitBillTippType'+i+'" value="0">'+
+                                                            '<input type="hidden" id="splitBillGCAppliedId'+i+'" value="0">'+
+                                                            '<input type="hidden" id="splitBillGCAppliedCHFVal'+i+'" value="0">'+
+                                                            '<input type="hidden" id="splitBillnitiateId'+i+'" value="'+respo2D[5]+'">'+
                                                         '</div>'+
-                                                    '</div>'+
-                                                    '<div id="splitBillClientDiv2'+i+'" class="d-flex flex-wrap justify-content-between pt-1 pb-2 split-bill-client-card-body-2">'+
-                                                        '<div style="width: 100%; display:none;" class="mt-1 alert alert-danger text-center" id="splitTheBillError01'+i+'">'+
-                                                            '<strong>Geben Sie zuerst einen gültigen Wert ein!, Gesamtpreis nach dem Trinkgeld</strong>'+
-                                                        '</div>'+
-                                                        '<div id="splitTheBillPayAtPOS'+i+'" class="alert alert-info text-center mt-1" style="display:none; width:100%;">'+
-                                                            '<strong>Schließen Sie die Zahlung am POS-Terminal ab!</strong>'+
-                                                        '</div>'+
-                                                        '<div id="splitBillPhaseOneError51'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
-                                                            '<strong>Schreiben Sie zuerst den Code!</strong>'+
-                                                        '</div>'+
-                                                        '<div id="splitBillPhaseOneError52'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
-                                                            '<strong>Ihre Geschenkkarte wurde nicht gefunden!</strong>'+
-                                                        '</div>'+
-                                                        '<div id="splitBillPhaseOneError53'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
-                                                            '<strong>Diese Geschenkkarte ist nicht mehr gültig/Ausgeben!</strong>'+
-                                                        '</div>'+
-                                                        '<div id="splitBillPhaseOneError54'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
-                                                            '<strong>Tragen Sie zunächst einen gültigen Anwendungswert ein!</strong>'+
-                                                        '</div>'+
-                                                        '<div id="splitBillPhaseOneError55'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
-                                                            '<strong>Etwas ist schiefgelaufen. Bitte neu laden und erneut versuchen!</strong>'+
-                                                        '</div>'+
-                                                        '<div id="splitBillPhaseOneError56'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
-                                                            '<strong>Dieser Betrag ist zu hoch für diese Geschenkkarte!</strong>'+
-                                                        '</div>'+
-                                                        '<div id="splitBillPhaseOneError57'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
-                                                            '<strong>Versuchen Sie es mit einem kleineren Wert, dieser ist zu viel für die aktuelle Rechnung!</strong>'+
-                                                        '</div>'+
-                                                        '<div id="splitBillPhaseOneError58'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
-                                                            '<strong>Diese Geschenkkarte ist noch nicht bezahlt. Bezahlen Sie sie, bevor Sie sie verwenden!</strong>'+
-                                                        '</div>'+
-                                                        '<div id="splitBillPhaseOneError59'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
-                                                            '<strong>Diese Geschenkkarte ist abgelaufen!</strong>'+
-                                                        '</div>'+
-                                                        '<div id="splitBillPhaseOneError510'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
-                                                            '<strong>Diese Geschenkkarte ist nicht von diesem Restaurant und kann hier nicht eingelöst werden!</strong>'+
-                                                        '</div>'+
-                                                        '<div id="splitBillPhaseOneError511'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
-                                                            '<strong>Die Geschenkkarte, die Sie verwenden wollten, ist ungültig</strong>'+
-                                                        '</div>'+
-                                                        '<div id="splitBillPhaseOneError512'+i+'" class="alert alert-danger text-center mt-1" style="display:none; width:100%;">'+
-                                                            '<strong>Die Geschenkkarte, die Sie anwenden wollten, ist noch nicht verkauft (aktiv)!</strong>'+
-                                                        '</div>'+
-                                                        '<div class="split-bill-summary-strip">'+
-                                                            '<div class="split-bill-hand-icon"><i class="fa-solid fa-hand-holding-dollar fa-lg"></i></div>'+
-                                                            '<div class="split-bill-costume-wrap">'+
-                                                                '<button id="splitBillTippBtnCostume'+i+'" style="width:100%; margin:0px;" type="button" class="btn btn-outline-dark shadow-none split-bill-tipp-btn-costume">'+
-                                                                    '<input id="splitBillTippInputCostume'+i+'" step="0.05" min="0" id="tipWaiterCosVal" type="number" onkeyup="setCostumeTipStafSplitBill(\''+i+'\',this.value)" style="width:95%; border:none;" placeholder="Gesamt mit tipp +">'+
-                                                                '</button>'+
-                                                            '</div>'+
-                                                            '<div style="width:30%;" class="text-right split-bill-summary-totals" id="splitBillClientDiv2_1'+i+'">'+
-                                                                '<p style="margin-bottom: 3px; font-size:1.2rem;" class="split-bill-summary-tipp-value"><strong class="split-bill-summary-tipp-value-text"<i style="color:red;" class="fa-solid fa-circle-xmark" id="cancelTippApplyBtn'+i+'" onclick="cancelTippApply(\''+i+'\')"></i> Tipp: <span id="splitBillModalTippValueClient'+i+'">'+parseFloat(0).toFixed(2)+'</span> CHF</strong></p>'+
-                                                                '<p style="margin-bottom: 3px; font-size:1.2rem;" class="split-bill-summary-pay-value"><strong class="split-bill-summary-pay-value-text">Bezahlen: <span id="splitBillModalPayValueClient'+i+'">'+parseFloat(respo2D[0]).toFixed(2)+'</span> CHF</strong></p>'+
-                                                            '</div>'+
-                                                        '</div>'+
-                                                        '<input type="hidden" id="splitBillTippType'+i+'" value="0">'+
-                                                        '<input type="hidden" id="splitBillGCAppliedId'+i+'" value="0">'+
-                                                        '<input type="hidden" id="splitBillGCAppliedCHFVal'+i+'" value="0">'+
-                                                        '<input type="hidden" id="splitBillnitiateId'+i+'" value="'+respo2D[5]+'">'+
-                                                    '</div>'+
                                                     '</div>';
                                 $('#splitTheBillInitiateModalBody').append(newClientLineShow);
                             }
@@ -1414,3 +1061,275 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:5px;">
 
 </script>
 
+<style>
+#splitTheBillInitiateModal .split-the-bill-initiate-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px 16px;
+    background-color: #f5f6f7;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    padding: 14px 18px;
+}
+
+#splitTheBillInitiateModal .split-bill-header-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    min-width: 0;
+}
+
+#splitTheBillInitiateModal .split-bill-initiate-title {
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: #69a6a5;
+    line-height: 1.2;
+}
+
+#splitTheBillInitiateModal .split-bill-header-pills {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    flex: 1 1 auto;
+    justify-content: center;
+}
+
+#splitTheBillInitiateModal .split-bill-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 25px;
+    border-radius: 50px;
+    background: linear-gradient(to bottom, #76cfcf, #4db6ac);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    color: #fff;
+    font-weight: 600;
+    font-size: 15px;
+    white-space: nowrap;
+}
+
+#splitTheBillInitiateModal .split-bill-pill-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    color: #fff;
+    stroke: #fff;
+}
+
+#splitTheBillInitiateModal .split-bill-initiate-close {
+    float: none;
+    margin: 0;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 50%;
+    background-color: #e53935;
+    color: #fff;
+    opacity: 1;
+    font-size: 28px;
+    font-weight: 300;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-shadow: none;
+    border: none;
+    box-shadow: none;
+}
+
+#splitTheBillInitiateModal .split-bill-initiate-close:hover,
+#splitTheBillInitiateModal .split-bill-initiate-close:focus {
+    color: #fff;
+    opacity: 0.92;
+    outline: none;
+}
+
+#splitTheBillInitiateModal #splitTheBillInitiateModalBody {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+    align-items: stretch;
+    padding: 12px;
+    background: #eef1f2;
+}
+
+#splitTheBillInitiateModal .split-bill-client-card {
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+    background: linear-gradient(to bottom, #76c7c1, #3ba8a0);
+}
+
+#splitTheBillInitiateModal .split-bill-client-card .split-bill-client-card-head {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 12px 12px 6px !important;
+    border-bottom: none !important;
+}
+
+#splitTheBillInitiateModal .split-bill-client-card-body-2 {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 6px 12px 12px !important;
+    border-bottom: none !important;
+}
+
+#splitTheBillInitiateModal .split-bill-client-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+#splitTheBillInitiateModal .split-bill-pay-row1 .btn,
+#splitTheBillInitiateModal .split-bill-pay-row2 .btn {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 14px;
+    padding: 6px 8px;
+    background-color: #fff !important;
+    color: #3ba8a0 !important;
+    border: none !important;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+#splitTheBillInitiateModal .split-bill-client-card-body .btn.btn-dark:not(:disabled) {
+    background-color: #2d8a82 !important;
+    color: #fff !important;
+}
+
+#splitTheBillInitiateModal .split-bill-client-card-body .btn:disabled {
+    opacity: 0.55;
+}
+
+#splitTheBillInitiateModal .split-bill-client-card-body .input-group,
+#splitTheBillInitiateModal .split-bill-client-card-body .btn-danger {
+    margin-top: 4px;
+}
+
+#splitTheBillInitiateModal .split-bill-tipp-btn-costume {
+    width: 100%;
+    margin: 0;
+    max-height: 30px;
+    align-self: center;
+    border-radius: 50px !important;
+    padding: 6px 14px !important;
+    min-height: 38px;
+    background: rgba(255, 255, 255, 0.22) !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+}
+
+#splitTheBillInitiateModal .split-bill-tipp-btn-costume input {
+    background: transparent !important;
+    color: #fff !important;
+    text-align: center;
+}
+
+#splitTheBillInitiateModal .split-bill-tipp-btn-costume input::placeholder {
+    color: rgba(255, 255, 255, 0.72);
+}
+
+#splitTheBillInitiateModal .split-bill-summary-strip {
+    display: flex;
+    align-items: stretch;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+    margin-top: 6px;
+}
+
+#splitTheBillInitiateModal .split-bill-hand-icon {
+    color: #fff;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 4px 0;
+}
+
+#splitTheBillInitiateModal .split-bill-costume-wrap {
+    flex: 1 1 140px;
+    display: flex;
+    justify-content: center;
+    min-width: 0;
+}
+
+#splitTheBillInitiateModal .split-bill-summary-totals {
+    flex: 1 1 160px;
+    min-width: 0;
+    text-align: right;
+}
+
+#splitTheBillInitiateModal .split-bill-client-card .alert {
+    width: 100%;
+    margin-bottom: 6px;
+    font-size: 14px;
+    padding: 6px 8px;
+}
+
+#splitTheBillInitiateModal .split-bill-client-card-head .alert-success,
+#splitTheBillInitiateModal .split-bill-client-card .split-bill-client-card-body-2 .alert-success {
+    background-color: #d4edda !important;
+    color: #155724 !important;
+    border-radius: 0;
+}
+
+#splitTheBillInitiateModal .alert-success .split-bill-client-head strong,
+#splitTheBillInitiateModal .split-bill-client-card-head .alert-success .split-bill-client-card-body .btn {
+    color: inherit !important;
+}
+
+#splitTheBillInitiateModal .split-bill-summary-tipp-value .fa-circle-xmark::before {
+    font-size: 30px;
+}
+
+#splitTheBillInitiateModal .split-bill-summary-tipp-value, #splitTheBillInitiateModal .split-bill-summary-pay-value {
+    margin-bottom: 3px;
+    font-size: 19px;
+    border-radius: 18px;
+    padding: 6px 14px;
+    min-height: 36px;
+    background: rgba(255, 255, 255, 0.22);
+    color: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    font-size: 14px !important;
+}
+
+#splitTheBillInitiateModal .split-bill-summary-tipp-value-text {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin-left: 23px;
+    gap: 5px;
+    color: #fff !important;
+}
+
+#splitTheBillInitiateModal .split-bill-summary-pay-value-text {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+}
+
+@media (max-width: 420px) {
+    #splitTheBillInitiateModal .split-bill-summary-strip {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    #splitTheBillInitiateModal .split-bill-costume-wrap {
+        flex: 1 1 auto;
+    }
+    #splitTheBillInitiateModal .split-bill-summary-totals {
+        width: 100% !important;
+        flex: 1 1 auto;
+        text-align: left;
+    }
+}
+</style>
