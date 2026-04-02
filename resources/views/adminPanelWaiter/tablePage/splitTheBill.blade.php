@@ -59,7 +59,7 @@
     }
     var btn = document.getElementById("splitBillOpenCameraModalBtn");
     // Assigning event listeners to the button
-    btn.addEventListener("click", splitBillOpenCameraGC);
+    // btn.addEventListener("click", splitBillOpenCameraGC);
     
 </script>
 
