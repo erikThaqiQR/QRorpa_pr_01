@@ -363,7 +363,8 @@ use App\payTecTransactionLog;
                             "price"       => $mappedProducts[$prod[0]]['price'] + $prod[4],
                             "type"        => $prod[5] ?? '',
                             "prod_id"     => $prod[7] ?? '',
-                            "ex"          => $prod[2] ?? ''
+                            "ex"          => $prod[2] ?? '',
+                            "grouped"     => true
                         ];
                     } else {
                         $mappedProducts[$prod[0]] = [
@@ -372,7 +373,8 @@ use App\payTecTransactionLog;
                             "price"       => $prod[4],
                             "type"        => $prod[5] ?? '',
                             "prod_id"     => $prod[7] ?? '',
-                            "ex"          => $prod[2] ?? ''
+                            "ex"          => $prod[2] ?? '',
+                            "grouped"     => false
                         ];
                     }
                 }
@@ -423,7 +425,7 @@ use App\payTecTransactionLog;
                         } 
                     ?>
                     <td style="text-align: right;">
-                        @if ($sasiaProdThis <= 1)
+                        @if (!$produkti['grouped'])
                             <p style="padding:2px;">{{number_format($produkti['price'] / $sasiaProdThis, 2, '.', '')}}<sup style="font-size:8px; margin:0px; padding:0px;">CHF</sup></p>
                         @endif
                     </td>
