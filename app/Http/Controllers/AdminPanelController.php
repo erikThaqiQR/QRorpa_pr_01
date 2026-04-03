@@ -68,6 +68,7 @@ use App\orderServingDevices;
 use Illuminate\Http\Request;
 use SpryngApiHttpPhp\Client;
 use App\payTecTransactionLog;
+use App\payTecTransactionLogPassive;
 use App\cooksProductSelection;
 use App\Events\addToCartAdmin;
 use App\orderServingOrderShow;
@@ -718,7 +719,7 @@ EPD
         $showProdData = $req->tableN.'-||-'.$newTabOrder->id.'-||-'.$newTabOrder->status.'-||-'.$newTabOrder->OrderQmimi.'-||-'.
         $newTabOrder->created_at.'-||-'.$newTabOrder->OrderSasia.'-||-'.$newTabOrder->OrderEmri.'-||-'.$newTabOrder->OrderPershkrimi.'-||-'.
         $newTabOrder->OrderType.'-||-'.$tabOrComm.'-||-'.$waiterDataName.'-||-'.$thePlate.'-||-'.$newTabOrder->tabCode.'-||-'.$extraToShow.'-||-'.
-        $newTabOrder->OrderSasiaDone.'-||-'.$newTabOrder->usrPhNr.'-||-'.$newTabOrder->toPlate.'-||-'.$newTabOrder->abrufenStat;
+        $newTabOrder->OrderSasiaDone.'-||-'.$newTabOrder->usrPhNr.'-||-'.$newTabOrder->toPlate.'-||-'.$newTabOrder->abrufenStat.'-||-'.$req->prodId.'-||-'.$tabCodeN;
 
         return $showProdData;
     }
@@ -2761,7 +2762,7 @@ EPD
         $showProdData = $requ->tNr.'-||-'.$newTabOrder->id.'-||-'.$newTabOrder->status.'-||-'.$newTabOrder->OrderQmimi.'-||-'.
         $newTabOrder->created_at.'-||-'.$newTabOrder->OrderSasia.'-||-'.$newTabOrder->OrderEmri.'-||-'.$newTabOrder->OrderPershkrimi.'-||-'.
         $newTabOrder->OrderType.'-||-'.$tabOrComm.'-||-'.$waiterDataName.'-||-'.$thePlate.'-||-'.$newTabOrder->tabCode.'-||-'.$extraToShow.'-||-'.
-        $newTabOrder->OrderSasiaDone.'-||-'.$newTabOrder->usrPhNr.'-||-'.$newTabOrder->toPlate.'-||-'.$newTabOrder->abrufenStat;
+        $newTabOrder->OrderSasiaDone.'-||-'.$newTabOrder->usrPhNr.'-||-'.$newTabOrder->toPlate.'-||-'.$newTabOrder->abrufenStat.'-||-'.$requ->pid.'-||-'.$tabCodeN;
 
         return $showProdData;
     }
@@ -2965,7 +2966,7 @@ EPD
         $showProdData = $requ->tNr.'-||-'.$newTabOrder->id.'-||-'.$newTabOrder->status.'-||-'.$newTabOrder->OrderQmimi.'-||-'.
         $newTabOrder->created_at.'-||-'.$newTabOrder->OrderSasia.'-||-'.$newTabOrder->OrderEmri.'-||-'.$newTabOrder->OrderPershkrimi.'-||-'.
         $newTabOrder->OrderType.'-||-'.$tabOrComm.'-||-'.$waiterDataName.'-||-'.$thePlate.'-||-'.$newTabOrder->tabCode.'-||-'.$extraToShow.'-||-'.
-        $newTabOrder->OrderSasiaDone.'-||-'.$newTabOrder->usrPhNr.'-||-'.$newTabOrder->toPlate.'-||-'.$newTabOrder->abrufenStat;
+        $newTabOrder->OrderSasiaDone.'-||-'.$newTabOrder->usrPhNr.'-||-'.$newTabOrder->toPlate.'-||-'.$newTabOrder->abrufenStat.'-||-'.$requ->pid.'-||-'.$tabCodeN;
 
         return $showProdData;
     }
@@ -4013,8 +4014,7 @@ EPD
 
     public function copyOrdersToOrdersPassive(Request $req){
         if(isset($_GET['hash']) && $_GET['hash'] == '123555789222333' ){
-            $orders = Orders::where('created_at', '>', Carbon::now()->subDays(2)->toDateTimeString())->get();
-            foreach($orders as $orOne){
+            foreach(Orders::where('created_at', '>', Carbon::now()->subMinutes(10)->toDateTimeString())->get() as $orOne){
                 if(OrdersPassive::find($orOne->id) == Null){
                     $Orpassive = new OrdersPassive();
                     $Orpassive->id = $orOne->id;
@@ -4061,7 +4061,7 @@ EPD
                 }
             }
 
-            foreach(Orders::where('created_at', '>', Carbon::now()->subDays(2)->toDateTimeString())->get() as $orOneAll){
+            foreach(Orders::where('created_at', '>', Carbon::now()->subDays(1)->toDateTimeString())->get() as $orOneAll){
                 $pasOr = OrdersPassive::find($orOneAll->id);
                 if($pasOr != Null){
                     if($pasOr->statusi != $orOneAll->statusi || $pasOr->StatusBy != $orOneAll->StatusBy || $pasOr->cancelComm != $orOneAll->cancelComm){
@@ -4158,11 +4158,64 @@ EPD
             //         $waLoPass->actId = $waLoOne->actId;
             //         $waLoPass->sasia = $waLoOne->sasia;
             //         $waLoPass->save();
+
+                    
             //     }
             // }
             // foreach(waiterActivityLog::where('created_at', '<', Carbon::now()->subMinutes(600)->toDateTimeString())->get() as $waLoOne){
             //     if(waiterActivityLogPassive::find($waLoOne->id) != Null){
             //         $waLoOne->delete();
+            //     }
+            // }
+
+            // foreach(payTecTransactionLog::where('created_at', '>', Carbon::now()->subMinutes(10)->toDateTimeString())->get() as $payLogOne){
+            //     if(payTecTransactionLogPassive::find($payLogOne->id) == Null){
+            //         $payTecLogPassive = new payTecTransactionLogPassive();
+            //         $payTecLogPassive->orderId = $payLogOne->orderId;
+            //         $payTecLogPassive->toRes = $payLogOne->toRes;
+            //         if(isset($payLogOne->TrmID)){ $payTecLogPassive->TrmID = $payLogOne->TrmID; }
+            //         if(isset($payLogOne->TrxResult)){ $payTecLogPassive->TrxResult = $payLogOne->TrxResult; }
+            //         if(isset($payLogOne->Brand)){ $payTecLogPassive->Brand = $payLogOne->Brand; }                    
+            //         if(isset($payLogOne->VoicePhone)){ $payTecLogPassive->VoicePhone = $payLogOne->VoicePhone; }
+            //         if(isset($payLogOne->TrxRefNum)){ $payTecLogPassive->TrxRefNum = $payLogOne->TrxRefNum; }
+            //         if(isset($payLogOne->AccountType)){ $payTecLogPassive->AccountType = $payLogOne->AccountType; }
+            //         if(isset($payLogOne->AcqID)){ $payTecLogPassive->AcqID = $payLogOne->AcqID; }
+            //         if(isset($payLogOne->AID)){ $payTecLogPassive->AID = $payLogOne->AID; }
+            //         if(isset($payLogOne->AIDICC)){ $payTecLogPassive->AIDICC = $payLogOne->AIDICC; }
+            //         if(isset($payLogOne->AmtAuth)){ $payTecLogPassive->AmtAuth = $payLogOne->AmtAuth; }
+            //         if(isset($payLogOne->AuthC)){ $payTecLogPassive->AuthC = $payLogOne->AuthC; }
+            //         if(isset($payLogOne->ARC)){ $payTecLogPassive->ARC = $payLogOne->ARC; }
+            //         if(isset($payLogOne->CVMResults)){ $payTecLogPassive->CVMResults = $payLogOne->CVMResults; }
+            //         if(isset($payLogOne->IssCntryC)){ $payTecLogPassive->IssCntryC = $payLogOne->IssCntryC; }
+            //         if(isset($payLogOne->POSEntryMode)){ $payTecLogPassive->POSEntryMode = $payLogOne->POSEntryMode; }
+            //         if(isset($payLogOne->TrxAmt)){ $payTecLogPassive->TrxAmt = $payLogOne->TrxAmt; }
+            //         if(isset($payLogOne->TrxCurrC)){ $payTecLogPassive->TrxCurrC = $payLogOne->TrxCurrC; }
+            //         if(isset($payLogOne->TrxType)){ $payTecLogPassive->TrxType = $payLogOne->TrxType; }
+            //         if(isset($payLogOne->TrxSeqCnt)){ $payTecLogPassive->TrxSeqCnt = $payLogOne->TrxSeqCnt; }
+            //         if(isset($payLogOne->TrxDate)){ $payTecLogPassive->TrxDate = $payLogOne->TrxDate; }
+            //         if(isset($payLogOne->TrxTime)){ $payTecLogPassive->TrxTime = $payLogOne->TrxTime; }
+            //         if(isset($payLogOne->AuthReslt)){ $payTecLogPassive->AuthReslt = $payLogOne->AuthReslt; }
+            //         if(isset($payLogOne->AppPANEnc)){ $payTecLogPassive->AppPANEnc = $payLogOne->AppPANEnc; }
+            //         if(isset($payLogOne->StatKeyPANRctInd)){ $payTecLogPassive->StatKeyPANRctInd = $payLogOne->StatKeyPANRctInd; }
+            //         if(isset($payLogOne->KeyPANRctDOLInd)){ $payTecLogPassive->KeyPANRctDOLInd = $payLogOne->KeyPANRctDOLInd; }
+            //         if(isset($payLogOne->DisplayName)){ $payTecLogPassive->DisplayName = $payLogOne->DisplayName; }
+            //         if(isset($payLogOne->TrxResultExtended)){ $payTecLogPassive->TrxResultExtended = $payLogOne->TrxResultExtended; }
+            //         if(isset($payLogOne->IIN)){ $payTecLogPassive->IIN = $payLogOne->IIN; }
+            //         if(isset($payLogOne->AppPANPrtCardholder)){ $payTecLogPassive->AppPANPrtCardholder = $payLogOne->AppPANPrtCardholder; }
+            //         if(isset($payLogOne->AppPANPrtAttendant)){ $payTecLogPassive->AppPANPrtAttendant = $payLogOne->AppPANPrtAttendant; }
+            //         if(isset($payLogOne->SurrogatePAN)){ $payTecLogPassive->SurrogatePAN = $payLogOne->SurrogatePAN; }
+            //         if(isset($payLogOne->CardholderText)){ $payTecLogPassive->CardholderText = $payLogOne->CardholderText; }
+            //         if(isset($payLogOne->AttendantText)){ $payTecLogPassive->AttendantText = $payLogOne->AttendantText; }
+            //         if(isset($payLogOne->TipAmt)){ $payTecLogPassive->TipAmt = $payLogOne->TipAmt; }
+            //         if(isset($payLogOne->AmtRemaining)){ $payTecLogPassive->AmtRemaining = $payLogOne->AmtRemaining; }
+            //         $payTecLogPassive->save();
+                 
+            //     }
+            // }
+
+            // foreach(payTecTransactionLog::where('created_at', '<', Carbon::now()->subDays(7)->toDateTimeString())->get() as $payLogOne){
+            //     if(payTecTransactionLogPassive::find($payLogOne->id) != Null){
+            //         $payLogOne->delete();
             //     }
             // }
         }
@@ -6363,6 +6416,26 @@ EPD
         }
     }
 
+    public function tabOrderShowGroupedOrdersByProduct(Request $req){
+        $tabOrAll = TabOrder::query()
+                            ->join('tab_verification_p_numbers as tvpn', 'tab_orders.id', '=', 'tvpn.tabOrderId')
+                            ->where([
+                                ['tab_orders.tabCode', $req->tabCode],
+                                ['tvpn.phoneNr', $req->clientPHN],
+                                ['tab_orders.toPlate', $req->plateId],
+                                ['tab_orders.prodId', $req->productId],
+                            ])
+                            ->select([
+                                'tab_orders.*',
+                                'tab_orders.status as TOstatus',
+                                'tvpn.phoneNr',
+                            ])
+                            ->latest('tab_orders.created_at')
+                            ->get();
+        return json_encode( $tabOrAll );
+    }
+
+
     public function tabOrderModalCheckTotalPriceShow(Request $req){
          $totalQmimiShow = number_format(0, 2, '.', '');
         if($req->tabOrSel == '0'){
@@ -6539,7 +6612,7 @@ EPD
             $showProdData = $thisTabOr->tableNr.'-||-'.$newTabOrder->id.'-||-'.$newTabOrder->status.'-||-'.$newTabOrder->OrderQmimi.'-||-'.
             $newTabOrder->created_at.'-||-'.$newTabOrder->OrderSasia.'-||-'.$newTabOrder->OrderEmri.'-||-'.$newTabOrder->OrderPershkrimi.'-||-'.
             $newTabOrder->OrderType.'-||-'.$tabOrComm.'-||-'.$waiterDataName.'-||-'.$thePlate.'-||-'.$newTabOrder->tabCode.'-||-'.$extraToShow.'-||-'.
-            $newTabOrder->OrderSasiaDone.'-||-'.$newTabOrder->usrPhNr.'-||-'.$newTabOrder->toPlate.'-||-'.$newTabOrder->abrufenStat;
+            $newTabOrder->OrderSasiaDone.'-||-'.$newTabOrder->usrPhNr.'-||-'.$newTabOrder->toPlate.'-||-'.$newTabOrder->abrufenStat.'-||-'.$thisTabOr->prodId.'-||-'.$tabCodeN;
 
             if($showProdDataAll == 'none'){
                 $showProdDataAll = $showProdData;
