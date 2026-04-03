@@ -5325,13 +5325,13 @@ EPD
                 if(isset($mappedOrderedProducts[$explodedProduct[0]])){
                     $mappedOrderedProducts[$explodedProduct[0]] = [
                         "productName" => $explodedProduct[0],
-                        "quantity" => ++$mappedOrderedProducts[$explodedProduct[0]]['quantity'],
+                        "quantity" => $explodedProduct[3] ? $mappedOrderedProducts[$explodedProduct[0]]['quantity'] + $explodedProduct[3] : ++$mappedOrderedProducts[$explodedProduct[0]]['quantity'],
                         "price" => $mappedOrderedProducts[$explodedProduct[0]]['price'] + $explodedProduct[4]
                     ];
                 } else {
                     $mappedOrderedProducts[$explodedProduct[0]] = [
                         "productName" => $explodedProduct[0],
-                        "quantity" => 1,
+                        "quantity" => $explodedProduct[3] ?? 1,
                         "price" => $explodedProduct[4]
                     ];
                 }
