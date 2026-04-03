@@ -5316,13 +5316,33 @@ EPD
             $time2D = explode(':',explode(' ',$theTime)[1]);
             $theTime = $date2D[2].'.'. $date2D[1].'.'. $date2D[0].' '.$time2D[0].':'.$time2D[1];
 
+            $orderedProducts = explode('---8---',$theOr->porosia);
+
+            $mappedOrderedProducts = [];
+            foreach($orderedProducts as $product){
+                $explodedProduct = explode('-8-', $product);
+
+                if(isset($mappedOrderedProducts[$explodedProduct[0]])){
+                    $mappedOrderedProducts[$explodedProduct[0]] = [
+                        "productName" => $explodedProduct[0],
+                        "quantity" => $explodedProduct[3] ? $mappedOrderedProducts[$explodedProduct[0]]['quantity'] + $explodedProduct[3] : ++$mappedOrderedProducts[$explodedProduct[0]]['quantity'],
+                        "price" => $mappedOrderedProducts[$explodedProduct[0]]['price'] + $explodedProduct[4]
+                    ];
+                } else {
+                    $mappedOrderedProducts[$explodedProduct[0]] = [
+                        "productName" => $explodedProduct[0],
+                        "quantity" => $explodedProduct[3] ?? 1,
+                        "price" => $explodedProduct[4]
+                    ];
+                }
+            }
+
             $theOrder = '<p style="width:100%; text-align:left; font-size:0.9rem; display:flex; flex-wrap: wrap; justify-content: space-between;">';
-            foreach(explode('---8---',$theOr->porosia) as $produkti){  
-                $prod = explode('-8-', $produkti);
-                $theOrder .= '<span style="width:80%;">'.$prod[3].'x '.$prod[0].' ';
+            foreach($mappedOrderedProducts as $product){
+                $theOrder .= '<span style="width:80%;">'.$product['quantity'].'x '.$product['productName'].' ';
 
                 $theOrder .= ' </span>';
-                $theOrder .= ' <span style="width:20%; text-align:right;">'.number_format($prod[4], 2, '.', '');
+                $theOrder .= ' <span style="width:20%; text-align:right;">'.number_format($product['price'], 2, '.', '');
                 $theOrder .= ' </span><br>';
             }
             $theOrder .= '</p>';
