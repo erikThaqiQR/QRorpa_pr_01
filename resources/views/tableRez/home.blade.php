@@ -32,7 +32,7 @@
 
 
 
-    @if ($theResId == 58)
+    @if ($theResId == 9999999999999)
         <!-- Modal -->
         <div class="modal fade mt-5" id="res58BlockReservationsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
             <div class="modal-dialog" role="document">

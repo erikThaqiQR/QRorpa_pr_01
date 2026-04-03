@@ -26,7 +26,9 @@ use App\accessControllForAdmins;
 use App\tabVerificationPNumbers;
 use App\orderServingNotification;
 use App\orderServingDevicesAccess;
+use App\TableQrcode;
 use Illuminate\Support\Facades\Auth;
+use Symfony\Component\Console\Helper\Table;
 
 class adminMngWorkersController extends Controller
 {

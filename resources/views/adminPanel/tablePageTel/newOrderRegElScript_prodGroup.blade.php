@@ -695,8 +695,10 @@
 
 
 
+
     function buildTheNewProdInOrderTable(tNr, tOrId, tOrStatus, tOrQmimi, tOrCreAt, tOrSasia, tOrEmri, tOrPershkrimi, tOrType, tOrKoment, staffName, plateName, extrasAll, tOrSasiaDone, clPhNr, plateId, abrufenStat, prodId, tabCode){
   
+        console.log('buildTheNewProdInOrderTable function called with: ', {tNr, tOrId, tOrStatus, tOrQmimi, tOrCreAt, tOrSasia, tOrEmri, tOrPershkrimi, tOrType, tOrKoment, staffName, plateName, extrasAll, tOrSasiaDone, clPhNr, plateId, abrufenStat, prodId, tabCode});
         if ($('#tabOrderDivGroup'+prodId).length) {
             var oldSasia = parseInt($('#tabOrderSasiaSpan'+prodId).text());
             var newSasia = oldSasia + parseInt(tOrSasia);

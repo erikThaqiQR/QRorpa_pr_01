@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Auth;
     var last = "";
     var lastV = 0;
 </script>
-@if ($usrNotiReg21 != Null) 
+@if ($usrNotiReg21 != Null && $usrNotiReg21Sound != Null) 
     <script> var hasAddSoundSelected= true; </script>
 @else
     <script> var hasAddSoundSelected= false; </script>
@@ -310,4 +310,9 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:1%;">
     </div>
 </div>
 
-@include('adminPanel.tablePageTel.newOrderRegElScript')
+@if(in_array($sFor, [31000000, 5000]))
+    <!-- display same products together -->
+    @include('adminPanel.tablePageTel.newOrderRegElScript_prodGroup')
+@else
+    @include('adminPanel.tablePageTel.newOrderRegElScript')
+@endif

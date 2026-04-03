@@ -390,6 +390,8 @@ Route::post('deleteTabOrderCheckForConfirmed', 'AdminPanelController@deleteTabOr
 
 Route::post('tabOrderModalCheckTotalPriceShow', 'AdminPanelController@tabOrderModalCheckTotalPriceShow')->name('tablePage.tabOrderModalCheckTotalPriceShow');
 
+Route::get('tabOrderShowGroupedOrdersByProduct', 'AdminPanelController@tabOrderShowGroupedOrdersByProduct')->name('tablePage.tabOrderShowGroupedOrdersByProduct');
+
 Route::post('tabOrderModalCheckActiveOrToReopen', 'AdminPanelController@tabOrderModalCheckActiveOrToReopen')->name('tablePage.tabOrderModalCheckActiveOrToReopen');
 //--------------------------------------------------------------------------------------------------------------------
 

@@ -260,10 +260,15 @@ use App\restorantTablesToRoom;
 </script>
 
 @include('adminPanel.tablePageTel.newOrderRegEl')
-@if (1 == 0)
+@if (false)
     @include('adminPanel.tablePageTel.tableIndexActiveOrMd')
 @else
-    @include('adminPanel.tablePageTel.tableIndexActiveOrMdVer_2')
+    @if(in_array($sFor, [31, 5000]))
+        <!-- display same products together -->
+        @include('adminPanel.tablePageTel.tableIndexActiveOrMdVer_2_podGroup')
+    @else
+        @include('adminPanel.tablePageTel.tableIndexActiveOrMdVer_2')
+    @endif
 @endif
 @include('adminPanel.tablePageTel.tableIndexNotifications')
 @include('adminPanel.tablePageTel.tablePageIndexScript')

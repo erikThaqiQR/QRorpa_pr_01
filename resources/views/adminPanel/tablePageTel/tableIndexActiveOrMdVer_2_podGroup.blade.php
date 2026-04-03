@@ -62,7 +62,7 @@ use App\waiterActivityLog;
                 </div>
 
                 <div class="d-flex flex-wrap justify-content-between mb-2" style="width:100%;" id="extraServicesOnTable{{$tabelOne->tableNr}}">
-                    <button id="payAllProd{{$tabelOne->tableNr}}" class="btn btn-dark shadow-none"  onclick="prepPayAllProds('{{$tabelOne->tableNr}}','{{Auth::user()->sFor}}')"
+                    <button id="payAllProd{{$tabelOne->tableNr}}" class="btn btn-dark shadow-none" onclick="prepPayAllProds('{{$tabelOne->tableNr}}','{{Auth::user()->sFor}}')"
                         style="width:24.6%; font-size:0.65rem;" data-toggle="modal" data-target="#payAllPhaseOne">
                         <strong>Bezahlen</strong>
                     </button>
@@ -241,12 +241,12 @@ use App\waiterActivityLog;
                                                     ?>
 
                                                     <div style="border: 1px solid rgb(72,81,87); border-radius:2px; margin-bottom:2px;" id="tabOrderDiv{{$thisTOrder->id}}"
-                                                    class="d-flex flex-wrap justify-content-between {{ $thisTOrder->abrufenStat == 1 ? 'tabOrderDivCalled' : ($thisTOrder->status == 1 ? 'tabOrderDivConfirmed' : '') }}" 
+                                                    class="d-flex flex-wrap justify-content-between tabOrderDivGroup{{$prodsInTabIdGroupOne}} {{ $thisTOrder->abrufenStat == 1 ? 'tabOrderDivCalled' : ($thisTOrder->status == 1 ? 'tabOrderDivConfirmed' : '') }}" 
                                                     onclick="closeOrSelect('{{$tabelOne->tableNr}}','{{$thisTOrder->id}}','{{$thisTOrder->OrderSasia}}')">
                                                         <p class="pl-1" style="width:60%; margin:0; padding-top:2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height:0.9;">
                                                             <strong>
                                                                 
-                                                            <span id="tabOrderSasiaSpan{{$thisTOrder->id}}">{{$thisTOrder->OrderSasia}}x</span> {{$thisTOrder->OrderEmri}}
+                                                            <span id="tabOrderSasiaSpan{{$thisTOrder->id}}" class="tabOrderSasiaSpan{{$prodsInTabIdGroupOne}}">{{$thisTOrder->OrderSasia}}x</span> {{$thisTOrder->OrderEmri}}
                                                             @if ($thisTOrder->OrderType != 'empty' && $thisTOrder->OrderExtra != 'empty')
                                                                 <?php $theTy2D = explode('||',$thisTOrder->OrderType); ?>
                                                                 <br>
@@ -301,7 +301,7 @@ use App\waiterActivityLog;
                                                             @endif
                                                             </strong>
                                                         </p>
-                                                        <p style="width:15%; margin:0; text-align:center;"><strong>{{number_format($thisTOrder->OrderQmimi, 2, '.', '')}}.-</strong></p>
+                                                        <p style="width:15%; margin:0; text-align:center;"><strong><span id="tabOrderQmimiSpan{{$thisTOrder->id}}" class="tabOrderQmimiSpan{{$prodsInTabIdGroupOne}}">{{number_format($thisTOrder->OrderQmimi, 2, '.', '')}}</span>.-</strong></p>
                                                         @if($thisTOrder->OrderSasia == $thisTOrder->OrderSasiaDone)
                                                         <div style="width:5% ; background-color:green;">
                                                             <!-- <div style="width:60%; aspect-ratio: 1 / 1; border-radius:50%; background-color:green; margin:20% 0% 20% 0%;"></div> -->
@@ -313,12 +313,12 @@ use App\waiterActivityLog;
                                                         @endif
                                                     </div>
                                                 @else
-                                                   <div style="border: 1px solid rgb(72,81,87); border-radius:2px; margin-bottom:2px;" class="d-flex flex-wrap justify-content-between"
+                                                   <div style="border: 1px solid rgb(72,81,87); border-radius:2px; margin-bottom:2px;" class="d-flex flex-wrap justify-content-between" id="tabOrderDivGroup{{$prodsInTabIdGroupOne}}"
                                                    onclick="openGroupProductSelectionPage('{{$prodsInTabIdGroupOne}}','{{$tabelOne->kaTab}}','{{$activeClientsPNrOneNew}}','{{$onePlateIdThisCl}}')">
                                                         <p class="pl-1" style="width:80%; margin:0; padding-top:2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height:0.9; font-weight:bold;">
-                                                            <span id="tabOrderSasiaSpan{{$prodsInTabIdGroupOne}}">{{$prodsInTabSasiaGroup[$prodsInTabIdGroupOne]}}x</span> {{$prodsInTabEmriGroup[$prodsInTabIdGroupOne]}}
+                                                            <i class="fa-brands fa-osi"></i> <span id="tabOrderSasiaSpan{{$prodsInTabIdGroupOne}}">{{$prodsInTabSasiaGroup[$prodsInTabIdGroupOne]}}x</span> {{$prodsInTabEmriGroup[$prodsInTabIdGroupOne]}}
                                                         </p>
-                                                        <p style="width:20%; margin:0; text-align:center;"><strong>{{number_format($prodsInTabQmimiGroup[$prodsInTabIdGroupOne], 2, '.', '')}}.-</strong></p>
+                                                        <p style="width:20%; margin:0; text-align:center;"><strong><span id="tabOrderQmimiSpan{{$prodsInTabIdGroupOne}}">{{number_format($prodsInTabQmimiGroup[$prodsInTabIdGroupOne], 2, '.', '')}}</span>.-</strong></p>
                                                     </div>
                                                 @endif
                                             <!-- End display table orders -->
@@ -553,12 +553,9 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:20%;">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-body d-flex flex-wrap justify-content-between">
-                <p class="text-center mb-3" style="color:rgb(39,190,175); width:100%; font-size:1.2rem;">
-                   
-                </p>
-                <div style="width:100%" class="d-flex flex-wrap justify-content-start" id="selectToPayProdsInSelectedGroupBtns">
-                    
-                </div>
+                <p class="text-center mb-3" style="color:rgb(39,190,175); width:100%; font-size:1.2rem;"></p>
+
+                <div style="width:100%" class="d-flex flex-wrap justify-content-start" id="selectToPayProdsInSelectedGroupBtns"></div>
 
                 <button class="btn btn-outline-danger shadow-none mt-4" onclick="selectToPayProdsInSelectedGroupCancel()" style="width:100%; margin:0px;"><strong>Stornieren</strong></button>
             </div>
@@ -644,6 +641,7 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:20%;">
 @include('adminPanel.tablePageTel.splitTheBillRechnung')
 
 @include('adminPanel.tablePageTel.tableIndexActiveOrMdScriptVer_2')
+@include('adminPanel.tablePageTel.tableIndexActiveOrMdpodGroupScript')
 @include('adminPanel.tablePageTel.tableIndexPayAllCode')
 @include('adminPanel.tablePageTel.tableIndexPaySelectedCode')
 @include('adminPanel.tablePageTel.billTabletModal')
