@@ -468,14 +468,14 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:5px;">
         var toPayCHF = parseFloat($('#splitBillModalPayValueClient'+clientNr).html()).toFixed(2);
         var crrGCAmtCHF = parseFloat($('#splitBillGCAppliedCHFVal'+clientNr).val()).toFixed(2);
     
-        if(tipVal == '' || tipVal == ' ' || (parseFloat(toPayCHF) >= parseFloat(tipVal))){
+        if(tipVal == '' || tipVal == ' ' || isNaN(parseFloat(tipVal)) || parseFloat(tipVal) < 0){
             // invalide 
             $('#splitBillTippBtnCostume'+clientNr).attr('class','btn btn-dark shadow-none');
 
             $('#splitBillModalTippValueClient'+clientNr).html(parseFloat(0).toFixed(2));  
             if($('#splitTheBillError01'+clientNr).is(':hidden')){ $('#splitTheBillError01'+clientNr).show(50).delay(4500).hide(50); }         
         }else{
-            var newTipValue = parseFloat(parseFloat(tipVal).toFixed(2) - parseFloat(toPayCHF).toFixed(2)).toFixed(2);
+            var newTipValue = parseFloat(tipVal).toFixed(2);
 
             $('#splitBillTippBtnCostume'+clientNr).attr('class','btn btn-dark shadow-none');
             $('#splitBillModalTippValueClient'+clientNr).html(parseFloat(newTipValue).toFixed(2));

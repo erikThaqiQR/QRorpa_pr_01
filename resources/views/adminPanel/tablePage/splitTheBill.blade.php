@@ -359,13 +359,16 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:5px;">
                                                             '<div class="split-bill-summary-strip">'+
                                                                 '<div class="split-bill-hand-icon" style="color: #fff; flex-shrink: 0;"><i class="fa-solid fa-hand-holding-dollar fa-lg"></i></div>'+
                                                                 '<div class="split-bill-costume-wrap">'+
-                                                                    '<input class="split-bill-tipp-btn-costume" id="splitBillTippInputCostume'+i+'" step="0.05" min="0" id="tipWaiterCosVal" type="number" onkeyup="setCostumeTipStafSplitBill(\''+i+'\',this.value)" style="width:95%; border:none; font-size:12px;" placeholder="Gesamt mit Tipp">'+
+                                                                    '<input class="split-bill-tipp-btn-costume" id="splitBillTippInputCostume'+i+'" step="0.05" min="0" id="tipWaiterCosVal" type="number" onkeyup="setCostumeTipStafSplitBill(\''+i+'\',this.value)" style="width:95%; border:none; font-size:11px;" placeholder="Gesamt mit Tipp">'+
                                                                 '</div>'+
                                                                 '<div style="width:30%; flex: 1 1 140px; min-width: 0;" class="text-right split-bill-summary-totals" id="splitBillClientDiv2_1'+i+'">'+
                                                                     '<p style="margin-bottom: 4px; color:#fff; font-size:1.2rem; position:relative;" class="split-bill-summary-tipp-value"><strong class="split-bill-summary-tipp-value-text"><i style="color:#ffffff; position: absolute; left: 0;" class="fa-solid fa-circle-xmark" id="cancelTippApplyBtn'+i+'" onclick="cancelTippApply(\''+i+'\')"></i> Tipp: <span id="splitBillModalTippValueClient'+i+'">'+parseFloat(0).toFixed(2)+'</span> CHF</strong></p>'+
                                                                     '<p style="margin-bottom: 4px; color:#fff; font-size:1.2rem;" class="split-bill-summary-pay-value"><strong class="split-bill-summary-pay-value-text">Bezahlen <span id="splitBillModalPayValueClient'+i+'">'+parseFloat(respo2D[0]).toFixed(2)+'</span> CHF</strong></p>'+
                                                                 '</div>'+
                                                             '</div>'+
+                                                            '<input type="hidden" id="splitBillTippType'+i+'" value="0">'+
+                                                            '<input type="hidden" id="splitBillGCAppliedId'+i+'" value="0">'+
+                                                            '<input type="hidden" id="splitBillGCAppliedCHFVal'+i+'" value="0">'+
                                                             '<input type="hidden" id="splitBillnitiateId'+i+'" value="'+respo2D[5]+'">'+
                                                         '</div>'+
                                                     '</div>';
@@ -474,14 +477,14 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:5px;">
         var toPayCHF = parseFloat($('#splitBillModalPayValueClient'+clientNr).html()).toFixed(2);
         var crrGCAmtCHF = parseFloat($('#splitBillGCAppliedCHFVal'+clientNr).val()).toFixed(2);
     
-        if(tipVal == '' || tipVal == ' ' || (parseFloat(toPayCHF) >= parseFloat(tipVal))){
+        if(tipVal == '' || tipVal == ' ' || isNaN(parseFloat(tipVal)) || parseFloat(tipVal) < 0){
             // invalide 
             $('#splitBillTippBtnCostume'+clientNr).attr('class','btn btn-dark shadow-none');
 
             $('#splitBillModalTippValueClient'+clientNr).html(parseFloat(0).toFixed(2));  
             if($('#splitTheBillError01'+clientNr).is(':hidden')){ $('#splitTheBillError01'+clientNr).show(50).delay(4500).hide(50); }         
         }else{
-            var newTipValue = parseFloat(parseFloat(tipVal).toFixed(2) - parseFloat(toPayCHF).toFixed(2)).toFixed(2);
+            var newTipValue = parseFloat(tipVal).toFixed(2);
 
             $('#splitBillTippBtnCostume'+clientNr).attr('class','btn btn-dark shadow-none');
             $('#splitBillModalTippValueClient'+clientNr).html(parseFloat(newTipValue).toFixed(2));
