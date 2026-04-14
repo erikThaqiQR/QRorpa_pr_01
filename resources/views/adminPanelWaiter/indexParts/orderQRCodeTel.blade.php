@@ -85,15 +85,34 @@ use Illuminate\Support\Facades\Auth;
                     
                   </p>  
                   <p style="width: 65%;">
-                    @foreach(explode('---8---',$order->porosia) as $produkti)
-                      @php
-                        $prod = explode('-8-', $produkti);
-                      @endphp 
+                    @php
+                      $orderedProducts = explode('---8---',$order->porosia);
+
+                      $mappedOrderedProducts = [];
+                      foreach($orderedProducts as $product){
+                        $explodedProduct = explode('-8-', $product);
+
+                        if(isset($mappedOrderedProducts[$explodedProduct[0]])){
+                            $mappedOrderedProducts[$explodedProduct[0]] = [
+                                "productName" => $explodedProduct[0],
+                                "quantity" => $explodedProduct[3] ? $mappedOrderedProducts[$explodedProduct[0]]['quantity'] + $explodedProduct[3] : ++$mappedOrderedProducts[$explodedProduct[0]]['quantity'],
+                                "type" => null
+                            ];
+                        } else {
+                            $mappedOrderedProducts[$explodedProduct[0]] = [
+                                "productName" => $explodedProduct[0],
+                                "quantity" => $explodedProduct[3] ?? 1,
+                                "type" => $explodedProduct[5] != 'empty' ? $explodedProduct[5] : null
+                            ];
+                        }
+                      }
+                    @endphp
+                    @foreach($mappedOrderedProducts as $produkti)
                       <span >
-                        ({{$prod[3]}} x) {{$prod[0]}}  
-                        @if($prod[5] != "empty")
+                        ({{$produkti["quantity"]}} x) {{$produkti["productName"]}}  
+                        @if($produkti["type"])
                           <!-- Tipi  -->
-                          <span style="font-size:10px;"><strong>({{$prod[5]}})</strong></span>
+                          <span style="font-size:10px;"><strong>({{$produkti["type"]}})</strong></span>
                         @endif  
                       </span>
                       <br>
