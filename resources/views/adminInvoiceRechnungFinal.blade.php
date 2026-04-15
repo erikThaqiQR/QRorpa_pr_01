@@ -485,7 +485,7 @@ use App\rechnungClientToBills;
                         }
                     }else{
                         if($items->nrTable == 500){
-                            $Pr = Produktet::find($produkti['price_id']);
+                            $Pr = Produktet::find($produkti['prod_id']);
                             $taPr = Takeaway::where('prod_id',$Pr->id)->first();
                             if($taPr != Null){
                                 if($taPr->mwstForPro == 7.70 || $taPr->mwstForPro == 8.10){
