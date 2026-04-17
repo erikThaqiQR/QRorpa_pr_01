@@ -356,7 +356,17 @@ use App\payTecTransactionLog;
                 foreach ($products as $product) {
                     $prod = explode('-8-', $product);
 
-                    if(isset($mappedProducts[$prod[0]])){
+                    if(str_contains($prod[3], '/')){
+                        $mappedProducts[] = [
+                            "productName" => $prod[0] ?? '',
+                            "quantity"    => $prod[3] ?? 1,
+                            "price"       => $prod[4],
+                            "type"        => $prod[5] ?? '',
+                            "prod_id"     => $prod[7] ?? '',
+                            "ex"          => $prod[2] ?? '',
+                            "grouped"     => false
+                        ];
+                    } else if(isset($mappedProducts[$prod[0]])){
                         $mappedProducts[$prod[0]] = [
                             "productName" => $prod[0] ?? '',
                             "quantity"    => $prod[3] ? $mappedProducts[$prod[0]]['quantity'] + $prod[3] : ++$mappedProducts[$prod[0]]['quantity'],

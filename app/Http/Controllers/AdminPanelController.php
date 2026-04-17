@@ -5322,7 +5322,13 @@ EPD
             foreach($orderedProducts as $product){
                 $explodedProduct = explode('-8-', $product);
 
-                if(isset($mappedOrderedProducts[$explodedProduct[0]])){
+                if(str_contains($explodedProduct[3], '/')){
+                    $mappedOrderedProducts[] = [
+                        "productName" => $explodedProduct[0],
+                        "quantity" => $explodedProduct[3],
+                        "price" => $explodedProduct[4]
+                    ];
+                } else if(isset($mappedOrderedProducts[$explodedProduct[0]])){
                     $mappedOrderedProducts[$explodedProduct[0]] = [
                         "productName" => $explodedProduct[0],
                         "quantity" => $explodedProduct[3] ? $mappedOrderedProducts[$explodedProduct[0]]['quantity'] + $explodedProduct[3] : ++$mappedOrderedProducts[$explodedProduct[0]]['quantity'],

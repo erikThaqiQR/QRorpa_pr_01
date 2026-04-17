@@ -91,17 +91,23 @@ use Illuminate\Support\Facades\Auth;
                       foreach($orderedProducts as $product){
                         $explodedProduct = explode('-8-', $product);
 
-                        if(isset($mappedOrderedProducts[$explodedProduct[0]])){
+                        if(str_contains($explodedProduct[3], '/')){
+                          $mappedOrderedProducts[] = [
+                                "productName" => $explodedProduct[0],
+                                "quantity"    => $explodedProduct[3],
+                                "type"        => $explodedProduct[5] != 'empty' ? $explodedProduct[5] : null
+                            ];
+                        } else if(isset($mappedOrderedProducts[$explodedProduct[0]])){
                             $mappedOrderedProducts[$explodedProduct[0]] = [
                                 "productName" => $explodedProduct[0],
-                                "quantity" => $explodedProduct[3] ? $mappedOrderedProducts[$explodedProduct[0]]['quantity'] + $explodedProduct[3] : ++$mappedOrderedProducts[$explodedProduct[0]]['quantity'],
-                                "type" => null
+                                "quantity"    => $explodedProduct[3] ? $mappedOrderedProducts[$explodedProduct[0]]['quantity'] + $explodedProduct[3] : ++$mappedOrderedProducts[$explodedProduct[0]]['quantity'],
+                                "type"        => null
                             ];
                         } else {
                             $mappedOrderedProducts[$explodedProduct[0]] = [
                                 "productName" => $explodedProduct[0],
-                                "quantity" => $explodedProduct[3] ?? 1,
-                                "type" => $explodedProduct[5] != 'empty' ? $explodedProduct[5] : null
+                                "quantity"    => $explodedProduct[3] ?? 1,
+                                "type"        => $explodedProduct[5] != 'empty' ? $explodedProduct[5] : null
                             ];
                         }
                       }
