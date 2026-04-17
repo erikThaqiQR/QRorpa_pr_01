@@ -396,18 +396,18 @@ use App\rechnungClientToBills;
                             "ex"          => $prod[2] ?? '',
                             "grouped"     => false
                         ];
-                    } else if(isset($mappedProducts[$prod[0]])){
-                        $mappedProducts[$prod[0]] = [
+                    } else if(isset($mappedProducts[$prod[7]])){
+                        $mappedProducts[$prod[7]] = [
                             "productName" => $prod[0] ?? '',
-                            "quantity"    => $prod[3] ? $prod[3] + $mappedProducts[$prod[0]]['quantity'] : ++$mappedProducts[$prod[0]]['quantity'],
-                            "price"       => $mappedProducts[$prod[0]]['price'] + $prod[4],
+                            "quantity"    => $prod[3] ? $prod[3] + $mappedProducts[$prod[7]]['quantity'] : ++$mappedProducts[$prod[7]]['quantity'],
+                            "price"       => $mappedProducts[$prod[7]]['price'] + $prod[4],
                             "type"        => $prod[5] ?? null,
                             "prod_id"     => $prod[7] ?? '',
                             "ex"          => $prod[2] ?? '',
                             "grouped"     => true
                         ];
                     } else {
-                        $mappedProducts[$prod[0]] = [
+                        $mappedProducts[$prod[7]] = [
                             "productName" => $prod[0] ?? '',
                             "quantity"    => $prod[3] ?? 1,
                             "price"       => $prod[4],

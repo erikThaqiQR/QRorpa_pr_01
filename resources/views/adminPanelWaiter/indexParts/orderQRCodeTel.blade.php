@@ -98,14 +98,14 @@ use Illuminate\Support\Facades\Auth;
                                 "quantity"    => $explodedProduct[3],
                                 "type"        => $explodedProduct[5] != 'empty' ? $explodedProduct[5] : null
                             ];
-                        } else if(isset($mappedOrderedProducts[$explodedProduct[0]])){
-                            $mappedOrderedProducts[$explodedProduct[0]] = [
+                        } else if(isset($mappedOrderedProducts[$explodedProduct[7]])){
+                            $mappedOrderedProducts[$explodedProduct[7]] = [
                                 "productName" => $explodedProduct[0],
-                                "quantity"    => $explodedProduct[3] ? $mappedOrderedProducts[$explodedProduct[0]]['quantity'] + $explodedProduct[3] : ++$mappedOrderedProducts[$explodedProduct[0]]['quantity'],
+                                "quantity"    => $explodedProduct[3] ? $mappedOrderedProducts[$explodedProduct[7]]['quantity'] + $explodedProduct[3] : ++$mappedOrderedProducts[$explodedProduct[7]]['quantity'],
                                 "type"        => null
                             ];
                         } else {
-                            $mappedOrderedProducts[$explodedProduct[0]] = [
+                            $mappedOrderedProducts[$explodedProduct[7]] = [
                                 "productName" => $explodedProduct[0],
                                 "quantity"    => $explodedProduct[3] ?? 1,
                                 "type"        => $explodedProduct[5] != 'empty' ? $explodedProduct[5] : null
