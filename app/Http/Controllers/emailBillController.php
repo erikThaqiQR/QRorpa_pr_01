@@ -43,6 +43,7 @@ use App\Events\removePaidProduct;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Intervention\Image\ImageManagerStatic as Image;
+use App\giftCardRechnungPay;
 
 class emailBillController extends Controller{
   
@@ -282,18 +283,36 @@ EPD
 
 
     public function rechnungConfirmPayment(Request $req){
-        $theExI = emailReceiptFromAdm::find($req->emBiId);
-        if($theExI != NULL){
-            if($theExI->statusConf == 0){
-                $theExI->statusConf = 9;
-                $theExI->statusConfBy = Auth::user()->id;
-                $theExI->save();
+        if($req->type == 'order'){
+            $theExI = emailReceiptFromAdm::find($req->emBiId);
+
+            if($theExI != NULL){
+                if($theExI->statusConf == 0){
+                    $theExI->statusConf = 9;
+                    $theExI->statusConfBy = Auth::user()->id;
+                    $theExI->save();
+                }else{
+                    "alreadyConf";
+                }
             }else{
-                "alreadyConf";
+                "notFound";
             }
-        }else{
-            "notFound";
+        } else {
+            $theGC = giftCardRechnungPay::find($req->emBiId);
+
+            if($theGC != NULL){
+                if($theGC->payment_status === 1){
+                    return "alreadyConf";
+                } else {
+                    $theGC->status_confirmed = 1;
+                    $theGC->status_confirmed_by = Auth::user()->id;
+                    $theGC->save();
+                }
+            } else {
+                return "notFound";
+            }
         }
+      
     }
 
     public function getDataClDayToPay(Request $req){

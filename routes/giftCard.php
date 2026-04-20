@@ -37,6 +37,10 @@
     Route::post('validateGiftCardOnScanToApply', 'GiftCardController@validateGiftCardOnScanToApply')->name('giftCard.validateGiftCardOnScanToApply');
 
     Route::post('searchGCByCode', 'GiftCardController@searchGCByCode')->name('giftCard.searchGCByCode');
+
+    Route::post('giftCardRechnungReminer', 'GiftCardController@rechnungReminderGC')->name('giftCard.rechnungReminder');
+
+    Route::get('giftCardRechnungDownload/{giftCardId}', 'GiftCardController@rechnungDownloadGC')->name('giftCard.rechnungDownloadGC');
     //--------------------------------------------------------------------------------------------------------------------
 
     // giftCardCreateGCToSell?hashVal=hPj65fggFG4234FGfBjQasLMk345jGfD24784d&nrOfGC=5

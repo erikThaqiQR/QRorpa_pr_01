@@ -13,6 +13,7 @@ use App\OrdersPassive;
     use App\User;
     use App\rechnungClient;
     use App\rechnungClientToBills;
+    use App\giftCardRechnungPay;
 ?>
 
  <!-- <script src="https://kit.fontawesome.com/11d299ad01.js" crossorigin="anonymous"></script>  -->
@@ -284,70 +285,152 @@ use App\OrdersPassive;
    
     @if (isset($_GET['clS']) && $_GET['clS'] != 0)
         <div id="notConfirmedBillsDiv">
-            @foreach (emailReceiptFromAdm::where([['forRes',Auth::user()->sFor],['statusConf','0']])
-            ->join('rechnung_client_to_bills', 'email_receipt_from_adms.id', '=', 'rechnung_client_to_bills.billId')
-            ->select('email_receipt_from_adms.*', 'rechnung_client_to_bills.clientId as clId')
-            ->orderByDesc('created_at')->get() as $oneRecNot)
-                @if($oneRecNot->clId == $_GET['clS'])
-                    <?php
-                        $stD2d = explode('-',explode(' ',$oneRecNot->created_at)[0]);
-                        $endD = date('d-m-Y', mktime(0, 0, 0, $stD2d[1], $stD2d[2] + $oneRecNot->exInfoDaysToPay, $stD2d[0]));
-                        $endD2d = explode('-',$endD);
+            @php
+                $clS = $_GET['clS'];
+                $emailReceipts = emailReceiptFromAdm::where('forRes',Auth::user()->sFor)
+                    ->whereIn('statusConf', ['0', '9'])
+                    ->where('rechnung_client_to_bills.clientId', $clS)
+                    ->join('rechnung_client_to_bills', 'email_receipt_from_adms.id', '=', 'rechnung_client_to_bills.billId')
+                    ->select([
+                        DB::raw("'order' as type"),
+                        'email_receipt_from_adms.id as id',
+                        'rechnung_client_to_bills.clientId as clId',
+                        'email_receipt_from_adms.exInfoName as clientName',
+                        'email_receipt_from_adms.exInfoLastname as clientLastName',
+                        'email_receipt_from_adms.exInfoFirma as clientFirma',
+                        'email_receipt_from_adms.exInfoClPhoneNr as clientPhoneNr',
+                        'email_receipt_from_adms.exInfoStreet as clientStreet',
+                        'email_receipt_from_adms.exInfoEmail as clientEmail',
+                        'email_receipt_from_adms.exInfoPlzOrt as clientPlzOrt',
+                        'email_receipt_from_adms.exInfoDaysToPay as clientDaysToPay',
+                        'email_receipt_from_adms.forOrder as forOrder',
+                        'email_receipt_from_adms.theComm as theComm',
+                        'email_receipt_from_adms.created_at as created_at',
+                        'email_receipt_from_adms.statusConf as paymentStatus',
+                        DB::raw('NULL as price'),
+                        'email_receipt_from_adms.statusConfBy as confirmedBy',
+                        DB::raw('NULL as giftCardId')
+                        ])
+                    ->orderByDesc('created_at')
+                    ->get();
 
-                        $dt1 = time();
-                        $dt2 = strtotime($endD2d[2].'-'.$endD2d[1].'-'.$endD2d[0]);
-                        $datediff = $dt2 - $dt1;
-                        $daysLeft = round($datediff / (60 * 60 * 24));
-                    ?>
-                    @if($daysLeft > 5 )
-                        <div class="d-flex flex-wrap justify-content-between pt-1 pb-1 mb-2" style="background-color:rgba(39,190,175,0.4); border-radius:4px;">
-                    @elseif($daysLeft <= 5 && $daysLeft > 3)
-                        <div class="d-flex flex-wrap justify-content-between pt-1 pb-1 mb-2" style="background-color:rgba(23,162,184,0.4); border-radius:4px;">
-                    @elseif($daysLeft == 3)
-                        <div class="d-flex flex-wrap justify-content-between pt-1 pb-1 mb-2" style="background-color:rgba(247, 249, 137,0.4); border-radius:4px;">
-                    @elseif($daysLeft <= 2)
-                        <div class="d-flex flex-wrap justify-content-between pt-1 pb-1 mb-2" style="background-color:rgba(220,53,69,0.4); border-radius:4px;">
+                $giftCards = giftCardRechnungPay::where('gift_cards.toRes', Auth::user()->sFor)
+                    ->where('gift_card_rechnung_pays.clientId', $clS)
+                    ->join('gift_cards', 'gift_cards.id', '=', 'gift_card_rechnung_pays.gcId')
+                    ->select(
+                        DB::raw("'gift_card' as type"),
+                        'gift_card_rechnung_pays.id as id',
+                        'gift_card_rechnung_pays.clientId as clId',
+                        'gift_card_rechnung_pays.clName as clientName',
+                        'gift_card_rechnung_pays.clLastName as clientLastName',
+                        'gift_card_rechnung_pays.clFirma as clientFirma',
+                        'gift_card_rechnung_pays.clPhoneNr as clientPhoneNr',
+                        'gift_card_rechnung_pays.clStreetNr as clientStreet',
+                        'gift_card_rechnung_pays.clEmail as clientEmail',
+                        'gift_card_rechnung_pays.clPlzOrt as clientPlzOrt',
+                        'gift_card_rechnung_pays.clDaysToPay as clientDaysToPay',
+                        DB::raw('NULL as forOrder'),
+                        DB::raw('NULL as theComm'),
+                        'gift_card_rechnung_pays.created_at as created_at',
+                        'gift_card_rechnung_pays.status_confirmed as paymentStatus',
+                        'gift_cards.gcSumInChf as price',
+                        'gift_card_rechnung_pays.status_confirmed_by as confirmedBy',
+                        'gift_cards.id as giftCardId'
+                    )
+                    ->orderByDesc('created_at')
+                    ->get();
+
+                $merged = $emailReceipts->merge($giftCards)->sortBy('created_at');
+
+                $notConfirmed = $merged->filter(function($item) {
+                    return $item->paymentStatus === 0;
+                });
+
+                $confirmed = $merged->filter(function($item) {
+                    return $item->paymentStatus === 9 || $item->paymentStatus === 1;
+                });
+
+            @endphp
+
+            @foreach ($notConfirmed as $oneRecNot)
+                <?php
+                    $stD2d = explode('-',explode(' ',$oneRecNot->created_at)[0]);
+                    $endD = date('d-m-Y', mktime(0, 0, 0, $stD2d[1], $stD2d[2] + $oneRecNot->clientDaysToPay, $stD2d[0]));
+                    $endD2d = explode('-',$endD);
+
+                    $dt1 = time();
+                    $dt2 = strtotime($endD2d[2].'-'.$endD2d[1].'-'.$endD2d[0]);
+                    $datediff = $dt2 - $dt1;
+                    $daysLeft = round($datediff / (60 * 60 * 24));
+
+                    if($oneRecNot->type == 'order'){
+                        $refId = OrdersPassive::find($oneRecNot->forOrder)->refId;
+                    } else if($oneRecNot->type == 'gift_card'){
+                        $refId = $oneRecNot->id;
+                    }
+                ?>
+                @if($daysLeft > 5 )
+                    <div class="d-flex flex-wrap justify-content-between pt-1 pb-1 mb-2" style="background-color:rgba(39,190,175,0.4); border-radius:4px;">
+                @elseif($daysLeft <= 5 && $daysLeft > 3)
+                    <div class="d-flex flex-wrap justify-content-between pt-1 pb-1 mb-2" style="background-color:rgba(23,162,184,0.4); border-radius:4px;">
+                @elseif($daysLeft == 3)
+                    <div class="d-flex flex-wrap justify-content-between pt-1 pb-1 mb-2" style="background-color:rgba(247, 249, 137,0.4); border-radius:4px;">
+                @elseif($daysLeft <= 2)
+                    <div class="d-flex flex-wrap justify-content-between pt-1 pb-1 mb-2" style="background-color:rgba(220,53,69,0.4); border-radius:4px;">
+                @endif
+                    <p class="text-center" style="width:49.5%; font-weight:bold;"># {{$refId}}</p>
+                    <p class="text-center" style="width:49.5%; font-weight:bold;">{{$oneRecNot->clientFirma}}</p>
+
+                    <p class="text-center" style="width:100%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->clientName}} {{$oneRecNot->clientLastName}}</p>
+
+                    <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->clientStreet}}</p>
+                    <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->clientPlzOrt}}</p>
+
+                    <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->clientPhoneNr}}</p>
+                    <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->clientEmail}}</p>
+
+                    <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$stD2d[2]}}-{{$stD2d[1]}}-{{$stD2d[0]}}</p>
+                    <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">({{$oneRecNot->clientDaysToPay}} Tage) {{$endD}}</p>
+
+                    @if($oneRecNot->type == 'order' && $oneRecNot->theComm != 'empty')
+                        <p class="text-center mt-1 mb-1" style="width:100%">
+                            <strong>Kommentar: {{$oneRecNot->theComm }}</strong>
+                        </p>
                     @endif
-                        <p class="text-center" style="width:49.5%; font-weight:bold;"># {{OrdersPassive::find($oneRecNot->forOrder)->refId}}</p>
-                        <p class="text-center" style="width:49.5%; font-weight:bold;">{{$oneRecNot->exInfoFirma}}</p>
 
-                        <p class="text-center" style="width:100%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->exInfoName}} {{$oneRecNot->exInfoLastname}}</p>
+                    <button id="sndRemEmBtn{{ $oneRecNot->type == 'order' ? $oneRecNot->id : $oneRecNot->giftCardId }}" class="btn btn-info shadow-none" style="width:33.2%" onclick="sendReminderEmail('{{ $oneRecNot->type == 'order' ? $oneRecNot->id : $oneRecNot->giftCardId }}', '{{ $oneRecNot->type }}')">
+                        <i class="fas fa-at"></i> <strong>Erinnerung</strong>
+                    </button>
 
-                        <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->exInfoStreet}}</p>
-                        <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->exInfoPlzOrt}}</p>
-
-                        <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->exInfoClPhoneNr}}</p>
-                        <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->exInfoEmail}}</p>
-
-                        <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$stD2d[2]}}-{{$stD2d[1]}}-{{$stD2d[0]}}</p>
-                        <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">({{$oneRecNot->exInfoDaysToPay}} Tage) {{$endD}}</p>
-
-                        @if($oneRecNot->theComm != 'empty')
-                            <p class="text-center mt-1 mb-1" style="width:100%">
-                                <strong>Kommentar: {{$oneRecNot->theComm }}</strong>
-                            </p>
-                        @endif
-
-                        <button id="sndRemEmBtn{{$oneRecNot->id}}" class="btn btn-info shadow-none" style="width:33.2%" onclick="sendReminderEmail('{{$oneRecNot->id}}')">
-                            <i class="fas fa-at"></i> <strong>Erinnerung</strong>
-                        </button>
-
+                    @if ($oneRecNot->type == 'order')
                         <form style="width:33.2%" method="post" action="{{ route('emailBill.rechnungGetBilMngPage') }}">
                             {{csrf_field()}}         
                             <input type="hidden" value="{{$oneRecNot->id}}" name="emBiId">
                             <button type="submit" class="btn btn-info shadow-none" style="width:100%"> <i class="fa fa-file-pdf-o" aria-hidden="true"></i></button>
                         </form>
-
-                        <button style="width:33.2%;" class="btn btn-success shadow-none" onclick="confPaymentOpen('{{$oneRecNot->id}}','{{$oneRecNot->forOrder}}')" data-toggle="modal" data-target="#billPayConfModal">
-                            <strong>Bezahlt</strong>
-                        </button>
-                        
-                        <div style="width:100%; display:none;" class="alert alert-success text-center mt-1" id="emailSendSuccess{{$oneRecNot->id}}">
-                            Eine E-Mail, um den Kunden an die verbleibenden Tage zur Zahlung der Rechnung zu erinnern, wurde erfolgreich gesendet
+                    @else
+                         <div style="width:33.2%" class="d-flex justify-content-between align-items-center">
+                            <form style="width: 50%;" method="post" action="{{ route('giftCard.giftCardGetReceipt') }}">
+                                {{csrf_field()}}         
+                                <input  id="giftCardId" type="hidden" value="{{$oneRecNot->giftCardId}}" name="giftCardId">
+                                <button type="submit" class="btn btn-info mt-1 shadow-none" style="width:100%"> <i class="fa fa-file-pdf-o" aria-hidden="true"></i> <strong></strong></button>
+                            </form>
+                            <a style="width: 50%;" class="btn btn-secondary mt-1 ml-1 shadow-none" href="{{ route('giftCard.rechnungDownloadGC', $oneRecNot->giftCardId) }}">
+                                <i class="fa-solid fa-receipt"></i> <strong></strong>
+                            </a>
                         </div>
-                        
+                    @endif
+
+
+                    <button style="width:33.2%;" class="btn btn-success shadow-none" onclick="confPaymentOpen('{{$oneRecNot->id}}','{{ $oneRecNot->type == 'order' ? $oneRecNot->forOrder : $oneRecNot->id }}', '{{ $oneRecNot->type }}')" data-toggle="modal" data-target="#billPayConfModal">
+                        <strong>Bezahlt</strong>
+                    </button>
+                    
+                    <div style="width:100%; display:none;" class="alert alert-success text-center mt-1" id="emailSendSuccess{{$oneRecNot->type == 'order' ? $oneRecNot->id : $oneRecNot->giftCardId}}">
+                        Eine E-Mail, um den Kunden an die verbleibenden Tage zur Zahlung der Rechnung zu erinnern, wurde erfolgreich gesendet
                     </div>
-                @endif
+                    
+                </div>
             @endforeach
         </div>
 
@@ -357,46 +440,47 @@ use App\OrdersPassive;
         </button>
         <div id="confirmedBillsDiv" style="display:none;">
             <div id="confirmedBillsList">
-                @foreach (emailReceiptFromAdm::where([['forRes',Auth::user()->sFor],['statusConf','9']])
-                ->join('rechnung_client_to_bills', 'email_receipt_from_adms.id', '=', 'rechnung_client_to_bills.billId')
-                ->select('email_receipt_from_adms.*', 'rechnung_client_to_bills.clientId as clId')
-                ->orderByDesc('created_at')->get() as $oneRecNot)
-                    @if($oneRecNot->clId == $_GET['clS'])
-                        <?php
-                            $stD2d = explode('-',explode(' ',$oneRecNot->created_at)[0]);
-                            $endD = date('d-m-Y', mktime(0, 0, 0, $stD2d[1], $stD2d[2] + $oneRecNot->exInfoDaysToPay, $stD2d[0]));
+                @foreach ($confirmed as $oneRecNot)
+                    <?php
+                        $stD2d = explode('-',explode(' ',$oneRecNot->created_at)[0]);
+                        $endD = date('d-m-Y', mktime(0, 0, 0, $stD2d[1], $stD2d[2] + $oneRecNot->clientDaysToPay, $stD2d[0]));
 
-                            $tM = User::find($oneRecNot->statusConfBy);
-                        ?>
-                        <div class="d-flex flex-wrap justify-content-between pt-1 pb-1 mb-2" style="background-color:rgba(40,167,69,0.2); border-radius:4px;">
-                            <p class="text-center" style="width:49.5%; font-weight:bold;">#{{OrdersPassive::find($oneRecNot->forOrder)->refId}}</p>
-                            <p class="text-center" style="width:49.5%; font-weight:bold;">{{$oneRecNot->exInfoFirma}}</p>
+                        $tM = User::find($oneRecNot->confirmedBy);
 
-                            <p class="text-center" style="width:100%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->exInfoName}} {{$oneRecNot->exInfoLastname}}</p>
+                        if($oneRecNot->type == 'order'){
+                            $refId = OrdersPassive::find($oneRecNot->forOrder)->refId;
+                        } else if($oneRecNot->type == 'gift_card'){
+                            $refId = $oneRecNot->id;
+                        }
+                    ?>
+                    <div class="d-flex flex-wrap justify-content-between pt-1 pb-1 mb-2" style="background-color:rgba(40,167,69,0.2); border-radius:4px;">
+                        <p class="text-center" style="width:49.5%; font-weight:bold;">#{{$refId}}</p>
+                        <p class="text-center" style="width:49.5%; font-weight:bold;">{{$oneRecNot->clientFirma}}</p>
 
-                            <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->exInfoStreet}}</p>
-                            <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->exInfoPlzOrt}}</p>
+                        <p class="text-center" style="width:100%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->clientName}} {{$oneRecNot->clientLastName}}</p>
 
-                            <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->exInfoClPhoneNr}}</p>
-                            <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->exInfoEmail}}</p>
+                        <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->clientStreet}}</p>
+                        <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->clientPlzOrt}}</p>
 
-                            <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$stD2d[2]}}-{{$stD2d[1]}}-{{$stD2d[0]}}</p>
-                            <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$endD}}</p>
+                        <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->clientPhoneNr}}</p>
+                        <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$oneRecNot->clientEmail}}</p>
 
-                            @if($oneRecNot->theComm != 'empty')
-                                <p class="text-center mt-1 mb-1" style="width:100%">
-                                    <strong>Kommentar: {{$oneRecNot->theComm }}</strong>
-                                </p>
-                            @endif
+                        <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$stD2d[2]}}-{{$stD2d[1]}}-{{$stD2d[0]}}</p>
+                        <p class="text-center" style="width:49.5%; font-weight:bold; margin-top:-15px;">{{$endD}}</p>
 
-                            @if($tM != NULL)
-                            <p class="text-center" style="width:100%; font-weight:bold; margin-top:-15px;">Von {{$tM->name}}</p>
-                            @else
-                            <p class="text-center" style="width:100%; font-weight:bold; margin-top:-15px;">Von ---</p>
-                            @endif
+                        @if($oneRecNot->type == 'order' && $oneRecNot->theComm != 'empty')
+                            <p class="text-center mt-1 mb-1" style="width:100%">
+                                <strong>Kommentar: {{$oneRecNot->theComm }}</strong>
+                            </p>
+                        @endif
 
-                        </div>
-                    @endif
+                        @if($tM != NULL)
+                        <p class="text-center" style="width:100%; font-weight:bold; margin-top:-15px;">Von {{$tM->name}}</p>
+                        @else
+                        <p class="text-center" style="width:100%; font-weight:bold; margin-top:-15px;">Von ---</p>
+                        @endif
+
+                    </div>
                 @endforeach
             </div>
         </div>

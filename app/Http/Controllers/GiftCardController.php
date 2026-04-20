@@ -448,7 +448,7 @@ class GiftCardController extends Controller{
         $rechnungGCnew = new giftCardRechnungPay();
         $rechnungGCnew->toRes = Auth::user()->sFor;
         $rechnungGCnew->gcId = $newGC->id;
-        $rechnungGCnew->clientId = 0;
+        $rechnungGCnew->clientId = $req->usedAndExistingClientIdAll;
         $rechnungGCnew->clFirma = $clDtRechnungFirmaInp;
         $rechnungGCnew->clPhoneNr = $clDtRechnungTelInp;
         $rechnungGCnew->clName = $clDtRechnungNameInp;
@@ -1082,4 +1082,69 @@ EPD
     }
 
 
+    public function rechnungReminderGC(Request $req) {
+        $giftCardId = (int) $req->emReId;
+
+        $giftCard = giftCard::find($giftCardId);
+        $giftCardRechnung = giftCardRechnungPay::where('gcId', $giftCardId)->first();
+
+        if(!$giftCard){ return 'giftCardNotFound'; }
+
+        $to_email = $giftCardRechnung->clEmail;
+        $to_name = $giftCardRechnung->clName;
+        $GCvalue = number_format($giftCard->gcSumInChf,2,'.','');
+        $theRes = Restorant::find(Auth::user()->sFor);
+
+        $data = array(
+            'name'       => $to_name,
+            'resName'    => $theRes->emri,
+            "gcValue"    => $GCvalue,
+            "gcDueDate"  => Carbon::parse($giftCardRechnung->created_at)->addDays($giftCardRechnung->clDaysToPay)->format('d-m-Y'),
+            "gcId"       => $giftCardId,
+            "gcHash"     => $giftCard->gcHash
+        );
+
+        $theRes = Restorant::find($giftCard->toRes);
+        $theResEmri = $theRes->emri;
+        view()->share('theGC', $giftCard);
+        $customPaper = array(0, 0, 340.16, 750 + (2 * 21));
+        $pdfBill = PDF::loadView('GiftCardInvoice')->setPaper($customPaper, 'potrait');
+
+        // Auf rechnung bill
+        view()->share('items', $giftCard);
+        $pdfARe1 = PDF::loadView('adminInvoiceRechnungGC')->setPaper('a4', 'portrait');
+        $docName = 'rechnungBillFirst' . $theResEmri . '_' . $giftCardId . '.pdf';
+        $pdfARe1->save('storage/giftCardRechnungBill/' . $docName);
+
+        $pdfARe2 = PDF::loadView('adminInvoiceRechnungFinalGC')->setPaper('a4','portrait');
+
+        $koha2D = explode('-', explode(' ', $giftCard->created_at)[0]);
+        //------------------------------------------------------------------ 
+
+        Mail::send('emails.giftCardRechnungReminder', $data, function($message) use ($to_name, $to_email, $pdfBill, $pdfARe2, $theResEmri, $giftCardId, $koha2D) {
+            $message->to($to_email, $to_name)->subject("Zahlungserinnerung – Geschenkkarte bei $theResEmri");
+            $message->from('noreply@qrorpa.ch','QRorpa');
+            $message->attachData($pdfBill->output(), 'giftCardBill_' . $theResEmri . '_' . $giftCardId . '.pdf', [
+                'mime' => 'application/pdf',
+            ]);
+            $message->attachData($pdfARe2->output(), 'Rechnung_GC-' . $giftCardId . '-QRorpa-' . $koha2D[2] . '_' . $koha2D[1] . '_' . $koha2D[0] . '.pdf', [
+                'mime' => 'application/pdf',
+            ]);
+        });
+
+        return 'Email sent!';
+    }
+
+    public function rechnungDownloadGC($giftCardId){
+        $theGC = giftCard::find($giftCardId);
+
+        if($theGC != null){
+            $theRes = Restorant::find($theGC->toRes);
+            $date = date_format($theGC->created_at, 'd_m_Y');
+            view()->share('items', $theGC);
+            view()->share('theGC', $theGC);
+            $pdf = PDF::loadView('adminInvoiceRechnungFinalGC')->setPaper('a4', 'portrait');
+            return $pdf->download('Rechnung_GC-' . $giftCardId . '-QRorpa-' . $date . '.pdf');
+        }
+    }
 }
