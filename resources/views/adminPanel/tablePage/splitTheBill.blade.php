@@ -92,10 +92,12 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:4%;">
                     </span>
                     <span class="split-bill-pill">
                         <svg class="split-bill-pill-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <ellipse cx="12" cy="7" rx="8" ry="2.5"/>
-                            <path d="M4 7v10c0 1.5 3.5 3 8 3s8-1.5 8-3V7"/>
-                            <line x1="12" y1="20" x2="12" y2="22"/>
-                            <line x1="8" y1="22" x2="16" y2="22"/>
+                            <rect x="4" y="8" width="16" height="7" rx="1.5"/>
+                            <line x1="4" y1="11.5" x2="20" y2="11.5"/>
+                            <line x1="7" y1="15" x2="7" y2="20"/>
+                            <line x1="17" y1="15" x2="17" y2="20"/>
+                            <line x1="5" y1="20" x2="9" y2="20"/>
+                            <line x1="15" y1="20" x2="19" y2="20"/>
                         </svg>
                         <span class="split-bill-pill-text"><span id="splitTheBillInitiateModalTableNr">x</span></span>
                     </span>
@@ -1223,21 +1225,14 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:5px;">
 }
 
 #splitTheBillInitiateModal .split-bill-tipp-btn-costume {
-    border-radius: 50px !important;
-    padding: 6px 14px !important;
+    border-radius: 50px;
+    padding: 6px 14px;
     min-height: 38px;
-    background: rgba(255, 255, 255, 0.22) !important;
-    color: rgba(255, 255, 255, 0.95) !important;
-    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    background: rgba(255, 255, 255, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
-#splitTheBillInitiateModal .split-bill-tipp-btn-costume input {
-    background: transparent !important;
-    color: #fff !important;
-    text-align: center;
-}
-
-#splitTheBillInitiateModal .split-bill-tipp-btn-costume input::placeholder {
+#splitTheBillInitiateModal .split-bill-tipp-btn-costume::placeholder {
     color: rgba(255, 255, 255, 0.75);
 }
 

@@ -92,10 +92,12 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:4%;">
                     </span>
                     <span class="split-bill-pill">
                         <svg class="split-bill-pill-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <ellipse cx="12" cy="7" rx="8" ry="2.5"/>
-                            <path d="M4 7v10c0 1.5 3.5 3 8 3s8-1.5 8-3V7"/>
-                            <line x1="12" y1="20" x2="12" y2="22"/>
-                            <line x1="8" y1="22" x2="16" y2="22"/>
+                            <rect x="4" y="8" width="16" height="7" rx="1.5"/>
+                            <line x1="4" y1="11.5" x2="20" y2="11.5"/>
+                            <line x1="7" y1="15" x2="7" y2="20"/>
+                            <line x1="17" y1="15" x2="17" y2="20"/>
+                            <line x1="5" y1="20" x2="9" y2="20"/>
+                            <line x1="15" y1="20" x2="19" y2="20"/>
                         </svg>
                         <span class="split-bill-pill-text"><span id="splitTheBillInitiateModalTableNr">x</span></span>
                     </span>
@@ -348,7 +350,7 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:5px;">
                                                             '<div class="split-bill-summary-strip">'+
                                                                 '<div class="split-bill-hand-icon"><i class="fa-solid fa-hand-holding-dollar fa-lg"></i></div>'+
                                                                 '<div class="split-bill-costume-wrap">'+
-                                                                    '<input class="split-bill-tipp-btn-costume" id="splitBillTippInputCostume'+i+'" step="0.05" min="0" id="tipWaiterCosVal" type="number" onkeyup="setCostumeTipStafSplitBill(\''+i+'\',this.value)" style="width:95%; border:none;" placeholder="Gesamt mit tipp +">'+
+                                                                    '<input class="split-bill-tipp-btn-costume" id="splitBillTippInputCostume'+i+'" step="0.05" min="0" id="tipWaiterCosVal" type="number" onkeyup="setCostumeTipStafSplitBill(\''+i+'\',this.value)" style="border:none;" placeholder="Gesamt mit tipp +">'+
                                                                 '</div>'+
                                                                 '<div style="width:30%;" class="text-right split-bill-summary-totals" id="splitBillClientDiv2_1'+i+'">'+
                                                                     '<p style="margin-bottom: 4px; color:#fff; font-size:1.2rem; position:relative;" class="split-bill-summary-tipp-value"><strong class="split-bill-summary-tipp-value-text"<i style="color:#ffffff; position: absolute; left: 0;" class="fa-solid fa-circle-xmark" id="cancelTippApplyBtn'+i+'" onclick="cancelTippApply(\''+i+'\')"></i> Tipp: <span id="splitBillModalTippValueClient'+i+'">'+parseFloat(0).toFixed(2)+'</span> CHF</strong></p>'+
@@ -1066,7 +1068,7 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:5px;">
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 12px 16px;
     background-color: #f5f6f7;
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
@@ -1094,7 +1096,7 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:5px;">
 #splitTheBillInitiateModal .split-bill-header-pills {
     display: flex;
     align-items: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 10px;
     flex: 1 1 auto;
     justify-content: center;
@@ -1219,21 +1221,14 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:5px;">
     margin: 0;
     max-height: 30px;
     align-self: center;
-    border-radius: 50px !important;
-    padding: 6px 14px !important;
+    border-radius: 50px;
+    padding: 6px 14px;
     min-height: 38px;
-    background: rgba(255, 255, 255, 0.22) !important;
-    color: rgba(255, 255, 255, 0.95) !important;
-    border: 1px solid rgba(255, 255, 255, 0.35) !important;
+    background: rgba(255, 255, 255, 0.22);
+    border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
-#splitTheBillInitiateModal .split-bill-tipp-btn-costume input {
-    background: transparent !important;
-    color: #fff !important;
-    text-align: center;
-}
-
-#splitTheBillInitiateModal .split-bill-tipp-btn-costume input::placeholder {
+#splitTheBillInitiateModal .split-bill-tipp-btn-costume::placeholder {
     color: rgba(255, 255, 255, 0.72);
 }
 
