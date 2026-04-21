@@ -84,20 +84,22 @@
 use App\User;
 use App\Takeaway;
 use App\Restorant;
-    use App\PiketLog;
-    use App\Produktet;
+use App\PiketLog;
+use App\Produktet;
 use App\DeliveryProd;
 use App\emailReceiptFromAdm;
 use App\logOrderPayMChng;
 use App\OPSaferpayReference;
 use App\payTecTransactionLog;
 
-    if(PiketLog::where('order_u',$items->id)->first() != null && PiketLog::where('order_u',$items->id)->first()->piket < 0){
-       $pointsUsed = PiketLog::where('order_u',$items->id)->first()->piket * (-1);
+    $piketLog = PiketLog::where('order_u',$items->id)->first();
+
+    if($piketLog != null && $piketLog->piket < 0){
+       $pointsUsed = $piketLog->piket * (-1);
        $moneyOff = $pointsUsed*0.01;
 
-    }elseif(PiketLog::where('order_u',$items->id)->first() != null && PiketLog::where('order_u',$items->id)->first()->piket > 0){
-        $pointsEr = PiketLog::where('order_u',$items->id)->first()->piket;
+    }elseif($piketLog != null && $piketLog->piket > 0){
+        $pointsEr = $piketLog->piket;
     }
 
     if($items->inCashDiscount > 0){
@@ -346,36 +348,76 @@ use App\payTecTransactionLog;
                     <td></td>
                 </tr>
             @endif
-            @foreach(explode('---8---',$items->porosia) as $produkti)
+            
+            @php
+                $products = explode('---8---', $items->porosia);
+                $mappedProducts = [];
+
+                foreach ($products as $product) {
+                    $prod = explode('-8-', $product);
+
+                    if(str_contains($prod[3], '/')){
+                        $mappedProducts[] = [
+                            "productName" => $prod[0] ?? '',
+                            "quantity"    => $prod[3] ?? 1,
+                            "price"       => $prod[4],
+                            "type"        => $prod[5] ?? '',
+                            "prod_id"     => $prod[7] ?? '',
+                            "ex"          => $prod[2] ?? '',
+                            "grouped"     => false
+                        ];
+                    } else if(isset($mappedProducts[$prod[7]])){
+                        $mappedProducts[$prod[7]] = [
+                            "productName" => $prod[0] ?? '',
+                            "quantity"    => $prod[3] ? $mappedProducts[$prod[7]]['quantity'] + $prod[3] : ++$mappedProducts[$prod[7]]['quantity'],
+                            "price"       => $mappedProducts[$prod[7]]['price'] + $prod[4],
+                            "type"        => $prod[5] ?? '',
+                            "prod_id"     => $prod[7] ?? '',
+                            "ex"          => $prod[2] ?? '',
+                            "grouped"     => true
+                        ];
+                    } else {
+                        $mappedProducts[$prod[7]] = [
+                            "productName" => $prod[0] ?? '',
+                            "quantity"    => $prod[3] ?? 1,
+                            "price"       => $prod[4],
+                            "type"        => $prod[5] ?? '',
+                            "prod_id"     => $prod[7] ?? '',
+                            "ex"          => $prod[2] ?? '',
+                            "grouped"     => false
+                        ];
+                    }
+                }
+            @endphp
+
+            @foreach($mappedProducts as $produkti)
                 <?php
-                    $prod = explode('-8-', $produkti);
-                    
                     if($items->nrTable != 500 && $items->nrTable != 9000){
                         $kaTakeaway = False;
                     }else if($items->nrTable == 500){
                         if($items->userEmri == 'admin' || $items->userPhoneNr == '0000000000'){
-                            $taProdIns = Takeaway::where('prod_id',$prod[7])->first();
+                            $taProdIns = Takeaway::where('prod_id', $produkti['prod_id'])->first();
                         }else{
-                            $taProdIns = Takeaway::find($prod[7]);
+                            $taProdIns = Takeaway::find($produkti['prod_id']);
                         }
                         $kaTakeaway = True;
                     }else if($items->nrTable == 9000){
-                        $taProdIns = DeliveryProd::find($prod[7]);
+                        $taProdIns = DeliveryProd::find($produkti['prod_id']);
                         $kaTakeaway = True;
                     }
                 ?>
                 <tr class="details" style="margin-bottom:2px;">
                     <td style="width:5%;">
-                        <p style="padding:2px; padding-top:7px;">{{$prod[3]}} X</p>
+                        <p style="padding:2px; padding-top:7px;">{{$produkti['quantity']}} X</p>
                     </td>   
                     <td style="width:50%; text-align:left !important; margin:0px !important;">
                         <p style="padding:2px; line-height: 11px !important; margin:0px !important;">
-                            {{$prod[0]}}
-                            @if($prod[5] != '' && $prod[5] != 'empty')
-                                <span style="opacity:0.6; ">( {{$prod[5]}} )</span>
+                            {{$produkti['productName']}}
+                            @if($produkti['quantity'] <= 1 && $produkti['type'] != '' && $produkti['type'] != 'empty')
+                                <span style="opacity:0.6; ">( {{$produkti['type']}} )</span>
                             @endif  
-                            @if($prod[2] != '')
-                                <br><?php $thE = explode('--0--', $prod[2]);?>
+                            @if($produkti['ex'] != '')
+                                <br><?php $thE = explode('--0--', $produkti['ex']);?>
                                 @foreach ($thE as $ex)
                                     @if ($ex != '' && $ex != 'empty')
                                         <p style="margin-right:10px; font-weight:normal; opacity:0.7; font-size:10px;">+ {{ explode('||',$ex)[0]}}</p>
@@ -385,18 +427,20 @@ use App\payTecTransactionLog;
                         </p>
                     </td>
                     <?php
-                        if(str_contains($prod[3],'/')){
-                            $prod3_2D = explode('/',$prod[3]);
+                        if(str_contains($produkti['quantity'],'/')){
+                            $prod3_2D = explode('/',$produkti['quantity']);
                             $sasiaProdThis = $prod3_2D[0] / $prod3_2D[1];
                         }else{
-                            $sasiaProdThis = $prod[3];
+                            $sasiaProdThis = $produkti['quantity'];
                         } 
                     ?>
                     <td style="text-align: right;">
-                        <p style="padding:2px;">{{number_format($prod[4] / $sasiaProdThis, 2, '.', '')}}<sup style="font-size:8px; margin:0px; padding:0px;">CHF</sup></p>
+                        @if (!$produkti['grouped'])
+                            <p style="padding:2px;">{{number_format($produkti['price'] / $sasiaProdThis, 2, '.', '')}}<sup style="font-size:8px; margin:0px; padding:0px;">CHF</sup></p>
+                        @endif
                     </td>
                     <td style="text-align: right;">
-                        <p style="padding:2px;">{{number_format($prod[4], 2, '.', '')}}<sup style="font-size:8px; margin:0px; padding:0px;">CHF</sup></p>
+                        <p style="padding:2px;">{{number_format($produkti['price'], 2, '.', '')}}<sup style="font-size:8px; margin:0px; padding:0px;">CHF</sup></p>
                     </td>
                     <td style="text-align: right;">
 
@@ -410,13 +454,13 @@ use App\payTecTransactionLog;
                                     @if($kaTakeaway && $taProdIns != NULL) 
                                         <?php
                                             if($taProdIns->mwstForPro == 2.50 || $taProdIns->mwstForPro == 2.60){
-                                                $cal1 = number_format(($prod[4] * $totZbritja) / $totFromProductePrice , 9, '.', '');
-                                                $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
+                                                $cal1 = number_format(($produkti['price'] * $totZbritja) / $totFromProductePrice , 9, '.', '');
+                                                $cal2 = number_format($produkti['price'] - $cal1, 9, '.', '');
                                                 $mwstFor25 += number_format($cal2*$loTvsh, 9, '.', '');
                                                 $totMwst += number_format($cal2*$loTvsh, 9, '.', '');
                                             }else if($taProdIns->mwstForPro == 7.70 || $taProdIns->mwstForPro == 8.10){
-                                                $cal1 = number_format(($prod[4]* $totZbritja) / $totFromProductePrice , 9, '.', '');
-                                                $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
+                                                $cal1 = number_format(($produkti['price'] * $totZbritja) / $totFromProductePrice , 9, '.', '');
+                                                $cal2 = number_format($produkti['price'] - $cal1, 9, '.', '');
                                                 $mwstFor77 += number_format($cal2*$hiTvsh, 9, '.', '');
                                                 $totMwst += number_format($cal2*$hiTvsh, 9, '.', '');
                                             }
@@ -445,8 +489,8 @@ use App\payTecTransactionLog;
                                         <p style="padding:2px;">2.60 %</p>
                                         @endif
                                         <?php 
-                                            $cal1 = number_format(($prod[4]* $totZbritja) / $totFromProductePrice , 9, '.', '');
-                                            $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
+                                            $cal1 = number_format(($produkti['price']* $totZbritja) / $totFromProductePrice , 9, '.', '');
+                                            $cal2 = number_format($produkti['price'] - $cal1, 9, '.', '');
                                             $totMwst += number_format($cal2*$loTvsh, 9, '.', ''); 
                                             $mwstFor25 += number_format($cal2*$loTvsh, 9, '.', '');
                                         ?>
@@ -458,8 +502,8 @@ use App\payTecTransactionLog;
                                     <p style="padding:2px;">8.10 %</p>
                                     @endif
                                     <?php 
-                                        $cal1 = number_format(($prod[4]* $totZbritja) / $totFromProductePrice , 9, '.', '');
-                                        $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
+                                        $cal1 = number_format(($produkti['price']* $totZbritja) / $totFromProductePrice , 9, '.', '');
+                                        $cal2 = number_format($produkti['price'] - $cal1, 9, '.', '');
                                         $totMwst += number_format($cal2*$hiTvsh, 9, '.', ''); 
                                         $mwstFor77 += number_format($cal2*$hiTvsh, 9, '.', ''); 
                                     ?> 
@@ -472,13 +516,13 @@ use App\payTecTransactionLog;
                                     @if($kaTakeaway && $taProdIns != NULL) 
                                         <?php
                                             if($taProdIns->mwstForPro == 2.50 || $taProdIns->mwstForPro == 2.60){
-                                                $cal1 = number_format($prod[4] * $totZbritjaPrc, 9, '.', '');
-                                                $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
+                                                $cal1 = number_format($produkti['price'] * $totZbritjaPrc, 9, '.', '');
+                                                $cal2 = number_format($produkti['price'] - $cal1, 9, '.', '');
                                                 $mwstFor25 += number_format($cal2*$loTvsh, 9, '.', '');
                                                 $totMwst += number_format($cal2*$loTvsh, 9, '.', '');
                                             }else if($taProdIns->mwstForPro == 7.70 || $taProdIns->mwstForPro == 8.10){
-                                                $cal1 = number_format($prod[4] * $totZbritjaPrc, 9, '.', '');
-                                                $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
+                                                $cal1 = number_format($produkti['price'] * $totZbritjaPrc, 9, '.', '');
+                                                $cal2 = number_format($produkti['price'] - $cal1, 9, '.', '');
                                                 $mwstFor77 += number_format($cal2*$hiTvsh, 9, '.', '');
                                                 $totMwst += number_format($cal2*$hiTvsh, 9, '.', '');
                                             }
@@ -507,8 +551,8 @@ use App\payTecTransactionLog;
                                         <p style="padding:2px;">2.60 %</p>
                                         @endif
                                         <?php 
-                                            $cal1 = number_format($prod[4] * $totZbritjaPrc, 9, '.', '');
-                                            $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
+                                            $cal1 = number_format($produkti['price'] * $totZbritjaPrc, 9, '.', '');
+                                            $cal2 = number_format($produkti['price'] - $cal1, 9, '.', '');
                                             $totMwst += number_format($cal2*$loTvsh, 9, '.', ''); 
                                             $mwstFor25 += number_format($cal2*$loTvsh, 9, '.', '');
                                         ?>
@@ -520,8 +564,8 @@ use App\payTecTransactionLog;
                                     <p style="padding:2px;">8.10 %</p>
                                     @endif
                                     <?php 
-                                        $cal1 = number_format($prod[4] * $totZbritjaPrc, 9, '.', '');
-                                        $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
+                                        $cal1 = number_format($produkti['price'] * $totZbritjaPrc, 9, '.', '');
+                                        $cal2 = number_format($produkti['price'] - $cal1, 9, '.', '');
                                         $totMwst += number_format($cal2*$hiTvsh, 9, '.', ''); 
                                         $mwstFor77 += number_format($cal2*$hiTvsh, 9, '.', ''); 
                                     ?> 
@@ -532,11 +576,11 @@ use App\payTecTransactionLog;
                                     @if($kaTakeaway && $taProdIns != NULL) 
                                         <?php
                                             if($taProdIns->mwstForPro == 2.50 || $taProdIns->mwstForPro == 2.60){
-                                                $mwstFor25 += number_format($prod[4]*$loTvsh, 9, '.', '');
-                                                $totMwst += number_format($prod[4]*$loTvsh, 9, '.', '');
+                                                $mwstFor25 += number_format($produkti['price']*$loTvsh, 9, '.', '');
+                                                $totMwst += number_format($produkti['price']*$loTvsh, 9, '.', '');
                                             }else if($taProdIns->mwstForPro == 7.70 || $taProdIns->mwstForPro == 8.10){
-                                                $mwstFor77 += number_format($prod[4]*$hiTvsh, 9, '.', '');
-                                                $totMwst += number_format($prod[4]*$hiTvsh, 9, '.', '');
+                                                $mwstFor77 += number_format($produkti['price']*$hiTvsh, 9, '.', '');
+                                                $totMwst += number_format($produkti['price']*$hiTvsh, 9, '.', '');
                                             }
                                         ?>
                                         @if($date2D[0] <= 2023)
@@ -563,8 +607,8 @@ use App\payTecTransactionLog;
                                         <p style="padding:2px;">2.60 %</p>
                                         @endif
                                         <?php 
-                                            $totMwst += number_format($prod[4]*$loTvsh, 9, '.', ''); 
-                                            $mwstFor25 += number_format($prod[4]*$loTvsh, 9, '.', '');
+                                            $totMwst += number_format($produkti['price']*$loTvsh, 9, '.', ''); 
+                                            $mwstFor25 += number_format($produkti['price']*$loTvsh, 9, '.', '');
                                         ?>
                                     @endif
                                 @else
@@ -574,8 +618,8 @@ use App\payTecTransactionLog;
                                     <p style="padding:2px;">8.10 %</p>
                                     @endif
                                     <?php 
-                                        $totMwst += number_format($prod[4]*$hiTvsh, 9, '.', ''); 
-                                        $mwstFor77 += number_format($prod[4]*$hiTvsh, 9, '.', ''); 
+                                        $totMwst += number_format($produkti['price']*$hiTvsh, 9, '.', ''); 
+                                        $mwstFor77 += number_format($produkti['price']*$hiTvsh, 9, '.', ''); 
                                     ?> 
                                 @endif
                             @endif

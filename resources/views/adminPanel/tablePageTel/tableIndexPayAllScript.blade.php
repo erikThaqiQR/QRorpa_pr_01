@@ -102,8 +102,16 @@
 			success: (respo) => {
                 var totPay = parseFloat(0);
                 $.each(respo, function(index, value){
-                    $('#payAllPhaseOneDiv1').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-left">'+value.OrderSasia+'x '+value.OrderEmri+'</p>');
-                    $('#payAllPhaseOneDiv1').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-right">CHF '+parseFloat(value.OrderQmimi).toFixed(2)+'</p>');
+                    if($('#prodShowPayAllPre'+value.prodId).length && (resId == 31 || resId == 56)){
+                        let oldSasia = parseInt($('#prodShowPayAllPreSasia'+value.prodId).html());
+                        let oldQmimi = parseFloat($('#prodShowPayAllPreQmimi'+value.prodId).html());
+
+                        $('#prodShowPayAllPreSasia'+value.prodId).html(oldSasia + parseInt(value.OrderSasia));
+                        $('#prodShowPayAllPreQmimi'+value.prodId).html(parseFloat(parseFloat(oldQmimi) + parseFloat(value.OrderQmimi)).toFixed(2));
+                    }else{
+                        $('#payAllPhaseOneDiv1').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" id="prodShowPayAllPre'+value.prodId+'" class="text-left"><span id="prodShowPayAllPreSasia'+value.prodId+'">'+value.OrderSasia+'</span> x '+value.OrderEmri+'</span></p>');
+                        $('#payAllPhaseOneDiv1').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-right">CHF <span id="prodShowPayAllPreQmimi'+value.prodId+'">'+parseFloat(value.OrderQmimi).toFixed(2)+'</span></p>');
+                    }
                     totPay += parseFloat(value.OrderQmimi);
                 });
                 if($('#resTvshInput').val() == 0){

@@ -77,6 +77,7 @@ use App\tablesAccessToWaiters;
 use App\billsExpensesRecordRes;
 use App\rechnungClientForMonth;
 use App\accessControllForAdmins;
+use App\confirmTabOrdersLog;
 use App\displayAddForUser;
 use App\Events\ActiveAdminPanel;
 use App\tabVerificationPNumbers;
@@ -4414,6 +4415,7 @@ EPD
 
 
     public function admConfConfirmAll(Request $req){
+        $tabCode = TableQrcode::where([['tableNr',$req->tableNr],['Restaurant',Auth::user()->sFor]])->first()->kaTab;
         if($req->tabOrSelected != 0){
             $tabOrSelIds = array();
             $selectedTabOr = explode('||',$req->tabOrSelected); 
@@ -4479,10 +4481,32 @@ EPD
                     array_push($tabOrSelIds,$newTabOrder->id);
                 }
             }
-            $allTOrds = TabOrder::where([['tableNr',$req->tableNr],['tabCode',$req->tabCode],['status',0]])->whereIn('id', $tabOrSelIds)->get();
+            $allTOrds = TabOrder::where([['tableNr',$req->tableNr],['tabCode',$tabCode],['status',0]])->whereIn('id', $tabOrSelIds)->get();
             // value="406-8-1||403-8-1"
+
+            // register a log for tab order confirmation request
+            $tOrId = '';
+            foreach( $allTOrds as $oneTO){
+                if($tOrId == ''){ $tOrId = $oneTO->id;
+                }else{ $tOrId .= '--||--'.$oneTO->id; }
+            }
+            $logTabOrConfirm = new confirmTabOrdersLog();
+            $logTabOrConfirm->toRes = Auth::user()->sFor;
+
+            $logTabOrConfirm->tableNr = $req->tableNr;
+            $logTabOrConfirm->tabId = $tabCode;
+            $logTabOrConfirm->tabOrderIds = $tOrId;    
+            $logTabOrConfirm->save();
         }else{
-            $allTOrds = TabOrder::where([['tableNr',$req->tableNr],['tabCode',$req->tabCode],['status',0]])->get();
+            $allTOrds = TabOrder::where([['tableNr',$req->tableNr],['tabCode',$tabCode],['status',0]])->get();
+
+            $logTabOrConfirm = new confirmTabOrdersLog();
+            $logTabOrConfirm->toRes = Auth::user()->sFor;
+
+            $logTabOrConfirm->tableNr = $req->tableNr;
+            $logTabOrConfirm->tabId = $tabCode;
+            $logTabOrConfirm->tabOrderIds = 'all';    
+            $logTabOrConfirm->save();
         }
        
         if($req->indication == '0'){
@@ -4493,7 +4517,7 @@ EPD
                 // Send Notifications for the Clients
                 $toDoCart = 1;
                 $phoneNrActive = array();
-                foreach(tabVerificationPNumbers::where([['tabCode',$req->tabCode],['status','1']])->get() as $nrVers){
+                foreach(tabVerificationPNumbers::where([['tabCode',$tabCode],['status','1']])->get() as $nrVers){
                     if(!in_array($nrVers->phoneNr,$phoneNrActive) && !str_contains($nrVers->phoneNr, '|') && $nrVers->phoneNr != "0770000000"){
 
                         $newNotifyClient = new notifyClient();
@@ -4556,7 +4580,7 @@ EPD
                     // Send Notifications for the Clients
                     $toDoCart = 1;
                     $phoneNrActive = array();
-                    foreach(tabVerificationPNumbers::where([['tabCode',$req->tabCode],['status','1']])->get() as $nrVers){
+                    foreach(tabVerificationPNumbers::where([['tabCode',$tabCode],['status','1']])->get() as $nrVers){
                         if(!in_array($nrVers->phoneNr,$phoneNrActive) && !str_contains($nrVers->phoneNr, '|') && $nrVers->phoneNr != "0770000000"){
 
                             $newNotifyClient = new notifyClient();
@@ -4609,6 +4633,69 @@ EPD
                         $oneCook->notify(new \App\Notifications\NewOrderNotification($details));
                     }
                 }
+            }
+        }
+    }
+
+
+    // re-check tab order confirmation from logs
+    public function admConfConfirmAllCheckFromLogs(Request $req){
+        if(isset($_GET['hs']) && $_GET['hs'] == 'tR345eFgFGyvjhv543356Gffcgcf'){
+            foreach(confirmTabOrdersLog::all() as $logOne){
+                $activeTabCode = TableQrcode::where([['tableNr',$logOne->tableNr],['Restaurant',$logOne->toRes]])->first()->kaTab;
+                if($activeTabCode != 0 && $activeTabCode == $logOne->tabId){
+                    if($logOne->tabOrderIds == 'all'){
+                        // all on tab
+                        $tabOrToCheck = TabOrder::where([['toRes',$logOne->toRes],['tableNr',$logOne->tableNr],['tabCode',$activeTabCode],['status',0]])->get();
+                    }else{  
+                        // selected some on tab
+                        $tabOrIds = explode('--||--',$logOne->tabOrderIds);
+                        $tabOrToCheck = TabOrder::whereIn('id', $tabOrIds)->get();
+                    }
+
+                    foreach($tabOrToCheck as $tOrOne){
+                        if($tOrOne->status == 0){
+                            $tOrOne->status = 1;
+                            $tOrOne->save();
+
+                            // Send Notifications for the Admins
+                            foreach(User::where([['sFor',$tOrOne->toRes],['role','5']])->get() as $user){
+                                if($user->id != auth()->user()->id){
+                                    $details = [
+                                        'id' => $tOrOne->id,
+                                        'type' => 'AdminUpdateOrdersP',
+                                        'tableNr' => $tOrOne->tableNr
+                                    ];
+                                    $user->notify(new \App\Notifications\NewOrderNotification($details));
+                                }
+                            }
+                            // Send Notifications for the Waiters
+                            foreach(User::where([['sFor',$tOrOne->toRes],['role','55']])->get() as $oneWaiter){
+                                $aToTable = tablesAccessToWaiters::where([['waiterId',$oneWaiter->id],['tableNr', $tOrOne->tableNr]])->first();
+                                if($oneWaiter->id != Auth::user()->id && $aToTable != NULL && $aToTable->statusAct == 1){
+                                    // register the notification ...
+                                    $details = [
+                                        'id' => $tOrOne->id,
+                                        'type' => 'AdminUpdateOrdersP',
+                                        'tableNr' => $tOrOne->tableNr
+                                    ];
+                                    $oneWaiter->notify(new \App\Notifications\NewOrderNotification($details));
+                                }
+                            }
+                            // Send Notifications for the Cooks
+                            foreach(User::where([['sFor',$tOrOne->toRes],['role','54']])->get() as $oneCook){
+                                $details = [
+                                    'id' => $tOrOne->id,
+                                    'type' => 'AdminUpdateOrdersP',
+                                    'tableNr' => $tOrOne->tableNr
+                                ];
+                                $oneCook->notify(new \App\Notifications\NewOrderNotification($details));
+                            }
+                        }
+                    }
+                }
+
+                $logOne->delete();
             }
         }
     }
@@ -5369,13 +5456,35 @@ EPD
             $time2D = explode(':',explode(' ',$theTime)[1]);
             $theTime = $date2D[2].'.'. $date2D[1].'.'. $date2D[0].' '.$time2D[0].':'.$time2D[1];
 
+            $orderedProducts = explode('---8---',$theOr->porosia);
+
+            $mappedOrderedProducts = [];
+            foreach($orderedProducts as $product){
+                $explodedProduct = explode('-8-', $product);
+
+                if(isset($mappedOrderedProducts[$explodedProduct[7]])){
+                    $mappedOrderedProducts[$explodedProduct[7]] = [
+                        "productId" => $explodedProduct[7],
+                        "quantity" => $explodedProduct[3] ? $mappedOrderedProducts[$explodedProduct[7]]['quantity'] + $explodedProduct[3] : ++$mappedOrderedProducts[$explodedProduct[7]]['quantity'],
+                        "price" => $mappedOrderedProducts[$explodedProduct[7]]['price'] + $explodedProduct[4],
+                        "name" => $explodedProduct[0]
+                    ];
+                } else {
+                    $mappedOrderedProducts[$explodedProduct[7]] = [
+                        "productId" => $explodedProduct[7],
+                        "quantity" => $explodedProduct[3] ?? 1,
+                        "price" => $explodedProduct[4],
+                        "name" => $explodedProduct[0]
+                    ];
+                }
+            }
+
             $theOrder = '<p style="width:100%; text-align:left; font-size:0.9rem; display:flex; flex-wrap: wrap; justify-content: space-between;">';
-            foreach(explode('---8---',$theOr->porosia) as $produkti){  
-                $prod = explode('-8-', $produkti);
-                $theOrder .= '<span style="width:80%;">'.$prod[3].'x '.$prod[0].' ';
+            foreach($mappedOrderedProducts as $product){
+                $theOrder .= '<span style="width:80%;">'.$product['quantity'].'x '.$product['name'].' ';
 
                 $theOrder .= ' </span>';
-                $theOrder .= ' <span style="width:20%; text-align:right;">'.number_format($prod[4], 2, '.', '');
+                $theOrder .= ' <span style="width:20%; text-align:right;">'.number_format($product['price'], 2, '.', '');
                 $theOrder .= ' </span><br>';
             }
             $theOrder .= '</p>';
@@ -5550,15 +5659,35 @@ EPD
 
         $theTable = TableQrcode::where([['Restaurant',Auth::user()->sFor],['tableNr',$req->tableNrSend]])->first();
         if( $theTable != Null &&  $theTable->kaTab != 0){
-            $theProdsShow = '<p style="width:100%; text-align:left; font-size:0.9rem; display:flex; flex-wrap: wrap; justify-content: space-between;">';
+
+            $grTabOrdersByProdId = [];
             foreach(TabOrder::where('tabCode',$theTable->kaTab)->get() as $produkti){  
-                $theProdsShow .= '<span style="width:80%;">'.$produkti->OrderSasia.'x '.$produkti->OrderEmri.' ';
+                if(isset($grTabOrdersByProdId[$produkti->prodId])){
+                    $grTabOrdersByProdId[$produkti->prodId] = [
+                        "productId" => $produkti->prodId,
+                        "quantity" => $produkti->OrderSasia ? $grTabOrdersByProdId[$produkti->prodId]['quantity'] + $produkti->OrderSasia : ++$grTabOrdersByProdId[$produkti->prodId]['quantity'],
+                        "price" => $grTabOrdersByProdId[$produkti->prodId]['price'] + $produkti->OrderQmimi,
+                        "name" => $produkti->OrderEmri
+                    ];
+                }else{
+                    $grTabOrdersByProdId[$produkti->prodId] = [
+                        "productId" => $produkti->prodId,
+                        "quantity" => $produkti->OrderSasia ?? 1,
+                        "price" => $produkti->OrderQmimi,
+                        "name" => $produkti->OrderEmri
+                    ];
+                }
+            }
+
+            $theProdsShow = '<p style="width:100%; text-align:left; font-size:0.9rem; display:flex; flex-wrap: wrap; justify-content: space-between;">';
+            foreach($grTabOrdersByProdId as $produkti){  
+                $theProdsShow .= '<span style="width:80%;">'.$produkti['quantity'].'x '.$produkti['name'].' ';
 
                 $theProdsShow .= ' </span>';
-                $theProdsShow .= ' <span style="width:20%; text-align:right;">'.number_format($produkti->OrderQmimi, 2, '.', '');
+                $theProdsShow .= ' <span style="width:20%; text-align:right;">'.number_format($produkti['price'], 2, '.', '');
                 $theProdsShow .= ' </span><br>';
 
-                $total_shuma += number_format($produkti->OrderQmimi, 2, '.', '');
+                $total_shuma += number_format($produkti['price'], 2, '.', '');
             }
             $theProdsShow .= '</p>';
         }else{

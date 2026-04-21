@@ -117,8 +117,10 @@
                         var priceForOne = parseFloat(parseFloat(value.OrderQmimi)/parseFloat(value.OrderSasia)).toFixed(2);
                         var thisOrQmimi = parseFloat(parseFloat(priceForOne)*parseFloat(sasiaSelected)).toFixed(2)
 
-                        $('#payAllPhaseOneDiv1Sel').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-left">'+sasiaSelected+'x '+value.OrderEmri+'</p>');
-                        $('#payAllPhaseOneDiv1Sel').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-right">CHF '+parseFloat(thisOrQmimi).toFixed(2)+'</p>');
+                       
+                            $('#payAllPhaseOneDiv1Sel').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" id="prodShowPaySelPre'+value.prodId+'" class="text-left"><span id="prodShowPaySelPreSasia'+value.prodId+'">'+sasiaSelected+'</span> x '+value.OrderEmri+'</p>');
+                            $('#payAllPhaseOneDiv1Sel').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-right">CHF <span id="prodShowPaySelPreQmimi'+value.prodId+'">'+parseFloat(thisOrQmimi).toFixed(2)+'</span></p>');
+                        
                         totPay += parseFloat(thisOrQmimi);
                     });
                     if($('#resTvshInput').val() == 0){

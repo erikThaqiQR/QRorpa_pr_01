@@ -118,6 +118,18 @@ use App\restorantTablesToRoom;
             44 => [], // same as 26 (we'll reuse below)
             49 => [], // same as 26 (we'll reuse below)
 
+            57 => [
+                29 => 'res57_room29', 0 => 'res57_room29',
+                30 => 'res57_room30',
+                31 => 'res57_room31',
+            ],
+
+            60 => [
+                33 => 'res60_room33', 0 => 'res60_room33',
+                34 => 'res60_room34',
+                35 => 'res60_room35',
+            ],
+
             68 => [
                 8 => 'res68_room8', 0 => 'res68_room8',
                 9 => 'res68_room9',

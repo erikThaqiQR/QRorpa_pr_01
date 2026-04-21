@@ -1,3 +1,21 @@
+<?php
+
+
+use App\User;
+use App\Orders;
+use App\PiketLog;
+use App\Takeaway;
+use App\Produktet;
+use App\Restorant;
+use App\OrdersPassive;
+use App\emailReceiptFromAdm;
+use App\OPSaferpayReference;
+use App\rechnungClient;
+use App\rechnungClientToBills;
+use Intervention\Image\ImageManagerStatic as Image;
+
+?>
+
 <!doctype html>
 <html>
 <head>
@@ -138,16 +156,6 @@
 
 <?php
 
-    use App\emailReceiptFromAdm;
-    use App\Restorant;
-    use App\PiketLog;
-    use App\Produktet;
-use App\User;
-use App\Takeaway;
-use App\rechnungClient;
-use App\OPSaferpayReference;
-use App\rechnungClientToBills;
-
 
     if(PiketLog::where('order_u',$items->id)->first() != null && PiketLog::where('order_u',$items->id)->first()->piket < 0){
        $pointsUsed = PiketLog::where('order_u',$items->id)->first()->piket * (-1);
@@ -202,16 +210,13 @@ use App\rechnungClientToBills;
 
     $startDt = $orDt2d[2].'.'.$orDt2d[1].'.'.$orDt2d[0];
     $endPayDt = date('d.m.Y', strtotime($startDt. ' + '.$exInfo->exInfoDaysToPay.' day'));
-
-    $pdfname = 'storage/rechnungBillsFirst/rechnungBillFirst'.$theRes->emri.'_'.$items->id.'.pdf';
-    $pdftext = file_get_contents($pdfname);
-    $pages = preg_match_all("/\/Page\W/", $pdftext, $dummy);
-
+    
     $totFromProductePrice = number_format(0, 2, '.', '');
     foreach(explode('---8---',$items->porosia) as $produkti){
         $prod = explode('-8-', $produkti);
         $totFromProductePrice += number_format($prod[4], 2, '.', '');
     }
+
     if($theRes->resTvsh == 0){
         $hiTvsh = number_format( 0 , 9, '.', '');
         $loTvsh = number_format( 0 , 9, '.', '');
@@ -242,7 +247,7 @@ use App\rechnungClientToBills;
 
 <body id="pageCounter">
     <footer id="footerPC">
-        <p style="margin: 0px; padding:0px;  font-size:14px; text-align:right !important;"> <span  class="pageNumbers"></span>{{$pages}}</p>
+        <p style="margin: 0px; padding:0px;  font-size:14px; text-align:right !important;"> <span  class="pageNumbers"></span>xxxx</p>
     </footer>
 
     <div class="invoice-box">
@@ -379,27 +384,65 @@ use App\rechnungClientToBills;
                 $countProdsDs = 0;
                 $mwst77Tot = number_format(0,9,'.','');
                 $mwst25Tot = number_format(0,9,'.','');
+
+                $products = explode('---8---', $items->porosia);
+                $mappedProducts = [];
+
+                foreach ($products as $product) {
+                    $prod = explode('-8-', $product);
+
+                    if(str_contains($prod[3], '/')){
+                        $mappedProducts[] = [
+                            "productName" => $prod[0] ?? '',
+                            "quantity"    => $prod[3] ?? 1,
+                            "price"       => $prod[4],
+                            "type"        => $prod[5] ?? null,
+                            "prod_id"     => $prod[7] ?? '',
+                            "ex"          => $prod[2] ?? '',
+                            "grouped"     => false
+                        ];
+                    }else if(isset($mappedProducts[$prod[7]])){
+                        $mappedProducts[$prod[7]] = [
+                            "productName" => $prod[0] ?? '',
+                            "quantity"    => $prod[3] ? $prod[3] + $mappedProducts[$prod[7]]['quantity'] : ++$mappedProducts[$prod[7]]['quantity'],
+                            "price"       => $mappedProducts[$prod[7]]['price'] + $prod[4],
+                            "type"        => $prod[5] ?? null,
+                            "prod_id"     => $prod[7] ?? '',
+                            "ex"          => $prod[2] ?? '',
+                            "grouped"     => true
+                        ];
+                    } else {
+                        $mappedProducts[$prod[7]] = [
+                            "productName" => $prod[0] ?? '',
+                            "quantity"    => $prod[3] ?? 1,
+                            "price"       => $prod[4],
+                            "type"        => $prod[5] ?? null,
+                            "prod_id"     => $prod[7] ?? '',
+                            "ex"          => $prod[2] ?? '',
+                            "grouped"     => false
+                        ];
+                    }
+                }
             ?>
-            @foreach(explode('---8---',$items->porosia) as $produkti)
+            @foreach($mappedProducts as $produkti)
                 <?php
-                    $prod = explode('-8-', $produkti);
                     $countProdsDs++;
 
                     if($items->inCashDiscount > 0){
                         $totZbritja = number_format($items->inCashDiscount, 2, '.', '');
                         if($items->nrTable == 500){
-                            $Pr = Produktet::find($prod[7]);
+                            $Pr = Produktet::find($produkti['prod_id']);
                             $taPr = Takeaway::where('prod_id',$Pr->id)->first();
                             if($taPr != Null){
                                 if($taPr->mwstForPro == 7.70 || $taPr->mwstForPro == 8.10){
-                                    $cal1 = number_format(($prod[4]* $totZbritja) / $totFromProductePrice , 9, '.', '');
-                                    $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
+                                    $cal1 = number_format(($produkti['price']* $totZbritja) / $totFromProductePrice , 9, '.', '');
+                                    $cal2 = number_format($produkti['price'] - $cal1, 9, '.', '');
                                     $mwstValPrc = number_format($hiTvsh,9,'.','');
                                     $mwstOnChf = number_format($mwstValPrc *  $cal2,9,'.','');
                                     $mwst77Tot += number_format($mwstOnChf,9,'.','');
                                 }else if($taPr->mwstForPro == 2.50 || $taPr->mwstForPro == 2.60){
-                                    $cal1 = number_format(($prod[4]* $totZbritja) / $totFromProductePrice , 9, '.', '');
-                                    $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
+                                    $cal1 = number_format(($produkti['price']* $totZbritja) / $totFromProductePrice , 9, '.', '');
+                                    $cal2 = number_format($produkti['price'] - $cal1, 9, '.', '');
                                     $mwstValPrc = number_format($loTvsh,9,'.','');
                                     $mwstOnChf = number_format($mwstValPrc * $cal2,9,'.','');
                                     $mwst25Tot += number_format($mwstOnChf,9,'.','');
@@ -407,15 +450,15 @@ use App\rechnungClientToBills;
                                     $mwstOnChf = number_format(0,9,'.',''); 
                                 }
                             }else{
-                                $cal1 = number_format(($prod[4]* $totZbritja) / $totFromProductePrice , 9, '.', '');
-                                $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
+                                $cal1 = number_format(($produkti['price']* $totZbritja) / $totFromProductePrice , 9, '.', '');
+                                $cal2 = number_format($produkti['price'] - $cal1, 9, '.', '');
                                 $mwstValPrc = number_format($loTvsh,9,'.','');
                                 $mwstOnChf = number_format($mwstValPrc * $cal2,9,'.','');
                                 $mwst25Tot += number_format($mwstOnChf,9,'.','');
                             }
                         }else{
-                            $cal1 = number_format(($prod[4]* $totZbritja) / $totFromProductePrice , 9, '.', '');
-                            $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
+                            $cal1 = number_format(($produkti['price']* $totZbritja) / $totFromProductePrice , 9, '.', '');
+                            $cal2 = number_format($produkti['price'] - $cal1, 9, '.', '');
                             $mwstValPrc = number_format($hiTvsh,9,'.','');
                             $mwstOnChf = number_format($mwstValPrc * $cal2,9,'.','');
                             $mwst77Tot += number_format($mwstOnChf,9,'.','');
@@ -423,18 +466,18 @@ use App\rechnungClientToBills;
                     }else if($items->inPercentageDiscount > 0){
                         $totZbritjaPrc = number_format($items->inPercentageDiscount / 100, 2, '.', '');
                         if($items->nrTable == 500){
-                            $Pr = Produktet::find($prod[7]);
+                            $Pr = Produktet::find($produkti['price']);
                             $taPr = Takeaway::where('prod_id',$Pr->id)->first();
                             if($taPr != Null){
                                 if($taPr->mwstForPro == 7.70 || $taPr->mwstForPro == 8.10){
-                                    $cal1 = number_format($prod[4] * $totZbritjaPrc, 9, '.', '');
-                                    $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
+                                    $cal1 = number_format($produkti['price'] * $totZbritjaPrc, 9, '.', '');
+                                    $cal2 = number_format($produkti['price'] - $cal1, 9, '.', '');
                                     $mwstValPrc = number_format($hiTvsh,9,'.','');
                                     $mwstOnChf = number_format($mwstValPrc * $cal2,9,'.','');
                                     $mwst77Tot += number_format($mwstOnChf,9,'.','');
                                 }else if($taPr->mwstForPro == 2.50 || $taPr->mwstForPro == 2.60){
-                                    $cal1 = number_format($prod[4] * $totZbritjaPrc, 9, '.', '');
-                                    $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
+                                    $cal1 = number_format($produkti['price'] * $totZbritjaPrc, 9, '.', '');
+                                    $cal2 = number_format($produkti['price'] - $cal1, 9, '.', '');
                                     $mwstValPrc = number_format($loTvsh,9,'.','');
                                     $mwstOnChf = number_format($mwstValPrc * $cal2,9,'.','');
                                     $mwst25Tot += number_format($mwstOnChf,9,'.','');
@@ -442,43 +485,43 @@ use App\rechnungClientToBills;
                                     $mwstOnChf = number_format(0,9,'.',''); 
                                 }
                             }else{
-                                $cal1 = number_format($prod[4] * $totZbritjaPrc, 9, '.', '');
-                                $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
+                                $cal1 = number_format($produkti['price'] * $totZbritjaPrc, 9, '.', '');
+                                $cal2 = number_format($produkti['price'] - $cal1, 9, '.', '');
                                 $mwstValPrc = number_format($loTvsh,9,'.','');
                                 $mwstOnChf = number_format($mwstValPrc * $cal2,9,'.','');
                                 $mwst25Tot += number_format($mwstOnChf,9,'.','');
                             }
                         }else{
-                            $cal1 = number_format($prod[4] * $totZbritjaPrc, 9, '.', '');
-                            $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
+                            $cal1 = number_format($produkti['price'] * $totZbritjaPrc, 9, '.', '');
+                            $cal2 = number_format($produkti['price'] - $cal1, 9, '.', '');
                             $mwstValPrc = number_format($hiTvsh,9,'.','');
                             $mwstOnChf = number_format($mwstValPrc * $cal2,9,'.','');
                             $mwst77Tot += number_format($mwstOnChf,9,'.','');
                         }
                     }else{
                         if($items->nrTable == 500){
-                            $Pr = Produktet::find($prod[7]);
+                            $Pr = Produktet::find($produkti['prod_id']);
                             $taPr = Takeaway::where('prod_id',$Pr->id)->first();
                             if($taPr != Null){
                                 if($taPr->mwstForPro == 7.70 || $taPr->mwstForPro == 8.10){
                                     $mwstValPrc = number_format($hiTvsh,9,'.','');
-                                    $mwstOnChf = number_format($mwstValPrc * $prod[4],9,'.','');
+                                    $mwstOnChf = number_format($mwstValPrc * $produkti['price'],9,'.','');
                                     $mwst77Tot += number_format($mwstOnChf,9,'.','');
                                 }else if($taPr->mwstForPro == 2.50 || $taPr->mwstForPro == 2.60){
                                     $mwstValPrc = number_format($loTvsh,9,'.','');
-                                    $mwstOnChf = number_format($mwstValPrc * $prod[4],9,'.','');
+                                    $mwstOnChf = number_format($mwstValPrc * $produkti['price'],9,'.','');
                                     $mwst25Tot += number_format($mwstOnChf,9,'.','');
                                 }else{
                                     $mwstOnChf = number_format(0,9,'.',''); 
                                 }
                             }else{
                                 $mwstValPrc = number_format($loTvsh,9,'.','');
-                                $mwstOnChf = number_format($mwstValPrc * $prod[4],9,'.','');
+                                $mwstOnChf = number_format($mwstValPrc * $produkti['price'],9,'.','');
                                 $mwst25Tot += number_format($mwstOnChf,9,'.','');
                             }
                         }else{
                             $mwstValPrc = number_format($hiTvsh,9,'.','');
-                            $mwstOnChf = number_format($mwstValPrc * $prod[4],9,'.','');
+                            $mwstOnChf = number_format($mwstValPrc * $produkti['price'],9,'.','');
                             $mwst77Tot += number_format($mwstOnChf,9,'.','');
                         }
                     }
@@ -489,15 +532,15 @@ use App\rechnungClientToBills;
                     <tr class="details" style="margin-bottom:0px;">
                 @endif
                     <td>
-                        {{$prod[3]}} X
+                        {{$produkti['quantity']}} X
                     </td>   
                     <td style="text-align: left;">
-                        {{$prod[0]}}    
-                        @if($prod[5] != '' && $prod[5] != 'empty')
-                            <span style="opacity:0.6">( {{$prod[5]}} )</span>
+                        {{$produkti['productName']}}    
+                        @if(!$produkti['grouped'] && $produkti['type'] && $produkti['type'] != 'empty')
+                            <span style="opacity:0.6">( {{$produkti['type']}} )</span>
                         @endif  
-                        @if($prod[2] != '')
-                            <br><?php $thE = explode('--0--', $prod[2])?>
+                        @if($produkti['ex'] != '')
+                            <br><?php $thE = explode('--0--', $produkti['ex'])?>
                             @foreach ($thE as $ex)
                                 @if ($ex != '' && $ex != 'empty')
                                     <span style="margin-right:10px; font-weight:normal; opacity:0.7; font-size:11px;">+ {{ explode('||',$ex)[0]}}</span>
@@ -506,15 +549,17 @@ use App\rechnungClientToBills;
                         @endif
                     </td>
                     <?php
-                        if(str_contains($prod[3],'/')){
-                            $prod3_2D = explode('/',$prod[3]);
+                        if(str_contains($produkti['quantity'],'/')){
+                            $prod3_2D = explode('/',$produkti['quantity']);
                             $sasiaProdThis = $prod3_2D[0] / $prod3_2D[1];
                         }else{
-                            $sasiaProdThis = $prod[3];
+                            $sasiaProdThis = $produkti['quantity'];
                         } 
                     ?>
                     <td style="text-align: center;">
-                        {{number_format($prod[4] / $sasiaProdThis,2,'.','')}} CHF
+                        @if (!$produkti['grouped'])                        
+                            {{number_format($produkti['price'] / $sasiaProdThis,2,'.','')}} CHF
+                        @endif
                     </td>
                     <td style="text-align: center;">
                         {{number_format($mwstOnChf,2,'.','')}} CHF
@@ -524,7 +569,7 @@ use App\rechnungClientToBills;
                             {{number_format(0, 2, '.', '')}} %
                         @else
                             <?php
-                                $Pr = Produktet::find($prod[7]);
+                                $Pr = Produktet::find($produkti['prod_id']);
                                 $taPr = Takeaway::where('prod_id',$Pr->id)->first();
                             ?>
                             @if($items->nrTable == 500 && $taPr != Null)
@@ -562,7 +607,7 @@ use App\rechnungClientToBills;
                         @endif
                     </td>
                     <td style="text-align: right;">
-                        {{number_format($prod[4],2,'.','')}} CHF
+                        {{number_format($produkti['price'],2,'.','')}} CHF
                     </td>
                 </tr>
              @endforeach

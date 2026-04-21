@@ -5,13 +5,13 @@
   ?>
 @endif
 <?php
-
-    use Illuminate\Support\Facades\Auth;
     use App\Orders;
     use Carbon\Carbon;
     use App\accessControllForAdmins;
     use App\tablesAccessToWaiters;
     use App\displayAddForUser;
+    use App\Restorant;
+    use Illuminate\Support\Facades\Auth;
     
     use Jenssegers\Agent\Agent;
     $agent = new Agent();
@@ -123,7 +123,11 @@
         <input type="hidden" id="isDeviceMobile" value="0">
     @endif
 
-    @include('adminPanelWaiter.indexParts.orderQRCodeTel')
+    @if(in_array(Auth::user()->sFor, [3100, 56, 5000]))
+        @include('adminPanelWaiter.indexParts.orderQRCodeTel_prodGroup')
+    @else
+        @include('adminPanelWaiter.indexParts.orderQRCodeTel')
+    @endif
 
     <!-- Check for non valid TAB orders -->
     @include('adminPanelWaiter.indexParts.checkNonValidTABOrds')
@@ -358,7 +362,10 @@
                 });
                 }
             </script>
-            @if(displayAddForUser::where('toUser',Auth::user()->id)->first() == Null)
+            <?php
+                $theRes = Restorant::find(Auth::user()->sFor);
+            ?>
+            @if(displayAddForUser::where('toUser',Auth::user()->id)->first() == Null && $theRes->hasPos == 1)
                 <script>
                 $(document).ready(function(){
                     $('#showNewsVideoModal').modal('show');

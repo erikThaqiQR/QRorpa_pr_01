@@ -276,6 +276,7 @@ Route::post('getCheckInOutSalesRepo', 'AdminPanelController@getCheckInOutSalesRe
 
 // connfirm orders
 Route::post('admConfConfirmAll', 'AdminPanelController@admConfConfirmAll')->name('admConf.confirmAll');
+Route::get('admConfConfirmAllCheckFromLogs', 'AdminPanelController@admConfConfirmAllCheckFromLogs')->name('admConf.admConfConfirmAllCheckFromLogs');
 //--------------------------------------------------------------------------------------------------------------------
 
 // Abrufen sherbimi 
@@ -389,6 +390,8 @@ Route::post('executeAbrufenOnSelectedTabOr', 'AdminPanelController@executeAbrufe
 Route::post('deleteTabOrderCheckForConfirmed', 'AdminPanelController@deleteTabOrderCheckForConfirmed')->name('tablePage.deleteTabOrderCheckForConfirmed');
 
 Route::post('tabOrderModalCheckTotalPriceShow', 'AdminPanelController@tabOrderModalCheckTotalPriceShow')->name('tablePage.tabOrderModalCheckTotalPriceShow');
+
+Route::get('tabOrderShowGroupedOrdersByProduct', 'AdminPanelController@tabOrderShowGroupedOrdersByProduct')->name('tablePage.tabOrderShowGroupedOrdersByProduct');
 
 Route::post('tabOrderModalCheckActiveOrToReopen', 'AdminPanelController@tabOrderModalCheckActiveOrToReopen')->name('tablePage.tabOrderModalCheckActiveOrToReopen');
 //--------------------------------------------------------------------------------------------------------------------

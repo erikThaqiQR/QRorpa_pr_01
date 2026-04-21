@@ -24,7 +24,7 @@
                     $.each(respo2D, function(index, value) {
                         // Code to be executed for each element
                         orDt2D = value.split('-||-');
-                        buildTheNewProdInOrderTable(orDt2D[0], orDt2D[1], orDt2D[2], orDt2D[3], orDt2D[4], orDt2D[5], orDt2D[6], orDt2D[7], orDt2D[8], orDt2D[9], orDt2D[10], orDt2D[11], orDt2D[13], orDt2D[14], orDt2D[15], orDt2D[16], orDt2D[17]);
+                        buildTheNewProdInOrderTable(orDt2D[0], orDt2D[1], orDt2D[2], orDt2D[3], orDt2D[4], orDt2D[5], orDt2D[6], orDt2D[7], orDt2D[8], orDt2D[9], orDt2D[10], orDt2D[11], orDt2D[13], orDt2D[14], orDt2D[15], orDt2D[16], orDt2D[17], orDt2D[18], orDt2D[19]);
                     });
                     $("#tableIconDiv"+tNr).load(location.href+" #tableIconDiv"+tNr+">*","");
 
@@ -704,57 +704,6 @@
 
 
 
-
-
-
-    function prepPayAllProds(tNr,resId){
-        $('#payAllBtn1').prop('disabled', true);
-        $('#payAllBtn2').prop('disabled', true);
-        $('#payAllBtn3').prop('disabled', true);
-        $('#payAllBtn4').prop('disabled', true);
-        $('#tabOrder'+tNr).modal('hide');
-        $('body').attr('class','modal-open');
-        $('#payAllTableNr').val(tNr);
-
-        $.ajax({
-			url: '{{ route("admin.payAllFetchOrders") }}',
-            dataType: 'json',
-			method: 'post',
-			data: {
-				tNr: tNr,
-				resId: resId,
-				_token: '{{csrf_token()}}'
-			},
-			success: (respo) => {
-                var totPay = parseFloat(0);
-                $.each(respo, function(index, value){
-                    $('#payAllPhaseOneDiv1').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-left">'+value.OrderSasia+'x '+value.OrderEmri+'</p>');
-                    $('#payAllPhaseOneDiv1').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-right">CHF '+parseFloat(value.OrderQmimi).toFixed(2)+'</p>');
-                    totPay += parseFloat(value.OrderQmimi);
-                });
-                var mwst = parseFloat(totPay * 0.074930619);
-
-                $('#payAllPhaseOneDiv1').append('<p style="width: 50%; margin-bottom:8px;" class="text-left"><strong>Total inkl.</strong></p>');
-                $('#payAllPhaseOneDiv1').append('<p style="width: 50%; margin-bottom:8px;" class="text-right"><strong>CHF <span id="totAmProds">'+parseFloat(totPay).toFixed(2)+'</span></strong></p>');
-                $('#payAllPhaseOneDiv1').append('<p id="payAllPhaseOneDiv1TippP11" style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-left"><strong>Tipp.</strong></p>');
-                $('#payAllPhaseOneDiv1').append('<p id="payAllPhaseOneDiv1TippP12" style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-right"><strong>CHF <span id="tippAmProds">0.00</span></strong></p>');
-                $('#payAllPhaseOneDiv1').append('<p id="payAllstaffDiscountShow01" style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-left"><strong>Rabatt vom Personal.</strong></p>');
-                $('#payAllPhaseOneDiv1').append('<p id="payAllstaffDiscountShow02" style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-right"><strong>CHF <span id="staffDiscSpan">0.00</span></strong></p>');
-                $('#payAllPhaseOneDiv1').append('<p id="payAllgiftCardDiscountShow01" style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-left"><strong>Rabatt von der Geschenkkarte.</strong></p>');
-                $('#payAllPhaseOneDiv1').append('<p id="payAllgiftCardDiscountShow02" style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-right"><strong>CHF <span id="giftCardDiscSpan">0.00</span></strong></p>');
-                $('#payAllPhaseOneDiv1').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-left"><strong>MwSt.</strong></p>');
-                $('#payAllPhaseOneDiv1').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-right"><strong>CHF <span id="tvshAmProds">'+parseFloat(mwst).toFixed(2)+'</span> (<span id="tvshAmProdsPerventage">8.10</span> %)</strong></p>');
-                $('#payAllPhaseOneDiv1').append('<p id="payAllFinalPayShow01" style="width: 50%; margin-top:-8px; margin-bottom:8px; font-size:1.1rem;" class="text-left"><strong>Letzte Bezahlung.</strong></p>');
-                $('#payAllPhaseOneDiv1').append('<p id="payAllFinalPayShow02" style="width: 50%; margin-top:-8px; margin-bottom:8px; font-size:1.1rem;" class="text-right"><strong>CHF <span id="finalPaySpan">'+parseFloat(totPay).toFixed(2)+'</span></strong></p>');
-                
-                $('#payAllBtn1').prop('disabled', false);
-                $('#payAllBtn2').prop('disabled', false);
-                $('#payAllBtn3').prop('disabled', false);
-                $('#payAllBtn4').prop('disabled', false);
-            },
-			error: (error) => { console.log(error); }
-		});
-    }
 
 
 

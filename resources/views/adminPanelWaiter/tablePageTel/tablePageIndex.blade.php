@@ -110,6 +110,18 @@ use App\restorantTablesToRoom;
             44 => [], // same as 26 (we'll reuse below)
             49 => [], // same as 26 (we'll reuse below)
 
+            57 => [
+                29 => 'res57_room29', 0 => 'res57_room29',
+                30 => 'res57_room30',
+                31 => 'res57_room31',
+            ],
+
+            60 => [
+                33 => 'res60_room33', 0 => 'res60_room33',
+                34 => 'res60_room34',
+                35 => 'res60_room35',
+            ],
+
             68 => [
                 8 => 'res68_room8', 0 => 'res68_room8',
                 9 => 'res68_room9',
@@ -258,11 +270,17 @@ use App\restorantTablesToRoom;
     // 2. Page is being unloaded (better on iOS than beforeunload)
     window.addEventListener("pagehide", handleExitPOSPaytec);
 </script>
+
 @include('adminPanelWaiter.tablePageTel.newOrderRegEl')
-@if (1 == 0)
+@if (false)
     @include('adminPanelWaiter.tablePageTel.tableIndexActiveOrMd')
 @else
-    @include('adminPanelWaiter.tablePageTel.tableIndexActiveOrMdVer_2')
+    @if(in_array($sFor, [3100, 56, 5000]))
+        <!-- display same products together -->
+        @include('adminPanelWaiter.tablePageTel.tableIndexActiveOrMdVer_2_podGroup')
+    @else
+        @include('adminPanelWaiter.tablePageTel.tableIndexActiveOrMdVer_2')
+    @endif
 @endif
 @include('adminPanelWaiter.tablePageTel.tableIndexNotifications')
 @include('adminPanelWaiter.tablePageTel.tablePageIndexScript')

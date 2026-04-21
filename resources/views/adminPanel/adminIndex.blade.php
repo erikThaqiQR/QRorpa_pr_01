@@ -3,7 +3,9 @@
   use Carbon\Carbon;
   use App\accessControllForAdmins;
   use App\displayAddForUser;
-
+  use App\Restorant;
+  use Illuminate\Support\Facades\Auth;
+  
   use Jenssegers\Agent\Agent;
   $agent = new Agent();
 ?>
@@ -132,7 +134,12 @@
     <input type="hidden" id="isDeviceMobile" value="0">
   @endif
 
-  @include('adminPanel.indexParts.orderQRCodeTel')
+  
+  @if(in_array(Auth::user()->sFor, [31, 56, 5000]))
+    @include('adminPanel.indexParts.orderQRCodeTel_prodGroup')
+  @else
+    @include('adminPanel.indexParts.orderQRCodeTel')
+  @endif
 
   <!-- Check for non valid TAB orders -->
   @include('adminPanel.indexParts.checkNonValidTABOrds')
@@ -419,7 +426,10 @@
           });
         }
       </script>
-      @if(displayAddForUser::where('toUser',Auth::user()->id)->first() == Null)
+      <?php
+        $theRes = Restorant::find(Auth::user()->sFor);
+      ?>
+      @if(displayAddForUser::where('toUser',Auth::user()->id)->first() == Null && $theRes->hasPos == 1)
         <script>
           $(document).ready(function(){
             $('#showNewsVideoModal').modal('show');
@@ -446,7 +456,7 @@
 
 
     @if($agent->isTablet())
-      @include('adminPanel.partsTel.njoftimet')
+      @include('adminPanel.tablePage.tableIndexNotifications')
        <!-- BarbershopAdmin -->
       @if(Auth::user()->role == 15)
         <div id="all">  

@@ -699,10 +699,7 @@
     function buildTheNewProdInOrderTable(tNr, tOrId, tOrStatus, tOrQmimi, tOrCreAt, tOrSasia, tOrEmri, tOrPershkrimi, tOrType, tOrKoment, staffName, plateName, extrasAll, tOrSasiaDone, clPhNr, plateId, abrufenStat, prodId, tabCode){
   
         // console.log('buildTheNewProdInOrderTable function called with: ', {tNr, tOrId, tOrStatus, tOrQmimi, tOrCreAt, tOrSasia, tOrEmri, tOrPershkrimi, tOrType, tOrKoment, staffName, plateName, extrasAll, tOrSasiaDone, clPhNr, plateId, abrufenStat, prodId, tabCode});
-        console.log('#tabOrderDivGroup'+prodId+'tnr'+tNr+'plateId'+plateId);
-
         if ($('#tabOrderDivGroup'+prodId+'tnr'+tNr+'plateId'+plateId).length) {
-            console.log('in');
             var oldSasia = parseInt($('.tabOrderSasiaSpan'+prodId+'tnr'+tNr+'plateId'+plateId).text());
             var newSasia = oldSasia + parseInt(tOrSasia);
             $('.tabOrderSasiaSpan'+prodId+'tnr'+tNr+'plateId'+plateId).text(newSasia);
@@ -731,6 +728,7 @@
                                     '<p style="width:20%; margin:0; text-align:center;"><strong><span class="tabOrderQmimiSpan'+prodId+'tnr'+tNr+'plateId'+plateId+'">'+parseFloat(newQmimi).toFixed(2)+'</span>.-</strong></p>'+
                                 '</div>';
             $('#tab'+tNr+'OrClDiv'+clPhNr+'Plate'+plateId+'').append(newGroupOrderDiv);
+
 
         }else{
 

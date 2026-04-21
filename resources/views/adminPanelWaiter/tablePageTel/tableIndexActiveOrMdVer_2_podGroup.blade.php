@@ -273,7 +273,7 @@ use App\waiterActivityLog;
                                                     ?>
 
                                                     <div style="border: 1px solid rgb(72,81,87); border-radius:2px; margin-bottom:2px;" id="tabOrderDiv{{$thisTOrder->id}}"
-                                                    class="d-flex flex-wrap justify-content-between tabOrderDivGroup{{$prodsInTabIdGroupOne}}tnr{{$tabelOne->tableNr}}plateId{{$thisTOrder->toPlate}}
+                                                    class="d-flex flex-wrap justify-content-between tabOrderDivGroup{{$prodsInTabIdGroupOne}}tnr{{$tabelOne->tableNr}}plateId{{$thisTOrder->toPlate}} 
                                                     {{ $thisTOrder->abrufenStat == 1 ? 'tabOrderDivCalled' : ($thisTOrder->status == 1 ? 'tabOrderDivConfirmed' : '') }}" 
                                                     onclick="closeOrSelect('{{$tabelOne->tableNr}}','{{$thisTOrder->id}}','{{$thisTOrder->OrderSasia}}')">
                                                         <p class="pl-1" style="width:60%; margin:0; padding-top:2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height:0.9;">
@@ -677,11 +677,11 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:20%;">
 </div>  
 
 
-@include('adminPanel.tablePageTel.splitTheBill')
-@include('adminPanel.tablePageTel.splitTheBillRechnung')
+@include('adminPanelWaiter.tablePageTel.splitTheBill')
+@include('adminPanelWaiter.tablePageTel.splitTheBillRechnung')
 
-@include('adminPanel.tablePageTel.tableIndexActiveOrMdScriptVer_2')
-@include('adminPanel.tablePageTel.tableIndexActiveOrMdpodGroupScript')
-@include('adminPanel.tablePageTel.tableIndexPayAllCode')
-@include('adminPanel.tablePageTel.tableIndexPaySelectedCode')
-@include('adminPanel.tablePageTel.billTabletModal')
+@include('adminPanelWaiter.tablePageTel.tableIndexActiveOrMdScriptVer_2')
+@include('adminPanelWaiter.tablePageTel.tableIndexActiveOrMdpodGroupScript')
+@include('adminPanelWaiter.tablePageTel.tableIndexPayAllCode')
+@include('adminPanelWaiter.tablePageTel.tableIndexPaySelectedCode')
+@include('adminPanelWaiter.tablePageTel.billTabletModal')
