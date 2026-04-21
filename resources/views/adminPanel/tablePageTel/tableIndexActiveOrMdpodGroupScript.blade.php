@@ -44,9 +44,9 @@
                     showNewOrder +=  'class="d-flex flex-wrap justify-content-between';
 
                     if(value.abrufenStat == 1){
-                        showNewOrder +=  'tabOrderDivCalled';
+                        showNewOrder +=  ' tabOrderDivCalled';
                     }else if(value.status == 1){
-                        showNewOrder +=  'tabOrderDivConfirmed';
+                        showNewOrder +=  ' tabOrderDivConfirmed';
                     }
 
                     if(isSelected){

@@ -345,8 +345,15 @@ use App\waiterActivityLog;
                                                         @endif
                                                     </div>
                                                 @else
-                                                   <div style="border: 1px solid rgb(72,81,87); border-radius:2px; margin-bottom:2px;" class="d-flex flex-wrap justify-content-between"
-                                                   onclick="openGroupProductSelectionPage('{{$prodsInTabIdGroupOne}}','{{$tabelOne->kaTab}}','{{$activeClientsPNrOneNew}}','{{$onePlateIdThisCl}}')">
+                                                   <?php
+                                                        $onePerc = number_format( 100/$prodsInTabSasiaGroup[$prodsInTabIdGroupOne], 8, '.','');
+                                                        $percOfCalled = number_format( $onePerc * $prodsInTabSasiaCalledGroup[$prodsInTabIdGroupOne], 2, '.','');
+                                                        $percOfConfirmed = $percOfCalled + number_format( $onePerc * $prodsInTabSasiaConfirmedGroup[$prodsInTabIdGroupOne], 2, '.','');
+                                                    ?>
+                                                    <div style="border: 1px solid rgb(72,81,87); border-radius:2px; margin-bottom:2px; 
+                                                    background: linear-gradient(to right, rgb(126, 217, 86) 0% {{$percOfCalled}}%, rgb(208, 250, 248) {{$percOfCalled}}% {{$percOfConfirmed}}%, white {{$percOfConfirmed}}% 100%);" 
+                                                    class="d-flex flex-wrap justify-content-between" id="tabOrderDivGroup{{$prodsInTabIdGroupOne}}tnr{{$tabelOne->tableNr}}plateId{{$prodsInTabPlateIdGroup[$prodsInTabIdGroupOne]}}"
+                                                    onclick="openGroupProductSelectionPage('{{$prodsInTabIdGroupOne}}','{{$tabelOne->kaTab}}','{{$activeClientsPNrOneNew}}','{{$onePlateIdThisCl}}')">
                                                         <p class="pl-1" style="width:80%; margin:0; padding-top:2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height:0.9; font-weight:bold;">
                                                             <span id="tabOrderSasiaSpan{{$prodsInTabIdGroupOne}}">{{$prodsInTabSasiaGroup[$prodsInTabIdGroupOne]}}x</span> {{$prodsInTabEmriGroup[$prodsInTabIdGroupOne]}}
                                                         </p>
