@@ -31,6 +31,7 @@
 
                     // cancel orders selected -----------------------------------------------------
                     var selectedTOrs = $('#closeOrSelected'+tNr).val();
+                    $('#closeOrSelected'+tNr).val('0');
                     $('#payAllProd'+tNr).show(1);
                     $('#paySelProd'+tNr).hide(1);
                     $.each(selectedTOrs.split('||'), function( index, value ) {
@@ -49,7 +50,7 @@
                             
                         }
                     });
-                    $('#closeOrSelected'+tNr).val(0);
+                    
                     // ----------------------------------------------------------------------------
 
 				},

@@ -275,7 +275,7 @@ use App\restorantTablesToRoom;
 @if (false)
     @include('adminPanel.tablePageTel.tableIndexActiveOrMd')
 @else
-    @if(in_array($sFor, [31, 56, 5000]))
+    @if(in_array($sFor, [3100, 56, 69, 26]))
         <!-- display same products together -->
         @include('adminPanel.tablePageTel.tableIndexActiveOrMdVer_2_podGroup')
     @else

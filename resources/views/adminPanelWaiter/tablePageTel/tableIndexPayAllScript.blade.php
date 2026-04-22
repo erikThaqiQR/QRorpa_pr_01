@@ -102,7 +102,7 @@
 			success: (respo) => {
                 var totPay = parseFloat(0);
                 $.each(respo, function(index, value){
-                    if($('#prodShowPayAllPre'+value.prodId).length && (resId == 3100 || resId == 56)){
+                    if($('#prodShowPayAllPre'+value.prodId).length && (resId == 3100 || resId == 56 || resId == 69 || resId == 26)){
                         let oldSasia = parseInt($('#prodShowPayAllPreSasia'+value.prodId).html());
                         let oldQmimi = parseFloat($('#prodShowPayAllPreQmimi'+value.prodId).html());
 

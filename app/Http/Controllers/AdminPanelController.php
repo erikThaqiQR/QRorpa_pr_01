@@ -5456,10 +5456,32 @@ EPD
             $time2D = explode(':',explode(' ',$theTime)[1]);
             $theTime = $date2D[2].'.'. $date2D[1].'.'. $date2D[0].' '.$time2D[0].':'.$time2D[1];
 
+            $orderedProducts = explode('---8---',$theOr->porosia);
+
+            $mappedOrderedProducts = [];
+            foreach($orderedProducts as $product){
+                $explodedProduct = explode('-8-', $product);
+
+                if(isset($mappedOrderedProducts[$explodedProduct[7]])){
+                    $mappedOrderedProducts[$explodedProduct[7]] = [
+                        "productId" => $explodedProduct[7],
+                        "quantity" => $explodedProduct[3] ? $mappedOrderedProducts[$explodedProduct[7]]['quantity'] + $explodedProduct[3] : ++$mappedOrderedProducts[$explodedProduct[7]]['quantity'],
+                        "price" => $mappedOrderedProducts[$explodedProduct[7]]['price'] + $explodedProduct[4],
+                        "name" => $explodedProduct[0]
+                    ];
+                } else {
+                    $mappedOrderedProducts[$explodedProduct[7]] = [
+                        "productId" => $explodedProduct[7],
+                        "quantity" => $explodedProduct[3] ?? 1,
+                        "price" => $explodedProduct[4],
+                        "name" => $explodedProduct[0]
+                    ];
+                }
+            }
+
             $theOrder = '<p style="width:100%; text-align:left; font-size:0.9rem; display:flex; flex-wrap: wrap; justify-content: space-between;">';
-            foreach(explode('---8---',$theOr->porosia) as $produkti){  
-                $prod = explode('-8-', $produkti);
-                $theOrder .= '<span style="width:80%;">'.$prod[3].'x '.$prod[0].' ';
+            foreach($mappedOrderedProducts as $product){
+                $theOrder .= '<span style="width:80%;">'.$product['quantity'].'x '.$product['name'].' ';
 
                 $theOrder .= ' </span>';
                 $theOrder .= ' <span style="width:20%; text-align:right;">'.number_format($product['price'], 2, '.', '');
@@ -5631,72 +5653,69 @@ EPD
         $time2D = explode(':',explode(' ',$theTime)[1]);
         $theTime = $date2D[2].'.'. $date2D[1].'.'. $date2D[0].' '.$time2D[0].':'.$time2D[1];
 
-        $total_shuma = number_format(0, 2, '.', '');
-
-        
+        $total_shuma = 0;
 
         $theTable = TableQrcode::where([['Restaurant',Auth::user()->sFor],['tableNr',$req->tableNrSend]])->first();
-        if( $theTable != Null &&  $theTable->kaTab != 0){
+        if($theTable != Null && $theTable->kaTab != 0){
+            $theProdsShow = '';
 
-            $grTabOrdersByProdId = [];
-            foreach(TabOrder::where('tabCode',$theTable->kaTab)->get() as $produkti){  
-                if(isset($grTabOrdersByProdId[$produkti->prodId])){
-                    $grTabOrdersByProdId[$produkti->prodId] = [
-                        "productId" => $produkti->prodId,
-                        "quantity" => $produkti->OrderSasia ? $grTabOrdersByProdId[$produkti->prodId]['quantity'] + $produkti->OrderSasia : ++$grTabOrdersByProdId[$produkti->prodId]['quantity'],
-                        "price" => $grTabOrdersByProdId[$produkti->prodId]['price'] + $produkti->OrderQmimi,
-                        "name" => $produkti->OrderEmri
-                    ];
-                }else{
-                    $grTabOrdersByProdId[$produkti->prodId] = [
-                        "productId" => $produkti->prodId,
-                        "quantity" => $produkti->OrderSasia ?? 1,
-                        "price" => $produkti->OrderQmimi,
-                        "name" => $produkti->OrderEmri
+            // Group by prodId, sum qty and price
+            $grouped = [];
+            foreach(TabOrder::where('tabCode',$theTable->kaTab)->get() as $produkti){
+                $pid = $produkti->prodId;
+                if(!isset($grouped[$pid])){
+                    $grouped[$pid] = [
+                        'name'  => $produkti->OrderEmri,
+                        'qty'   => 0,
+                        'total' => 0,
                     ];
                 }
+                $grouped[$pid]['qty']   += $produkti->OrderSasia;
+                $grouped[$pid]['total'] += $produkti->OrderQmimi;
             }
 
-            $theProdsShow = '<p style="width:100%; text-align:left; font-size:0.9rem; display:flex; flex-wrap: wrap; justify-content: space-between;">';
-            foreach($grTabOrdersByProdId as $produkti){  
-                $theProdsShow .= '<span style="width:80%;">'.$produkti['quantity'].'x '.$produkti['name'].' ';
+            foreach($grouped as $item){
+                $name  = $item['qty'] . 'x ' . $item['name'];
+                $price = number_format($item['total'], 2, '.', '') . ' CHF';
 
-                $theProdsShow .= ' </span>';
-                $theProdsShow .= ' <span style="width:20%; text-align:right;">'.number_format($produkti['price'], 2, '.', '');
-                $theProdsShow .= ' </span><br>';
+                $maxName = 32 - strlen($price) - 1;
+                if(strlen($name) > $maxName){
+                    $name = substr($name, 0, $maxName);
+                }
+                $line = str_pad($name, 32 - strlen($price)) . $price;
 
-                $total_shuma += number_format($produkti['price'], 2, '.', '');
+                $theProdsShow .= $line . "\n";
+                $total_shuma  += $item['total'];
             }
-            $theProdsShow .= '</p>';
-        }else{
+        } else {
             $theProdsShow = '';
         }
 
-        $sdr2d = explode(',',$theRes->adresa);
-        $resAdr ='<p style="width:100%; font-size:0.7rem; text-align:center; margin-bottom:0px; margin-top:6px; line-height:1.1;">';
-        if (isset($sdr2d[0])){ $resAdr .= $sdr2d[0].'<br>';}
-        if (isset($sdr2d[1])){ $resAdr .= $sdr2d[1];}
-        if (isset($sdr2d[2])){ $resAdr .= ', '.$sdr2d[2];}
-        $resAdr .= '<br>';
-        if ($theRes != NULL && $theRes->resPhoneNr != 'empty'){
-            $resAdr .= 'Tel. '.$theRes->resPhoneNr;
-        }else{
+        $sdr2d  = explode(',', $theRes->adresa);
+        $resAdr = '';
+        if(isset($sdr2d[0])) { $resAdr .= trim($sdr2d[0]) . "\n"; }
+        if(isset($sdr2d[1])) { $resAdr .= trim($sdr2d[1]); }
+        if(isset($sdr2d[2])) { $resAdr .= ', ' . trim($sdr2d[2]); }
+        $resAdr .= "\n";
+
+        if($theRes != NULL && $theRes->resPhoneNr != 'empty'){
+            $resAdr .= 'Tel. ' . $theRes->resPhoneNr;
+        } else {
             $resAdr .= 'Tel. +41 XX XXX XX XX';
         }
-        $resAdr .= '<br>';
-        if ($theRes != NULL && $theRes->chemwstForRes != 'empty'){
-            if (str_contains($theRes->chemwstForRes, 'CHE')){
-                 $resAdr .= $theRes->chemwstForRes.' MWST';
-            }else{
+        $resAdr .= "\n";
+
+        if($theRes != NULL && $theRes->chemwstForRes != 'empty'){
+            if(str_contains($theRes->chemwstForRes, 'CHE')){
+                $resAdr .= $theRes->chemwstForRes . ' MWST';
+            } else {
                 $resAdr .= $theRes->chemwstForRes;
             }
-        }else{
+        } else {
             $resAdr .= 'CHE-xxx.xxx.xxx MWST';
         }
-        $resAdr .= '</p>';
 
-
-        return $theRes->emri.'---88---'.$req->tableNrSend.'---88---'.$theTime.'---88---'. $theProdsShow.'---88---'.$total_shuma.'---88---'.$resAdr;
+        return $theRes->emri . '---88---' . $req->tableNrSend . '---88---' . $theTime . '---88---' . $theProdsShow . '---88---' . number_format($total_shuma, 2, '.', '') . '---88---' . $resAdr;
     }
 
 

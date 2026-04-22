@@ -123,7 +123,7 @@
         <input type="hidden" id="isDeviceMobile" value="0">
     @endif
 
-    @if(in_array(Auth::user()->sFor, [3100, 56, 5000]))
+    @if(in_array(Auth::user()->sFor, [3100, 56, 69, 26]))
         @include('adminPanelWaiter.indexParts.orderQRCodeTel_prodGroup')
     @else
         @include('adminPanelWaiter.indexParts.orderQRCodeTel')
@@ -342,7 +342,7 @@
                         </button>
                         </div>
                         <div class="modal-body">
-                        <img style="width:100%; height:auto;" src="storage/gifs/autoConfirmTableOrders.gif" alt="">
+                        <!-- <img style="width:100%; height:auto;" src="storage/gifs/autoConfirmTableOrders.gif" alt=""> -->
                         </div>
                     </div>
                 </div>

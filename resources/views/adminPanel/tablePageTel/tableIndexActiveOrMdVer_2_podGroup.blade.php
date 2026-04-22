@@ -352,12 +352,12 @@ use App\waiterActivityLog;
                                                     ?>
                                                     <div style="border: 1px solid rgb(72,81,87); border-radius:2px; margin-bottom:2px; 
                                                     background: linear-gradient(to right, rgb(126, 217, 86) 0% {{$percOfCalled}}%, rgb(208, 250, 248) {{$percOfCalled}}% {{$percOfConfirmed}}%, white {{$percOfConfirmed}}% 100%);" 
-                                                    class="d-flex flex-wrap justify-content-between" id="tabOrderDivGroup{{$prodsInTabIdGroupOne}}tnr{{$tabelOne->tableNr}}plateId{{$prodsInTabPlateIdGroup[$prodsInTabIdGroupOne]}}"
-                                                    onclick="openGroupProductSelectionPage('{{$prodsInTabIdGroupOne}}','{{$tabelOne->kaTab}}','{{$activeClientsPNrOneNew}}','{{$onePlateIdThisCl}}')">
+                                                    class="d-flex flex-wrap justify-content-between" id="tabOrderDivGroup{{$prodsInTabIdGroupOne}}tnr{{$prodsInTabTableNrGroup[$prodsInTabIdGroupOne]}}plateId{{$prodsInTabPlateIdGroup[$prodsInTabIdGroupOne]}}"
+                                                    onclick="openGroupProductSelectionPage('{{$prodsInTabIdGroupOne}}','{{$tabelOne->kaTab}}','{{$activeClientsPNrOneNew}}','{{$prodsInTabPlateIdGroup[$prodsInTabIdGroupOne]}}')">
                                                         <p class="pl-1" style="width:80%; margin:0; padding-top:2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height:0.9; font-weight:bold;">
-                                                            <span id="tabOrderSasiaSpan{{$prodsInTabIdGroupOne}}">{{$prodsInTabSasiaGroup[$prodsInTabIdGroupOne]}}x</span> {{$prodsInTabEmriGroup[$prodsInTabIdGroupOne]}}
+                                                            <span class="tabOrderSasiaSpan{{$prodsInTabIdGroupOne}}tnr{{$prodsInTabTableNrGroup[$prodsInTabIdGroupOne]}}plateId{{$prodsInTabPlateIdGroup[$prodsInTabIdGroupOne]}}" id="tabOrderSasiaSpan">{{$prodsInTabSasiaGroup[$prodsInTabIdGroupOne]}}x</span> {{$prodsInTabEmriGroup[$prodsInTabIdGroupOne]}}
                                                         </p>
-                                                        <p style="width:20%; margin:0; text-align:center;"><strong>{{number_format($prodsInTabQmimiGroup[$prodsInTabIdGroupOne], 2, '.', '')}}.-</strong></p>
+                                                        <p style="width:20%; margin:0; text-align:center;"><strong><span class="tabOrderQmimiSpan{{$prodsInTabIdGroupOne}}tnr{{$prodsInTabTableNrGroup[$prodsInTabIdGroupOne]}}plateId{{$prodsInTabPlateIdGroup[$prodsInTabIdGroupOne]}}">{{number_format($prodsInTabQmimiGroup[$prodsInTabIdGroupOne], 2, '.', '')}}</span>.-</strong></p>
                                                     </div>
                                                 @endif
                                             <!-- End display table orders -->

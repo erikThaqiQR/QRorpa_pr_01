@@ -73,6 +73,8 @@
 
   <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
+
+  <script src="{{ asset('js/epos-2.27.0.js') }}"></script>
   
 <style>
     html, body{
@@ -135,7 +137,7 @@
   @endif
 
   
-  @if(in_array(Auth::user()->sFor, [31, 56, 5000]))
+  @if(in_array(Auth::user()->sFor, [3100, 56, 69, 26]))
     @include('adminPanel.indexParts.orderQRCodeTel_prodGroup')
   @else
     @include('adminPanel.indexParts.orderQRCodeTel')
@@ -405,7 +407,7 @@
               </button>
             </div>
             <div class="modal-body">
-              <img style="width:100%; height:auto;" src="storage/gifs/autoConfirmTableOrders.gif" alt="">
+              <!-- <img style="width:100%; height:auto;" src="storage/gifs/autoConfirmTableOrders.gif" alt=""> -->
             </div>
           
           </div>

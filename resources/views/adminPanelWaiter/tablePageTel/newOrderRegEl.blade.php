@@ -323,7 +323,7 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:1%;">
     </div>
 </div>
 
-@if(in_array($sFor, [3100, 56, 5000]))
+@if(in_array($sFor, [3100, 56, 69, 26]))
     <!-- display same products together -->
     @include('adminPanelWaiter.tablePageTel.newOrderRegElScript_prodGroup')
 @else
