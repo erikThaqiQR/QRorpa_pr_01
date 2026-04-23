@@ -137,7 +137,7 @@
   @endif
 
   
-  @if(in_array(Auth::user()->sFor, [3100, 56, 69, 26]))
+  @if(in_array(Auth::user()->sFor, [31, 56, 69, 26]))
     @include('adminPanel.indexParts.orderQRCodeTel_prodGroup')
   @else
     @include('adminPanel.indexParts.orderQRCodeTel')

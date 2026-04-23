@@ -117,10 +117,18 @@
                             }
                         });
                         var priceForOne = parseFloat(parseFloat(value.OrderQmimi)/parseFloat(value.OrderSasia)).toFixed(2);
-                        var thisOrQmimi = parseFloat(parseFloat(priceForOne)*parseFloat(sasiaSelected)).toFixed(2)
+                        var thisOrQmimi = parseFloat(parseFloat(priceForOne)*parseFloat(sasiaSelected)).toFixed(2);
 
-                        $('#payAllPhaseOneDiv1Sel').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-left">'+sasiaSelected+'x '+value.OrderEmri+'</p>');
-                        $('#payAllPhaseOneDiv1Sel').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-right">CHF '+parseFloat(thisOrQmimi).toFixed(2)+'</p>');
+                        if($('#prodShowPaySelPre'+value.prodId).length && (resId == 3100 || resId == 56 || resId == 69 || resId == 26)){
+                            let oldSasia = parseInt($('#prodShowPaySelPreSasia'+value.prodId).html());
+                            let oldQmimi = parseFloat($('#prodShowPaySelPreQmimi'+value.prodId).html());
+
+                            $('#prodShowPaySelPreSasia'+value.prodId).html(oldSasia + parseInt(sasiaSelected));
+                            $('#prodShowPaySelPreQmimi'+value.prodId).html(parseFloat(parseFloat(oldQmimi) + parseFloat(thisOrQmimi)).toFixed(2));
+                        }else{
+                            $('#payAllPhaseOneDiv1Sel').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" id="prodShowPaySelPre'+value.prodId+'" class="text-left"><span id="prodShowPaySelPreSasia'+value.prodId+'">'+sasiaSelected+'</span> x '+value.OrderEmri+'</span></p>');
+                            $('#payAllPhaseOneDiv1Sel').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-right">CHF <span id="prodShowPaySelPreQmimi'+value.prodId+'">'+parseFloat(thisOrQmimi).toFixed(2)+'</span></p>');
+                        }
                         totPay += parseFloat(thisOrQmimi);
                     });
                     if($('#resTvshInput').val() == 0){

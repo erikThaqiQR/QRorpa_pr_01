@@ -105,6 +105,22 @@
 
 
 
+    function checkInOpenTypeSelect(pId){
+        $.ajax({
+            url: '{{ route("dash.waiterCheckForCheckin") }}',
+            method: 'post',
+            data: {_token: '{{csrf_token()}}'},
+            success: (checkCHINRespo) => {
+                if($.trim(checkCHINRespo) == 'CheckInValide'){
+                    $('#openTypeSelect'+pId).modal('show');
+                }else{
+                    $('#CheckInFirstToAddOrdersPopUp').show(50);
+                }
+            },
+            error: (error) => { console.log(error); }
+        });
+    }
+
 
 
     function closeTypeSelect(pId){

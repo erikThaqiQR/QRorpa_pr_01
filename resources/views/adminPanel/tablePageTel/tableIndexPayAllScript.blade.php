@@ -113,6 +113,7 @@
                         $('#payAllPhaseOneDiv1').append('<p style="width: 50%; margin-top:-8px; margin-bottom:8px;" class="text-right">CHF <span id="prodShowPayAllPreQmimi'+value.prodId+'">'+parseFloat(value.OrderQmimi).toFixed(2)+'</span></p>');
                     }
                     totPay += parseFloat(value.OrderQmimi);
+                    
                 });
                 if($('#resTvshInput').val() == 0){
                     var mwst = parseFloat(0);

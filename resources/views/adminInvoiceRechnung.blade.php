@@ -390,37 +390,38 @@ use Intervention\Image\ImageManagerStatic as Image;
 
                 foreach ($products as $product) {
                     $prod = explode('-8-', $product);
-
-                    if(str_contains($prod[3], '/')){
-                        $mappedProducts[] = [
-                            "productName" => $prod[0] ?? '',
-                            "quantity"    => $prod[3] ?? 1,
-                            "price"       => $prod[4],
-                            "type"        => $prod[5] ?? null,
-                            "prod_id"     => $prod[7] ?? '',
-                            "ex"          => $prod[2] ?? '',
-                            "grouped"     => false
-                        ];
-                    }else if(isset($mappedProducts[$prod[7]])){
-                        $mappedProducts[$prod[7]] = [
-                            "productName" => $prod[0] ?? '',
-                            "quantity"    => $prod[3] ? $prod[3] + $mappedProducts[$prod[7]]['quantity'] : ++$mappedProducts[$prod[7]]['quantity'],
-                            "price"       => $mappedProducts[$prod[7]]['price'] + $prod[4],
-                            "type"        => $prod[5] ?? null,
-                            "prod_id"     => $prod[7] ?? '',
-                            "ex"          => $prod[2] ?? '',
-                            "grouped"     => true
-                        ];
-                    } else {
-                        $mappedProducts[$prod[7]] = [
-                            "productName" => $prod[0] ?? '',
-                            "quantity"    => $prod[3] ?? 1,
-                            "price"       => $prod[4],
-                            "type"        => $prod[5] ?? null,
-                            "prod_id"     => $prod[7] ?? '',
-                            "ex"          => $prod[2] ?? '',
-                            "grouped"     => false
-                        ];
+                    if(number_format($prod[4], 2, '.', '') > 0){
+                        if(str_contains($prod[3], '/')){
+                            $mappedProducts[] = [
+                                "productName" => $prod[0] ?? '',
+                                "quantity"    => $prod[3] ?? 1,
+                                "price"       => $prod[4],
+                                "type"        => $prod[5] ?? null,
+                                "prod_id"     => $prod[7] ?? '',
+                                "ex"          => $prod[2] ?? '',
+                                "grouped"     => false
+                            ];
+                        }else if(isset($mappedProducts[$prod[7]])){
+                            $mappedProducts[$prod[7]] = [
+                                "productName" => $prod[0] ?? '',
+                                "quantity"    => $prod[3] ? $prod[3] + $mappedProducts[$prod[7]]['quantity'] : ++$mappedProducts[$prod[7]]['quantity'],
+                                "price"       => $mappedProducts[$prod[7]]['price'] + $prod[4],
+                                "type"        => $prod[5] ?? null,
+                                "prod_id"     => $prod[7] ?? '',
+                                "ex"          => $prod[2] ?? '',
+                                "grouped"     => true
+                            ];
+                        } else {
+                            $mappedProducts[$prod[7]] = [
+                                "productName" => $prod[0] ?? '',
+                                "quantity"    => $prod[3] ?? 1,
+                                "price"       => $prod[4],
+                                "type"        => $prod[5] ?? null,
+                                "prod_id"     => $prod[7] ?? '',
+                                "ex"          => $prod[2] ?? '',
+                                "grouped"     => false
+                            ];
+                        }
                     }
                 }
             ?>
