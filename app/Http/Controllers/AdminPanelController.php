@@ -5662,7 +5662,23 @@ EPD
         if( $theTable != Null &&  $theTable->kaTab != 0){
 
             $grTabOrdersByProdId = [];
-            foreach(TabOrder::where([['tabCode',$theTable->kaTab],['OrderQmimi','>','0']])->get() as $produkti){  
+
+            $tabOrders = TabOrder::where([['tabCode',$theTable->kaTab],['OrderQmimi','>','0']]);
+
+            if($req->tabOrSel && $req->tabOrSel != 0){
+                $selectedOrderArray = explode('||', $req->tabOrSel);
+
+                $selectedTabOrId = [];
+                foreach($selectedOrderArray as $selTabOne){
+                    $selectedTabOrId[] = explode('-8-', $selTabOne)[0];
+                }
+
+                $tabOrders->whereIn('id', $selectedTabOrId);
+            }
+
+            $tabOrders = $tabOrders->get();
+
+            foreach($tabOrders as $produkti){  
                 if(isset($grTabOrdersByProdId[$produkti->prodId])){
                     $grTabOrdersByProdId[$produkti->prodId] = [
                         "productId" => $produkti->prodId,
