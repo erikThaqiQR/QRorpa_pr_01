@@ -275,11 +275,11 @@ use App\restorantTablesToRoom;
 @if (false)
     @include('adminPanelWaiter.tablePageTel.tableIndexActiveOrMd')
 @else
-    @if(in_array($sFor, [3100,56,69,26]))
+    @if(in_array($sFor, [3100,5000]))
+        @include('adminPanelWaiter.tablePageTel.tableIndexActiveOrMdVer_2')
+    @else
         <!-- display same products together -->
         @include('adminPanelWaiter.tablePageTel.tableIndexActiveOrMdVer_2_podGroup')
-    @else
-        @include('adminPanelWaiter.tablePageTel.tableIndexActiveOrMdVer_2')
     @endif
 @endif
 @include('adminPanelWaiter.tablePageTel.tableIndexNotifications')

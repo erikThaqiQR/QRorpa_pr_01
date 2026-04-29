@@ -137,10 +137,10 @@
   @endif
 
   
-  @if(in_array(Auth::user()->sFor, [31, 56, 69, 26]))
-    @include('adminPanel.indexParts.orderQRCodeTel_prodGroup')
-  @else
+  @if(in_array(Auth::user()->sFor, [3100, 5000]))
     @include('adminPanel.indexParts.orderQRCodeTel')
+  @else
+    @include('adminPanel.indexParts.orderQRCodeTel_prodGroup')
   @endif
 
   <!-- Check for non valid TAB orders -->

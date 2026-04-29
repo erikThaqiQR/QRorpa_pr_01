@@ -123,10 +123,10 @@
         <input type="hidden" id="isDeviceMobile" value="0">
     @endif
 
-    @if(in_array(Auth::user()->sFor, [3100, 56, 69, 26]))
-        @include('adminPanelWaiter.indexParts.orderQRCodeTel_prodGroup')
+    @if(in_array(Auth::user()->sFor, [3100, 5000]))
+         @include('adminPanelWaiter.indexParts.orderQRCodeTel')
     @else
-        @include('adminPanelWaiter.indexParts.orderQRCodeTel')
+        @include('adminPanelWaiter.indexParts.orderQRCodeTel_prodGroup')
     @endif
 
     <!-- Check for non valid TAB orders -->

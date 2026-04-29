@@ -795,6 +795,7 @@
                 method: 'post',
                 data: {
                     tableNrSend: tableNrSend,
+                    tabOrSel: $('#closeOrSelected'+tableNrSend).val(),
                     _token: '{{csrf_token()}}'
                 },
                 success: (printData) => {

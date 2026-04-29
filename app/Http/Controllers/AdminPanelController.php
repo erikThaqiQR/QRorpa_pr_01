@@ -5569,16 +5569,23 @@ EPD
                 }
 
                 if($theOr->nrTable == 500){
-                    if($taProdIns->mwstForPro == 2.50 || $taProdIns->mwstForPro == 2.60){
+                    if($taProdIns == Null){
                         $cal1 = number_format(($prod[4] * $totZbritja) / $totFromProductePrice , 9, '.', '');
                         $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
                         $mwstFor2526 += number_format($cal2*$loTvsh, 9, '.', '');
                         $totMwst += number_format($cal2*$loTvsh, 9, '.', '');
-                    }else if($taProdIns->mwstForPro == 7.70 || $taProdIns->mwstForPro == 8.10){
-                        $cal1 = number_format(($prod[4]* $totZbritja) / $totFromProductePrice , 9, '.', '');
-                        $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
-                        $mwstFor7781 += number_format($cal2*$hiTvsh, 9, '.', '');
-                        $totMwst += number_format($cal2*$hiTvsh, 9, '.', '');
+                    }else{
+                        if($taProdIns->mwstForPro == 2.50 || $taProdIns->mwstForPro == 2.60){
+                            $cal1 = number_format(($prod[4] * $totZbritja) / $totFromProductePrice , 9, '.', '');
+                            $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
+                            $mwstFor2526 += number_format($cal2*$loTvsh, 9, '.', '');
+                            $totMwst += number_format($cal2*$loTvsh, 9, '.', '');
+                        }else if($taProdIns->mwstForPro == 7.70 || $taProdIns->mwstForPro == 8.10){
+                            $cal1 = number_format(($prod[4]* $totZbritja) / $totFromProductePrice , 9, '.', '');
+                            $cal2 = number_format($prod[4] - $cal1, 9, '.', '');
+                            $mwstFor7781 += number_format($cal2*$hiTvsh, 9, '.', '');
+                            $totMwst += number_format($cal2*$hiTvsh, 9, '.', '');
+                        }
                     }
                 }else{
                     $cal1 = number_format(($prod[4]* $totZbritja) / $totFromProductePrice , 9, '.', '');
@@ -5662,7 +5669,23 @@ EPD
         if( $theTable != Null &&  $theTable->kaTab != 0){
 
             $grTabOrdersByProdId = [];
-            foreach(TabOrder::where([['tabCode',$theTable->kaTab],['OrderQmimi','>','0']])->get() as $produkti){  
+
+            $tabOrders = TabOrder::where([['tabCode',$theTable->kaTab],['OrderQmimi','>','0']]);
+
+            if($req->tabOrSel && $req->tabOrSel != 0){
+                $selectedOrderArray = explode('||', $req->tabOrSel);
+
+                $selectedTabOrId = [];
+                foreach($selectedOrderArray as $selTabOne){
+                    $selectedTabOrId[] = explode('-8-', $selTabOne)[0];
+                }
+
+                $tabOrders->whereIn('id', $selectedTabOrId);
+            }
+
+            $tabOrders = $tabOrders->get();
+
+            foreach($tabOrders as $produkti){  
                 if(isset($grTabOrdersByProdId[$produkti->prodId])){
                     $grTabOrdersByProdId[$produkti->prodId] = [
                         "productId" => $produkti->prodId,
@@ -5721,6 +5744,81 @@ EPD
 
         return $theRes->emri.'---88---'.$req->tableNrSend.'---88---'.$theTime.'---88---'. $theProdsShow.'---88---'.$total_shuma.'---88---'.$resAdr;
     }
+
+
+    // FOR THE PRINTER 
+    // public function callDataForPrintReceiptActiveTab(Request $req){
+
+    //     $theRes = Restorant::find(Auth::user()->sFor);
+    //     $theTime = Carbon::now();
+    //     $date2D = explode('-',explode(' ',$theTime)[0]);
+    //     $time2D = explode(':',explode(' ',$theTime)[1]);
+    //     $theTime = $date2D[2].'.'. $date2D[1].'.'. $date2D[0].' '.$time2D[0].':'.$time2D[1];
+
+    //     $total_shuma = 0;
+
+    //     $theTable = TableQrcode::where([['Restaurant',Auth::user()->sFor],['tableNr',$req->tableNrSend]])->first();
+    //     if($theTable != Null && $theTable->kaTab != 0){
+    //         $theProdsShow = '';
+
+    //         // Group by prodId, sum qty and price
+    //         $grouped = [];
+    //         foreach(TabOrder::where('tabCode',$theTable->kaTab)->get() as $produkti){
+    //             $pid = $produkti->prodId;
+    //             if(!isset($grouped[$pid])){
+    //                 $grouped[$pid] = [
+    //                     'name'  => $produkti->OrderEmri,
+    //                     'qty'   => 0,
+    //                     'total' => 0,
+    //                 ];
+    //             }
+    //             $grouped[$pid]['qty']   += $produkti->OrderSasia;
+    //             $grouped[$pid]['total'] += $produkti->OrderQmimi;
+    //         }
+
+    //         foreach($grouped as $item){
+    //             $name  = $item['qty'] . 'x ' . $item['name'];
+    //             $price = number_format($item['total'], 2, '.', '') . ' CHF';
+
+    //             $maxName = 32 - strlen($price) - 1;
+    //             if(strlen($name) > $maxName){
+    //                 $name = substr($name, 0, $maxName);
+    //             }
+    //             $line = str_pad($name, 32 - strlen($price)) . $price;
+
+    //             $theProdsShow .= $line . "\n";
+    //             $total_shuma  += $item['total'];
+    //         }
+    //     } else {
+    //         $theProdsShow = '';
+    //     }
+
+    //     $sdr2d  = explode(',', $theRes->adresa);
+    //     $resAdr = '';
+    //     if(isset($sdr2d[0])) { $resAdr .= trim($sdr2d[0]) . "\n"; }
+    //     if(isset($sdr2d[1])) { $resAdr .= trim($sdr2d[1]); }
+    //     if(isset($sdr2d[2])) { $resAdr .= ', ' . trim($sdr2d[2]); }
+    //     $resAdr .= "\n";
+
+    //     if($theRes != NULL && $theRes->resPhoneNr != 'empty'){
+    //         $resAdr .= 'Tel. ' . $theRes->resPhoneNr;
+    //     } else {
+    //         $resAdr .= 'Tel. +41 XX XXX XX XX';
+    //     }
+    //     $resAdr .= "\n";
+
+    //     if($theRes != NULL && $theRes->chemwstForRes != 'empty'){
+    //         if(str_contains($theRes->chemwstForRes, 'CHE')){
+    //             $resAdr .= $theRes->chemwstForRes . ' MWST';
+    //         } else {
+    //             $resAdr .= $theRes->chemwstForRes;
+    //         }
+    //     } else {
+    //         $resAdr .= 'CHE-xxx.xxx.xxx MWST';
+    //     }
+
+    //     return $theRes->emri . '---88---' . $req->tableNrSend . '---88---' . $theTime . '---88---' . $theProdsShow . '---88---' . number_format($total_shuma, 2, '.', '') . '---88---' . $resAdr;
+    // }
 
 
 
