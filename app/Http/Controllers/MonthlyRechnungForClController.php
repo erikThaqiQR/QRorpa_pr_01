@@ -21,11 +21,13 @@ class MonthlyRechnungForClController extends Controller{
 
     public function checkBilSendM(Request $req){
         if(isset($_GET['hs']) && $_GET['hs'] == 'H54r5fHvGFf4347HjHfd456GFvVCdRF56778544FfcCvGjNbVcSDHjOeqWeSXcY789D6d67D878d765D677d6D65D6Dd56DdtgHGjhbVBMmM'){
-            foreach(Restorant::all() as $resOne){
+            foreach(Restorant::where('id',$_GET['resId'])->get() as $resOne){
                 $dtNow = Carbon::now();
                 if($dtNow->day == 1 || $dtNow->day == 2){
+                    print $resOne->id.' dateOK<br>';
                     $theCls = rechnungClient::where('toRes',$resOne->id)->get();
                     if($theCls->count() > 0){
+                        print $resOne->id.' clientsOK<br>';
                         if($dtNow->month == 1){ $billYear = $dtNow->year - 1; $billmonth = 12; }
                         else{ $billYear = $dtNow->year; $billmonth = $dtNow->month - 1; }
 
@@ -41,8 +43,12 @@ class MonthlyRechnungForClController extends Controller{
                             $newMoBiForCl->toRes = $clOne->toRes;
                             $ordsId = array();
                             if(rechnungClientForMonth::where([['forClient',$clOne->id],['forYear',$billYear],['forMonth',$billmonth]])->first() == Null){
+                                print $resOne->id.' registerIsFree cl:'.$clOne->id.'<br>';
+                                print 'for month '.sprintf("%02d", $billmonth).'<br>';
                                 $clBills = rechnungClientToBills::where('clientId',$clOne->id)->whereMonth('created_at', sprintf("%02d", $billmonth))->get();
+                                print $clBills.'<br>';
                                 if($clBills->count() > 0){
+                                    print $resOne->id.' found clinets'.$clOne->id.' - '.$clBills->count().' clintToBills<br>';
 
                                     $totPrice = number_format(0, 4, '.', '');
                                     // iterate through bills
@@ -57,17 +63,27 @@ class MonthlyRechnungForClController extends Controller{
                                         }
                                         array_push($ordsId,$theOr->id);
                                     
-                                        $billsAcum .= $billOne->billId.'|||';
+                                        if($billsAcum == ''){
+                                            $billsAcum = $billOne->billId;
+                                        }else{
+                                            $billsAcum .= '|||'.$billOne->billId;
+                                        }
+                                        
                                     }
                                     $countClScc++;
 
                                     // create and save the eBanking QRcode
-                                    $moBillRecords = rechnungClientForMonth::where('forClient',$clOne->id)->get()->count() + 1;
+                                    if(rechnungClientForMonth::where('forClient',$clOne->id)->get() == Null){
+                                        $moBillRecords = 1;
+                                    }else{
+                                        $moBillRecords = rechnungClientForMonth::where('forClient',$clOne->id)->get()->count() + 1;
+                                    }
+                                    
                                     $billNr = str_pad($moBillRecords, 10, '0', STR_PAD_LEFT);
                                     
                                     $word = array_merge(range('a', 'z'), range('A', 'Z'), range('0', '9'));
                                     shuffle($word);
-                                    $name = substr(implode($word), 0, 25).'moRechToCl'.$moBillRecords;
+                                    $name = substr(implode($word), 0, 25).'moRechToCl'.$clOne->id;
                                     $file = "storage/ebankqrcodeMnth/".$name.".png";
 
                                     $adr2D = explode(',',$resOne->adresa);
@@ -153,7 +169,7 @@ EPD
 
                                     $to_name = $clOne->name.' '.$clOne->lastname;
                                     $to_email = $clOne->email;
-                                    $fromRes = Restorant::find(Auth::user()->sFor);
+                                    $fromRes = Restorant::find($resOne->id);
                                     $fromResName = $fromRes->emri;
                                     $moRechId = $newMoBiForCl->id;
                                     $data = array('sendName'=>$to_name, "sendEmail" => $to_email, "fromResName" => $fromRes->emri, "daysToPay" => $clOne->daysToPay, "moReId" => $moRechId);
@@ -165,8 +181,11 @@ EPD
                                             'mime' => 'application/pdf',
                                         ]);
                                     });
+                                    print $resOne->id.' emailSent_'.$to_email.'<br>';
                                     //--------------------------------------------------------------------------------------------------------
                                 }
+                            }else{
+                                print $resOne->id.' registerIsTaken cl:'.$clOne->id.'<br>';
                             }
                         } // clients loop
 
@@ -175,10 +194,10 @@ EPD
                         // }else{
                             // return 'sendFor: '.$countClScc.' clients';
                         // }
-                    }else{ /* return 'noClients'; */ } // check number of clients
-                }else{ /* return 'notThe01Date'; */ } // check date 1 & 2
+                    }else{  print $resOne->id.' no clients<br>'; } // check number of clients
+                }else{  print 'date not 1 or 29';  } // check date 1 & 2
             } // end Foreach
-        } // hash check
+        }else{ print 'hash wrong'; }
     } 
 
 

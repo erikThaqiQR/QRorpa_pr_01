@@ -62,7 +62,7 @@
 
                     showNewOrder +=     '<p class="pl-1" style="width:60%; margin:0; padding-top:2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height:0.9;">'+
                                             '<strong>'+
-                                            '<span id="tabOrderSasiaSpan'+value.id+'">'+value.OrderSasia+'x</span> '+value.OrderEmri+'';
+                                            '<span id="tabOrderSasiaSpan'+value.id+'">'+value.OrderSasia+'</span>x '+value.OrderEmri+'';
                     if (value.OrderType != 'empty' && value.OrderExtra != 'empty'){
                         const OrderType = value.OrderType;
                         const theTy2D = OrderType.split('||');

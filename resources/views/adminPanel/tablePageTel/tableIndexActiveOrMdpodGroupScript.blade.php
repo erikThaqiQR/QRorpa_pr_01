@@ -62,7 +62,7 @@
 
                     showNewOrder +=     '<p class="pl-1" style="width:60%; margin:0; padding-top:2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height:0.9;">'+
                                             '<strong>'+
-                                            '<span id="tabOrderSasiaSpan'+value.id+'">'+value.OrderSasia+'x</span>'+value.OrderEmri+'';
+                                            '<span id="tabOrderSasiaSpan'+value.id+'">'+value.OrderSasia+'</span>x'+value.OrderEmri+'';
                     if (value.OrderType != 'empty' && value.OrderExtra != 'empty'){
                         const OrderType = value.OrderType;
                         const theTy2D = OrderType.split('||');
@@ -112,6 +112,7 @@
                                         '<p style="width:20%; margin:0; font-size:0.6rem; line-height:1.1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">'+
                                             '<strong>'+
                                             time2D[0]+':'+time2D[1]+' Uhr <br>'+
+
                                             '</strong>'+
                                         '</p>'+
                                         '<p style="width:15%; margin:0; text-align:center;"><strong>'+parseFloat(value.OrderQmimi).toFixed(2)+'.-</strong></p>';

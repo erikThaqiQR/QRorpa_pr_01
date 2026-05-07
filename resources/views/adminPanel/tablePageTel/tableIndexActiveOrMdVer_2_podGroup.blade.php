@@ -278,7 +278,7 @@ use App\waiterActivityLog;
                                                         <p class="pl-1" style="width:60%; margin:0; padding-top:2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height:0.9;">
                                                             <strong>
                                                                 
-                                                            <span id="tabOrderSasiaSpan{{$thisTOrder->id}}">{{$thisTOrder->OrderSasia}}x</span> {{$thisTOrder->OrderEmri}}
+                                                            <span id="tabOrderSasiaSpan{{$thisTOrder->id}}" class="tabOrderSasiaSpan{{$prodsInTabIdGroupOne}}tnr{{$tabelOne->tableNr}}plateId{{$thisTOrder->toPlate}}">{{$thisTOrder->OrderSasia}}</span>x {{$thisTOrder->OrderEmri}}
                                                             @if ($thisTOrder->OrderType != 'empty' && $thisTOrder->OrderExtra != 'empty')
                                                                 <?php $theTy2D = explode('||',$thisTOrder->OrderType); ?>
                                                                 <br>
@@ -355,7 +355,7 @@ use App\waiterActivityLog;
                                                     class="d-flex flex-wrap justify-content-between" id="tabOrderDivGroup{{$prodsInTabIdGroupOne}}tnr{{$prodsInTabTableNrGroup[$prodsInTabIdGroupOne]}}plateId{{$prodsInTabPlateIdGroup[$prodsInTabIdGroupOne]}}"
                                                     onclick="openGroupProductSelectionPage('{{$prodsInTabIdGroupOne}}','{{$tabelOne->kaTab}}','{{$activeClientsPNrOneNew}}','{{$prodsInTabPlateIdGroup[$prodsInTabIdGroupOne]}}')">
                                                         <p class="pl-1" style="width:80%; margin:0; padding-top:2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height:0.9; font-weight:bold;">
-                                                            <span class="tabOrderSasiaSpan{{$prodsInTabIdGroupOne}}tnr{{$prodsInTabTableNrGroup[$prodsInTabIdGroupOne]}}plateId{{$prodsInTabPlateIdGroup[$prodsInTabIdGroupOne]}}" id="tabOrderSasiaSpan">{{$prodsInTabSasiaGroup[$prodsInTabIdGroupOne]}}x</span> {{$prodsInTabEmriGroup[$prodsInTabIdGroupOne]}}
+                                                            <span class="tabOrderSasiaSpan{{$prodsInTabIdGroupOne}}tnr{{$prodsInTabTableNrGroup[$prodsInTabIdGroupOne]}}plateId{{$prodsInTabPlateIdGroup[$prodsInTabIdGroupOne]}}" id="tabOrderSasiaSpan">{{$prodsInTabSasiaGroup[$prodsInTabIdGroupOne]}}</span>x {{$prodsInTabEmriGroup[$prodsInTabIdGroupOne]}}
                                                         </p>
                                                         <p style="width:20%; margin:0; text-align:center;"><strong><span class="tabOrderQmimiSpan{{$prodsInTabIdGroupOne}}tnr{{$prodsInTabTableNrGroup[$prodsInTabIdGroupOne]}}plateId{{$prodsInTabPlateIdGroup[$prodsInTabIdGroupOne]}}">{{number_format($prodsInTabQmimiGroup[$prodsInTabIdGroupOne], 2, '.', '')}}</span>.-</strong></p>
                                                     </div>

@@ -43,7 +43,7 @@
                             var tOSasisaTotal = onClAttr.split('\'')[7];
                             $('#tabOrderDiv'+tOId).removeClass('tabOrderDivSelected');
                             $('#tabOrderDiv'+tOId).attr('onclick','closeOrSelect(\''+tNr+'\',\''+tOId+'\',\''+tOSasisaTotal+'\')');
-                            $('#tabOrderSasiaSpan'+tOId).html(tOSasisaTotal+'x');
+                            $('#tabOrderSasiaSpan'+tOId).html(tOSasisaTotal);
 
                             $('#deleteAllPrompt'+tNr).attr('style','width:100%; display:none;');
                             $('#deleteSomePrompt'+tNr).attr('style','width:100%; display:none;');
@@ -255,7 +255,7 @@
         }
         $('#tabOrderDiv'+tOId).removeClass('tabOrderDivSelected');
         $('#tabOrderDiv'+tOId).attr('onclick','closeOrSelect(\''+tNr+'\',\''+tOId+'\',\''+tOSasisaTotal+'\')');
-        $('#tabOrderSasiaSpan'+tOId).html(tOSasisaTotal+'x');
+        $('#tabOrderSasiaSpan'+tOId).html(tOSasisaTotal);
 
         $('#deleteAllPrompt'+tNr).attr('style','width:100%; display:none;');
         $('#deleteSomePrompt'+tNr).attr('style','width:100%; display:none;');
@@ -283,7 +283,7 @@
         $('#tabOrderDiv'+tOId).addClass('tabOrderDivSelected');  
         $('#tabOrderDiv'+tOId).attr('onclick','closeOrRemove(\''+tNr+'\',\''+tOId+'\',\''+tOSasia+'\',\''+tOSasisaTotal+'\')');
         if(parseInt(tOSasia) != parseInt(tOSasisaTotal)){
-            $('#tabOrderSasiaSpan'+tOId).html(tOSasia+'/'+tOSasisaTotal+'x');
+            $('#tabOrderSasiaSpan'+tOId).html(tOSasia+'/'+tOSasisaTotal);
         }
         updateShownPriceForTabOrders(tNr);
     }
@@ -861,6 +861,109 @@
 			});
           // printWindow.window.close();
         }
+
+        // function printActiveOrdersOnTable(tableNrSend) {
+
+        //     const address = 'http://192.168.10.149/cgi-bin/epos/service.cgi?devid=local_printer&timeout=60000';
+
+        //     const epos = new epson.ePOSPrint(address);
+        //     const builder = new epson.ePOSBuilder();
+
+        //     epos.onreceive = function (res) {
+        //         console.log('Print Result: ' + res.success);
+        //     };
+
+        //     $.ajax({
+        //         url: '{{ route("print.callDataForPrintReceiptActiveTab") }}',
+        //         method: 'post',
+        //         data: {
+        //             tableNrSend: tableNrSend,
+        //             _token: '{{csrf_token()}}'
+        //         },
+        //         success: (printData) => {
+
+        //             printData = $.trim(printData);
+        //             let data = printData.split('---88---');
+
+        //             let resName = data[0];
+        //             let tableNr = data[1];
+        //             let tableNrShow = (tableNr == 500) ? 'Takeaway' : 'Tisch: ' + tableNr;
+        //             let timePrint = data[2];
+        //             let theOrderShowProd = data[3];
+        //             let totalToPay = parseFloat(data[4]).toFixed(2);
+        //             let resAdrs = data[5];
+
+        //             // ─────────────────────────
+        //             // HEADER
+        //             // ─────────────────────────
+        //             builder.addTextAlign(builder.ALIGN_CENTER);
+        //             builder.addTextSize(2, 2);
+        //             builder.addText(resName + '\n');
+
+        //             builder.addTextSize(1, 1);
+        //             builder.addTextStyle(false, false, true);
+        //             builder.addText('Zwischenrechnung\n');
+        //             builder.addTextStyle(false, false, false);
+
+        //             builder.addText(resAdrs + '\n');
+        //             builder.addText('--------------------------------\n');
+
+        //             // ─────────────────────────
+        //             // TABLE + TIME (SIDE BY SIDE FEEL)
+        //             // ─────────────────────────
+        //             builder.addTextAlign(builder.ALIGN_LEFT);
+
+        //             let left = tableNrShow;
+        //             let right = timePrint;
+
+        //             let line =
+        //                 left +
+        //                 ' '.repeat(Math.max(0, 32 - left.length - right.length)) +
+        //                 right;
+
+        //             builder.addText(line + '\n');
+        //             builder.addText('--------------------------------\n');
+
+        //             // ─────────────────────────
+        //             // ITEMS (HTML → CLEAN TEXT)
+        //             // ─────────────────────────
+        //             let tempDiv = document.createElement("div");
+        //             tempDiv.innerHTML = theOrderShowProd;
+
+        //             let lines = theOrderShowProd.trim().split('\n');
+        //             lines.forEach(line => {
+        //                 if (line.trim()) builder.addText(line + '\n');
+        //             });
+
+        //             builder.addText('--------------------------------\n');
+
+        //             // ─────────────────────────
+        //             // TOTAL (RIGHT LOOK)
+        //             // ─────────────────────────
+        //             builder.addTextStyle(false, false, true);
+
+        //             let totalLabel = 'Summe:';
+        //             let totalLine =
+        //                 totalLabel +
+        //                 ' '.repeat(Math.max(0, 32 - totalLabel.length - (totalToPay + ' CHF').length)) +
+        //                 totalToPay + ' CHF';
+
+        //             builder.addText(totalLine + '\n');
+
+        //             builder.addTextStyle(false, false, false);
+
+        //             // ─────────────────────────
+        //             // FOOTER SPACE
+        //             // ─────────────────────────
+        //             builder.addFeedLine(3);
+        //             builder.addCut(builder.CUT_FEED);
+
+        //             // SEND
+        //             epos.send(builder.toString());
+        //         },
+        //         error: (error) => console.log(error)
+        //     });
+        // }
 
 
 

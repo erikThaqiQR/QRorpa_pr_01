@@ -310,7 +310,7 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:1%;">
     </div>
 </div>
 
-@if(in_array($sFor, [3100,5000]))
+@if(in_array($sFor, [34,57]))
     @include('adminPanel.tablePageTel.newOrderRegElScript')
 @else
     <!-- display same products together -->

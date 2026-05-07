@@ -41,6 +41,26 @@
     $earningDay_4 = 0;
     $earningDay_5 = 0;
 ?>
+
+    @if (Auth::user()->sFor == 64 || Auth::user()->sFor == 55)
+        <!-- Modal -->
+        <div class="modal fade mt-5" id="resBlockModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content" style="border:2px solid rgb(39,190,175); border-radius:20px;">
+                    <div class="modal-body text-center">
+                        <p class="text-center" style="font-size:1.2rem;"><strong>Ihr Kassensystem wird voraussichtlich am 06.05.2026 vorübergehend eingeschränkt, sofern die offene Rechnung nicht bis heute beglichen wird.</strong></p>
+                        <p class="text-center" style="color:rgb(39,190,175); font-size:1.2rem;"><strong>Nach erfolgter Zahlung bitten wir Sie, uns eine Bestätigung an rechnungen@qrorpa.ch zu senden.</strong></p>
+                        <i style="color:rgb(39,190,175);" class="text-center fas fa-3x fa-store-alt-slash"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            $('#resBlockModal').modal('show');
+        </script>
+    @endif
+
  <!-- <script src="https://kit.fontawesome.com/11d299ad01.js" crossorigin="anonymous"></script>  -->
  @include('fontawesome')
 

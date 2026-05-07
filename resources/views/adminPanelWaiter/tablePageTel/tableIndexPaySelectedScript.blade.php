@@ -117,7 +117,7 @@
                         var priceForOne = parseFloat(parseFloat(value.OrderQmimi)/parseFloat(value.OrderSasia)).toFixed(2);
                         var thisOrQmimi = parseFloat(parseFloat(priceForOne)*parseFloat(sasiaSelected)).toFixed(2)
 
-                        if($('#prodShowPaySelPre'+value.prodId).length){
+                        if($('#prodShowPaySelPre'+value.prodId).length && (resId == 34 || resId == 57)){
                             let oldSasia = parseInt($('#prodShowPaySelPreSasia'+value.prodId).html());
                             let oldQmimi = parseFloat($('#prodShowPaySelPreQmimi'+value.prodId).html());
 

@@ -123,7 +123,7 @@
         <input type="hidden" id="isDeviceMobile" value="0">
     @endif
 
-    @if(in_array(Auth::user()->sFor, [3100, 5000]))
+    @if(in_array(Auth::user()->sFor, [34,57]))
          @include('adminPanelWaiter.indexParts.orderQRCodeTel')
     @else
         @include('adminPanelWaiter.indexParts.orderQRCodeTel_prodGroup')
@@ -185,6 +185,37 @@
     </script>
 
 
+
+<!-- Modal -->
+                        <div class="modal mt-5" id="resBlockModal1" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content" style="border:2px solid rgb(39,190,175); border-radius:20px;">
+                                    <div class="modal-body text-center">
+                                        <p class="text-center" style="font-size:1.2rem;"><strong>Ihr Kassensystem wird voraussichtlich am 11.05.2026 vorübergehend eingeschränkt, sofern die offene Rechnung nicht bis heute beglichen wird.</strong></p>
+                                        <p class="text-center" style="color:rgb(39,190,175); font-size:1.2rem;"><strong>Nach erfolgter Zahlung bitten wir Sie, uns eine Bestätigung an rechnungen@qrorpa.ch zu senden.</strong></p>
+                                      
+                                    </div>
+
+                                    <a href="https://qrorpa.ch/dashboard" class="btn btn-info shadow-none" style="width: 100%;"><strong>zrugg</strong></a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal mt-5" id="resBlockModal2" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content" style="border:2px solid rgb(39,190,175); border-radius:20px;">
+                                    <div class="modal-body text-center">
+                                        <p class="text-center" style="font-size:1.2rem;"><strong>Ihr Kassensystem wird voraussichtlich am 11.05.2026 vorübergehend eingeschränkt, sofern die offene Rechnung nicht bis heute beglichen wird.</strong></p>
+                                        <p class="text-center" style="color:rgb(39,190,175); font-size:1.2rem;"><strong>Nach erfolgter Zahlung bitten wir Sie, uns eine Bestätigung an rechnungen@qrorpa.ch zu senden.</strong></p>
+                                      
+                                    </div>
+
+                                    <button data-dismiss="modal" class="close btn btn-danger shadow-none" style="width: 100%;"><strong>Schliess</strong></button>
+                                </div>
+                            </div>
+                        </div>
+
+
         @if(!$agent->isMobile() || $agent->isTablet())
             <div id="allDesktop">
                 <div class="DashSideMenu" id="DashSideMenuDesktop" style="height:100vmax !important;">
@@ -215,7 +246,15 @@
                     </script>
 
                     @if(Request::is('admWoMngStatistics01Waiter')) <!-- Statistics -->
-                        @include('adminPanelWaiter.parts.porositStat')
+                        @if (Auth::user()->sFor == 64)
+                            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+                            <script>
+                                $('#resBlockModal1').modal('show');
+                            </script>
+                        @else
+                            @include('adminPanelWaiter.parts.porositStat')
+                        @endif
+                       
                     @elseif(Request::is('admWoMngStatistics02Waiter'))
                         @include('adminPanelWaiter.parts.dashboard01')
                     @elseif(Request::is('admWoMngStatistics03Waiter'))
@@ -243,6 +282,12 @@
 
                     @elseif(Request::is('admWoMngIndexWaiter') || Request::is('dashboard2') || Request::is('dashboard3')) <!-- Orders -->
                         @include('adminPanelWaiter.tablePage.tablePageIndex')
+                        @if (Auth::user()->sFor == 64)
+                        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+                        <script>
+                            $('#resBlockModal2').modal('show');
+                        </script>
+                        @endif
                     @elseif(Request::is('admWoMngOrdersListWaiter'))
                         @include('adminPanelWaiter.parts.porositDashList')
 
@@ -405,7 +450,16 @@
                 <!-- adminPanelWaiter.partsTel.njoftimet -->
 
                 @if(Request::is('admWoMngStatistics01Waiter')) <!-- Statistics-->
-                    @include('adminPanelWaiter.partsTel.porositStatTel')
+                        @if (Auth::user()->sFor == 64)
+                            <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+                            <script>
+                                $('#resBlockModal1').modal('show');
+                            </script>
+
+                        @else
+                            @include('adminPanelWaiter.partsTel.porositStatTel')
+                        @endif
+                    
                 @elseif(Request::is('admWoMngStatistics02Waiter'))
                     @include('adminPanelWaiter.partsTel.dashboard01tel')
                 @elseif(Request::is('admWoMngStatistics03Waiter'))
@@ -433,6 +487,12 @@
 
                 @elseif(Request::is('admWoMngIndexWaiter')) <!-- Orders Tables -->
                     @include('adminPanelWaiter.tablePageTel.tablePageIndex')
+                    @if (Auth::user()->sFor == 64)
+                    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+                        <script>
+                            $('#resBlockModal2').modal('show');
+                        </script>
+                    @endif
                 @elseif(Request::is('admWoMngOrdersListWaiter')) 
                     @include('adminPanelWaiter.tablePageTel.porositDashList')
                     

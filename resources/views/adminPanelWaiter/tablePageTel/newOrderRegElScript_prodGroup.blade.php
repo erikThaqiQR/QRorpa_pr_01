@@ -739,7 +739,7 @@
             newGroupOrderDiv =  '<div style="border: 1px solid rgb(72,81,87); border-radius:2px; margin-bottom:2px;" class="d-flex flex-wrap justify-content-between" id="tabOrderDivGroup'+prodId+'tnr'+tNr+'plateId'+plateId+'"'+
                                 'onclick="openGroupProductSelectionPage(\''+prodId+'\',\''+tabCode+'\',\''+clPhNr+'\',\''+plateId+'\')">'+
                                     '<p class="pl-1" style="width:80%; margin:0; padding-top:2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height:0.9; font-weight:bold;">'+
-                                        '<span class="tabOrderSasiaSpan'+prodId+'tnr'+tNr+'plateId'+plateId+'">'+newSasia+'x</span> '+tOrEmri+
+                                        '<span class="tabOrderSasiaSpan'+prodId+'tnr'+tNr+'plateId'+plateId+'">'+newSasia+'</span>x '+tOrEmri+
                                     '</p>'+
                                     '<p style="width:20%; margin:0; text-align:center;"><strong><span class="tabOrderQmimiSpan'+prodId+'tnr'+tNr+'plateId'+plateId+'">'+parseFloat(newQmimi).toFixed(2)+'</span>.-</strong></p>'+
                                 '</div>';
@@ -788,7 +788,7 @@
             tabOrDiv += 'onclick="closeOrSelect(\''+tNr+'\',\''+tOrId+'\',\''+tOrSasia+'\')">'+
                             '<p class="pl-1" style="width:60%; margin:0; padding-top:2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height:0.9;">'+
                                 '<strong>'+
-                                '<span id="tabOrderSasiaSpan'+tOrId+'" class="tabOrderSasiaSpan'+prodId+'tnr'+tNr+'plateId'+plateId+'">'+tOrSasia+'x</span> '+tOrEmri;
+                                '<span id="tabOrderSasiaSpan'+tOrId+'" class="tabOrderSasiaSpan'+prodId+'tnr'+tNr+'plateId'+plateId+'">'+tOrSasia+'</span>x '+tOrEmri;
                                 if (tOrType != 'empty' && extrasAll != 'empty'){
                                     tOrType2D = tOrType.split('||');
             tabOrDiv +=             '<br>'+

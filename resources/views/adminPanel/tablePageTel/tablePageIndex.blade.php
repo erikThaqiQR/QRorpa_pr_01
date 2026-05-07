@@ -149,6 +149,12 @@ use App\restorantTablesToRoom;
                 27 => 'res73_room27',
                 28 => 'res73_room28',
             ],
+
+            79 => [
+                36 => 'res79_room36', 0 => 'res79_room36',
+                37 => 'res79_room37',
+                38 => 'res79_room38',
+            ],
         ];
 
         // Reuse mapping for 44 and 49 same as 26
@@ -275,7 +281,7 @@ use App\restorantTablesToRoom;
 @if (false)
     @include('adminPanel.tablePageTel.tableIndexActiveOrMd')
 @else
-    @if(in_array($sFor, [3100, 5000]))
+    @if(in_array($sFor, [34,57]))
         @include('adminPanel.tablePageTel.tableIndexActiveOrMdVer_2')
     @else
         <!-- display same products together -->

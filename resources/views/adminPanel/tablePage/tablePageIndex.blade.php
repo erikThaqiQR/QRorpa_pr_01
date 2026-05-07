@@ -154,6 +154,12 @@ use App\restorantTablesToRoom;
                 27 => 'res73_room27',
                 28 => 'res73_room28',
             ],
+
+            79 => [
+                36 => 'res79_room36', 0 => 'res79_room36',
+                37 => 'res79_room37',
+                38 => 'res79_room38',
+            ],
         ];
 
         // Reuse mapping for 44 and 49 same as 26
