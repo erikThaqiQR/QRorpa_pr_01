@@ -612,4 +612,52 @@
         }
     }
 
+    function saveEpsonIpAddress(userId){
+        let ipAddressInput = $(`.epsonIpAddressInput${userId}`).val();
+        $.ajax({
+            url: '{{ route("admWoMng.saveEpsonIpAddress") }}',
+				method: 'post',
+				data: {
+					ipAddressInput: ipAddressInput,
+                    userId: userId,
+					_token: '{{csrf_token()}}'
+				},
+				success: (respo) => {
+                    $(`.errorNotifUser${userId}`).hide();
+                    $(`.successNotifUser${userId}`).text("IP-Adresse erfolgreich gespeichert!").show();
+                    setTimeout(() => {
+                        $(`.successNotifUser${userId}`).hide();
+                    }, 3000);
+				},
+				error: (error) => { 
+                    let errorMsg = error.responseJSON.errors.ipAddressInput[0]
+                        ?? 'An error occurred';
+                    $(`.errorNotifUser${userId}`).text(errorMsg).show();
+                }
+        });
+    }
+
+    function deleteEpsonIpAddress(userId){
+         $.ajax({
+            url: '{{ route("admWoMng.deleteEpsonIpAddress") }}',
+				method: 'post',
+				data: {
+                    userId: userId,
+					_token: '{{csrf_token()}}'
+				},
+				success: (respo) => {
+                    $(`.epsonIpAddressInput${userId}`).val(null);
+                    $(`.errorNotifUser${userId}`).hide();
+                    $(`.successNotifUser${userId}`).text("Die IP-Adresse wurde erfolgreich gelöscht.").show();
+                    setTimeout(() => {
+                        $(`.successNotifUser${userId}`).hide();
+                    }, 3000);
+				},
+				error: (error) => { 
+                    let errorMsg = 'An error occurred';
+                    $(`.errorNotifUser${userId}`).text(errorMsg).show();
+                }
+        });
+    }
+
 </script>

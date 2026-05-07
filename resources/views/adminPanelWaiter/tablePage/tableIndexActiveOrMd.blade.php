@@ -49,7 +49,7 @@ use App\newOrdersAdminAlert;
                     </div>
                     <span style="width:8%;"></span>
 
-                    <button style="width: 8%; margin:0px; padding:0px;" type="button" class="btn shadow-none" onclick="printActiveOrdersOnTable('{{$tabelOne->tableNr}}')">
+                    <button style="width: 8%; margin:0px; padding:0px;" type="button" class="btn shadow-none" onclick="printActiveOrdersOnTable('{{$tabelOne->tableNr}}', '{{ auth()->user()->epsonPrinterIp }}')">
                         <i class="pt-3 fa-2x fa-solid fa-receipt"></i>
                     </button>
                   

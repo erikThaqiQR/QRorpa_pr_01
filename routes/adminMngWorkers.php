@@ -198,4 +198,10 @@
     // Order serving page
         Route::get('orderServingDevicesPageWaiter', 'adminMngWorkersController@orderServingDevicesPageWaiter')->name('orServing.orderServingDevicesPageWaiter');
     //----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+    // Update Epson IP Address
+    Route::post('saveEpsonIpAddress', 'adminMngWorkersController@saveEpsonIpAddress')->name('admWoMng.saveEpsonIpAddress');
+    Route::post('deleteEpsonIpAddress', 'adminMngWorkersController@deleteEpsonIpAddress')->name('admWoMng.deleteEpsonIpAddress');
+    // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ?>

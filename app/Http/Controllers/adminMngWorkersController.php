@@ -1816,5 +1816,33 @@ class adminMngWorkersController extends Controller
     }
 
 
+    public function saveEpsonIpAddress(Request $req){
+        $validated = $req->validate([
+            'ipAddressInput' => 'nullable|ipv4',
+            'userId' => 'required|exists:users,id'
+        ]);
+
+        $ipAddress = $validated['ipAddressInput'];
+        $userId = $validated['userId'];
+
+        $user = User::find($userId);
+        $user->epsonPrinterIp = $ipAddress ?? null;
+        $user->save();
+
+        return response()->json([
+            'message' => 'IP address saved successfully'
+        ], 200);
+    }
     
+    public function deleteEpsonIpAddress(Request $req){
+        $userId = $req->userId;
+
+        $user = User::find($userId);
+        $user->epsonPrinterIp = null;
+        $user->save();
+
+        return response()->json([
+            'message' => 'IP address deleted successfully'
+        ], 200);
+    }
 }

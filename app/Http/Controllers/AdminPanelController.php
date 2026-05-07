@@ -91,6 +91,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use App\tabVerificationPNumbersPassive;
 use Intervention\Image\ImageManagerStatic as Image;
+use Illuminate\Support\Collection;
 
 
 class AdminPanelController extends Controller
@@ -4416,6 +4417,9 @@ EPD
 
     public function admConfConfirmAll(Request $req){
         $tabCode = TableQrcode::where([['tableNr',$req->tableNr],['Restaurant',Auth::user()->sFor]])->first()->kaTab;
+
+        $printOrderForCook = [];
+        
         if($req->tabOrSelected != 0){
             $tabOrSelIds = array();
             $selectedTabOr = explode('||',$req->tabOrSelected); 
@@ -4497,6 +4501,8 @@ EPD
             $logTabOrConfirm->tabId = $tabCode;
             $logTabOrConfirm->tabOrderIds = $tOrId;    
             $logTabOrConfirm->save();
+
+            $printOrderForCook = self::printConfirmedOrderForCooks($allTOrds);
         }else{
             $allTOrds = TabOrder::where([['tableNr',$req->tableNr],['tabCode',$tabCode],['status',0]])->get();
 
@@ -4507,6 +4513,8 @@ EPD
             $logTabOrConfirm->tabId = $tabCode;
             $logTabOrConfirm->tabOrderIds = 'all';    
             $logTabOrConfirm->save();
+
+            $printOrderForCook = self::printConfirmedOrderForCooks($allTOrds);
         }
        
         if($req->indication == '0'){
@@ -4635,8 +4643,161 @@ EPD
                 }
             }
         }
+
+        return $printOrderForCook;
     }
 
+    // This function will be used for printing the orders for the cooks after confirming
+    public static function printConfirmedOrderForCooks($allTabOrders){
+        // Convert from single model into a collection
+        if(!($allTabOrders instanceof Collection)) {
+            $allTabOrders = collect([$allTabOrders]);
+        }
+
+        $cooks = User::where('sFor', $allTabOrders[0]->toRes)
+            ->where('role', '54')
+            ->where('epsonPrinterIp', '!=', null)
+            ->get();
+
+        $cooksOrderMapping = [];
+
+        foreach($cooks as $cook){
+            $grouppedOrder = [];
+
+            foreach($allTabOrders as $tabOrder){
+                $product = Produktet::find($tabOrder->prodId);
+
+
+                $extraNames = null;
+                $typeName = null;
+                if($tabOrder->OrderExtra != 'empty'){
+                    $splittedExtra = explode('||', $tabOrder->OrderExtra);
+
+                    $extraModel = ekstra::where('toRes', $tabOrder->toRes)
+                        ->where('toCat', $product->kategoria)
+                        ->where('emri', $splittedExtra[0])
+                        ->first();
+
+                    foreach(explode('--0--', $tabOrder->OrderExtra) as $item){
+                        $extraNames[] = explode('||', $item)[0];
+                    }
+                    $extraNames = implode(', ', $extraNames);
+
+                    $cookAccessExtra = cooksProductSelection::where('toRes', $tabOrder->toRes)
+                        ->where('workerId', $cook->id)
+                        ->where('contentType', 'Extra')
+                        ->get();
+
+                    if($cookAccessExtra && $cookAccessExtra->contains('contentId', $extraModel->id)){
+                        $grouppedOrder[] = [
+                            "productName" => $product->emri,
+                            "quantity" => 1,
+                            "price" => $product->qmimi,
+                            "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
+                            "extras" => $extraNames,
+                            "type" => $typeName ?? null
+                        ];
+
+                        continue;
+                    } else if(!$cookAccessExtra) {
+                        $grouppedOrder[] = [
+                            "productName" => $product->emri,
+                            "quantity" => 1,
+                            "price" => $product->qmimi,
+                            "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
+                            "extras" => $extraNames,
+                            "type" => $typeName ?? null
+                        ];
+                        continue;
+                    }
+                }
+
+                if($tabOrder->OrderType != 'empty'){
+                    $splittedType = explode('||', $tabOrder->OrderType);
+
+                    $typesModel = LlojetPro::where('toRes', $tabOrder->toRes)
+                        ->where('kategoria', $product->kategoria)
+                        ->where('emri', $splittedType[0])
+                        ->first();
+                    $typeName = $typesModel->emri;
+
+                    $cookAccessType = cooksProductSelection::where('toRes', $tabOrder->toRes)
+                        ->where('workerId', $cook->id)
+                        ->where('contentType', 'Type')
+                        ->get();
+
+                    if($cookAccessType && $cookAccessType->contains('contentId', $typesModel->id)){
+                        $grouppedOrder[] = [
+                            "productName" => $product->emri,
+                            "quantity" => 1,
+                            "price" => $product->qmimi,
+                            "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
+                            "extras" => isset($extraNames) ? $extraNames : null,
+                            "type" => $typeName ?? null
+                        ];
+
+                        continue;
+                    } else if(!$cookAccessType) {
+                        $grouppedOrder[] = [
+                            "productName" => $product->emri,
+                            "quantity" => 1,
+                            "price" => $product->qmimi,
+                            "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
+                            "extras" => isset($extraNames) ? $extraNames : null,
+                            "type" => $typeName ?? null
+                        ];
+
+                        continue;
+                    }
+                } 
+
+                $cookAccessCategory = cooksProductSelection::where('toRes', $tabOrder->toRes)
+                        ->where('workerId', $cook->id)
+                        ->where('contentType', 'Category')
+                        ->where('contentId', $product->kategoria)
+                        ->first();
+
+                if($cookAccessCategory){
+                    $grouppedOrder[] = [
+                            "productName" => $product->emri,
+                            "quantity" => 1,
+                            "price" => $product->qmimi,
+                            "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
+                            "extras" => isset($extraNames) ? $extraNames : null,
+                            "type" => $typeName ?? null
+                        ];
+
+                    continue;
+                } else {
+                    $cookAccessProduct = cooksProductSelection::where('toRes', $tabOrder->toRes)
+                        ->where('workerId', $cook->id)
+                        ->where('contentType', 'Product')
+                        ->get();
+
+                    if($cookAccessProduct && $cookAccessProduct->contains('contentId', $product->id)){
+                        $grouppedOrder[] = [
+                            "productName" => $product->emri,
+                            "quantity" => 1,
+                            "price" => $product->qmimi,
+                            "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
+                            "extras" => isset($extraNames) ? $extraNames : null,
+                            "type" => $typeName ?? null
+                        ];
+
+                        continue;
+                    }
+                }
+            }
+
+            if(!empty($grouppedOrder)){
+                $cooksOrderMapping[$cook->id]['cookName'] = $cook->name;
+                $cooksOrderMapping[$cook->id]['cookPrinterIp'] = $cook->epsonPrinterIp;
+                $cooksOrderMapping[$cook->id]['cookOrder'] = $grouppedOrder;
+            }
+        }
+
+        return $cooksOrderMapping;
+    }
 
     // re-check tab order confirmation from logs
     public function admConfConfirmAllCheckFromLogs(Request $req){
@@ -4762,6 +4923,7 @@ EPD
                     $oneCook->notify(new \App\Notifications\NewOrderNotification($details));
                 }
             }
+            return self::printConfirmedOrderForCooks($theTOr);
         }
     }
 
@@ -6384,6 +6546,7 @@ EPD
                 }
             }
         }
+        return self::printConfirmedOrderForCooks($tabOrAll);
     }
 
 
@@ -6513,6 +6676,7 @@ EPD
                 }
             }
         }
+        return self::printConfirmedOrderForCooks($tabOrAll);
     }
 
 
