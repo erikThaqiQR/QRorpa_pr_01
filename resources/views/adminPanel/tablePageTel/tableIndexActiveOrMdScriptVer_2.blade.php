@@ -896,125 +896,143 @@
 
 
     function printActiveOrdersOnTable(tableNrSend, printerIp = null) {
-            if(!printerIp) return;
+        $.ajax({
+            url: '{{ route("print.callDataForPrintReceiptActiveTab") }}',
+            method: 'post',
+            data: {
+                tableNrSend: tableNrSend,
+                _token: '{{csrf_token()}}'
+            },
+            success: (printData) => {
+                printData = $.trim(printData);
+                const printData2D = printData.split('---88---');
 
-            $.ajax({
-                url: '{{ route("print.callDataForPrintReceiptActiveTab") }}',
-                method: 'post',
-                data: {
-                    tableNrSend: tableNrSend,
-                    tabOrSel: $('#closeOrSelected'+tableNrSend).val(),
-                    _token: '{{csrf_token()}}'
-                },
-                success: (printData) => {
-                    printData = $.trim(printData);
-                    const printData2D = printData.split('---88---');
+                const resName      = printData2D[0];
+                const tableNr      = printData2D[1];
+                const timePrint    = printData2D[2];
+                const theProdsHtml = printData2D[3];
+                const totalToPay   = parseFloat(printData2D[4]).toFixed(2);
+                const resAdrsHtml  = printData2D[5];
 
-                    const resName      = printData2D[0];
-                    const tableNr      = printData2D[1];
-                    const timePrint    = printData2D[2];
-                    const theProdsHtml = printData2D[3];
-                    const totalToPay   = parseFloat(printData2D[4]).toFixed(2);
-                    const resAdrsHtml  = printData2D[5];
+                const tableNrShow = (tableNr == 500) ? 'Takeaway' : 'Tisch: ' + tableNr;
 
-                    const tableNrShow = (tableNr == 500) ? 'Takeaway' : 'Tisch: ' + tableNr;
+                // ── FALLBACK: no printer IP → browser print ──────────────────
+                if (!printerIp) {
+                    let printWindow = window.open('', '', 'height=500, width=1000');
+                    printWindow.document.write(`
+                        <html>
+                        <head>
+                            <style>
+                                body { font-family: Arial, sans-serif; }
+                                h2 { color: #333; }
+                            </style>
+                        </head>
+                        <body>
+                            <h2 style="width:100%; text-align:center; margin-bottom:0px; margin-top:0;">${resName}<br>Zwischenrechnung</h2>
+                            ${resAdrsHtml}
+                            <div style="width:100%; display:flex; flex-wrap:wrap; justify-content:space-between;">
+                                <p style="width:40%; text-align:center; margin-bottom:0px; margin-top:6px; line-height:1.1;">${tableNrShow}</p>
+                                <p style="width:60%; text-align:center; margin-bottom:0px; margin-top:6px; line-height:1.1;">${timePrint}</p>
+                            </div>
+                            <hr style="width:100%; margin:4px 0 4px 0;">
+                            ${theProdsHtml}
+                            <hr style="width:100%; margin:4px 0 4px 0;">
+                            <div style="width:100%; display:flex; flex-wrap:wrap; justify-content:space-between;">
+                                <p style="width:50%; text-align:left; margin-bottom:0px; margin-top:0; line-height:1;"><strong>Summe: </strong></p>
+                                <p style="width:50%; text-align:right; margin-bottom:0px; margin-top:0; line-height:1;">${totalToPay} CHF</p>
+                            </div>
+                            <p style="color:white; width:100%;">-</p>
+                            <p style="color:white; width:100%;">-</p>
+                        </body>
+                        </html>
+                    `);
+                    printWindow.document.close();
+                    printWindow.print();
+                    return;
+                }
 
-                    // Parse products from the HTML string the backend returns
-                    // Backend builds HTML like: <span>2x ProductName </span><span>12.50</span>
-                    // We extract them via DOM parsing
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(theProdsHtml, 'text/html');
-                    const spans = doc.querySelectorAll('span');
+                // ── EPSON ePOS PRINT ─────────────────────────────────────────
+                const parser = new DOMParser();
+                const doc    = parser.parseFromString(theProdsHtml, 'text/html');
+                const spans  = doc.querySelectorAll('span');
 
-                    const items = [];
-                    for (let i = 0; i < spans.length; i += 2) {
-                        const nameSpan  = spans[i]?.textContent?.trim() || '';
-                        const priceSpan = spans[i + 1]?.textContent?.trim() || '';
-                        if (nameSpan) {
-                            items.push({
-                                label: nameSpan,          // e.g. "2x Schnitzel"
-                                price: priceSpan          // e.g. "12.50"
-                            });
-                        }
+                const items = [];
+                for (let i = 0; i < spans.length; i += 2) {
+                    const nameSpan  = spans[i]?.textContent?.trim() || '';
+                    const priceSpan = spans[i + 1]?.textContent?.trim() || '';
+                    if (nameSpan) items.push({ label: nameSpan, price: priceSpan });
+                }
+
+                const address = 'http://' + printerIp + '/cgi-bin/epos/service.cgi?devid=local_printer&timeout=60000';
+                const epos    = new epson.ePOSPrint(address);
+                const builder = new epson.ePOSBuilder();
+
+                epos.onreceive = function (res) {
+                    if (!res.success) console.error('Print failed:', res.code);
+                };
+
+                // HEADER
+                builder.addTextAlign(builder.ALIGN_CENTER);
+                builder.addTextSize(2, 2);
+                builder.addText(resName + '\n');
+                builder.addTextSize(1, 1);
+                builder.addTextStyle(false, false, true, builder.COLOR_1);
+                builder.addText('Zwischenrechnung\n');
+                builder.addTextStyle(false, false, false, builder.COLOR_1);
+                builder.addText('================================================\n');
+
+                // TABLE + TIME
+                builder.addTextAlign(builder.ALIGN_LEFT);
+                const left  = tableNrShow;
+                const right = timePrint;
+                const line  = left + ' '.repeat(Math.max(0, 48 - left.length - right.length)) + right;
+                builder.addText(line + '\n');
+                builder.addText('================================================\n');
+
+                // COLUMN HEADERS
+                builder.addTextStyle(false, false, true, builder.COLOR_1);
+                builder.addText('Produkt'.padEnd(38) + 'Preis\n');
+                builder.addTextStyle(false, false, false, builder.COLOR_1);
+                builder.addText('------------------------------------------------\n');
+
+                // ITEMS
+                items.forEach(function (item) {
+                    const maxLen = 36;
+                    let   label  = item.label;
+                    const price  = item.price.padStart(10);
+                    const lines  = [];
+
+                    while (label.length > maxLen) {
+                        lines.push(label.substring(0, maxLen));
+                        label = label.substring(maxLen);
                     }
+                    lines.push(label);
 
-                    // ─────────────────────────
-                    // ePOS BUILDER
-                    // ─────────────────────────
-                    const address = 'http://' + printerIp + '/cgi-bin/epos/service.cgi?devid=local_printer&timeout=60000';
-                    const epos    = new epson.ePOSPrint(address);
-                    const builder = new epson.ePOSBuilder();
+                    builder.addText(lines[0].padEnd(38) + price + '\n');
+                    for (let n = 1; n < lines.length; n++) {
+                        builder.addText('  ' + lines[n] + '\n');
+                    }
+                });
 
-                    epos.onreceive = function (res) {
-                        if (!res.success) {
-                            console.error('Print failed:', res.code);
-                        }
-                    };
+                builder.addText('================================================\n');
 
-                    // HEADER
-                    builder.addTextAlign(builder.ALIGN_CENTER);
-                    builder.addTextSize(2, 2);
-                    builder.addText(resName + '\n');
-                    builder.addTextSize(1, 1);
-                    builder.addTextStyle(false, false, true, builder.COLOR_1);
-                    builder.addText('Zwischenrechnung\n');
-                    builder.addTextStyle(false, false, false, builder.COLOR_1);
-                    builder.addText('================================================\n');
+                // TOTAL
+                builder.addTextStyle(false, false, true, builder.COLOR_1);
+                const totalLabel = 'Summe:';
+                const totalValue = totalToPay + ' CHF';
+                const totalLine  = totalLabel + ' '.repeat(Math.max(0, 48 - totalLabel.length - totalValue.length)) + totalValue;
+                builder.addText(totalLine + '\n');
+                builder.addTextStyle(false, false, false, builder.COLOR_1);
 
-                    // TABLE + TIME
-                    builder.addTextAlign(builder.ALIGN_LEFT);
-                    const left  = tableNrShow;
-                    const right = timePrint;
-                    const line  = left + ' '.repeat(Math.max(0, 48 - left.length - right.length)) + right;
-                    builder.addText(line + '\n');
-                    builder.addText('================================================\n');
+                // FOOTER
+                builder.addFeedLine(4);
+                builder.addCut(builder.CUT_FEED);
 
-                    // COLUMN HEADERS
-                    builder.addTextStyle(false, false, true, builder.COLOR_1);
-                    builder.addText('Produkt'.padEnd(38) + 'Preis\n');
-                    builder.addTextStyle(false, false, false, builder.COLOR_1);
-                    builder.addText('------------------------------------------------\n');
-
-                    // ITEMS
-                    // Backend already combines qty into label ("2x ProductName"), price is the line total
-                    items.forEach(function (item) {
-                        const maxLen   = 36;
-                        let   label    = item.label;
-                        const price    = item.price.padStart(10);
-                        const lines    = [];
-
-                        while (label.length > maxLen) {
-                            lines.push(label.substring(0, maxLen));
-                            label = label.substring(maxLen);
-                        }
-                        lines.push(label);
-
-                        // first line: name + price right-aligned (38 + 10 = 48)
-                        builder.addText(lines[0].padEnd(38) + price + '\n');
-                        for (let n = 1; n < lines.length; n++) {
-                            builder.addText('  ' + lines[n] + '\n');
-                        }
-                    });
-
-                    builder.addText('================================================\n');
-
-                    // TOTAL
-                    builder.addTextStyle(false, false, true, builder.COLOR_1);
-                    const totalLabel = 'Summe:';
-                    const totalValue = totalToPay + ' CHF';
-                    const totalLine  = totalLabel + ' '.repeat(Math.max(0, 48 - totalLabel.length - totalValue.length)) + totalValue;
-                    builder.addText(totalLine + '\n');
-                    builder.addTextStyle(false, false, false, builder.COLOR_1);
-
-                    // FOOTER
-                    builder.addFeedLine(4);
-                    builder.addCut(builder.CUT_FEED);
-
-                    epos.send(builder.toString());
-                },
-                error: (error) => { console.log(error); }
-            });
-        }
+                epos.send(builder.toString());
+            },
+            error: (error) => { console.log(error); }
+        });
+    }
 
 
 

@@ -132,10 +132,10 @@
                 <div class="input-group mt-1">
                     <input type="text" class="form-control epsonIpAddressInput{{$user->id}} shadow-none" placeholder="IP-Adresse" value="{{ $user->epsonPrinterIp }}">
                     <div class="input-group-append">
-                        <button class="btn btn-danger" type="button" onclick="deleteEpsonIpAddress({{$user->id}})">
+                        <button class="btn btn-danger" type="button" onclick="deleteEpsonIpAddress('{{$user->id}}')">
                             <i class="fas fa-trash-alt"></i>
                         </button>
-                        <button class="btn btn-info" type="button" onclick="saveEpsonIpAddress({{$user->id}})">
+                        <button class="btn btn-info" type="button" onclick="saveEpsonIpAddress('{{$user->id}}')">
                             <i class="fa-solid fa-check"></i>
                         </button>
                     </div>
@@ -251,10 +251,10 @@
                 <div class="input-group mt-1">
                     <input type="text" class="form-control epsonIpAddressInput{{$user->id}} shadow-none" placeholder="IP address" value="{{ $user->epsonPrinterIp }}">
                     <div class="input-group-append">
-                        <button class="btn btn-danger" type="button" onclick="deleteEpsonIpAddress({{$user->id}})">
+                        <button class="btn btn-danger" type="button" onclick="deleteEpsonIpAddress('{{$user->id}}')">
                             <i class="fas fa-trash-alt"></i>
                         </button>
-                        <button class="btn btn-info" type="button" onclick="saveEpsonIpAddress({{$user->id}})">
+                        <button class="btn btn-info" type="button" onclick="saveEpsonIpAddress('{{$user->id}}')">
                             <i class="fa-solid fa-check"></i>
                         </button>
                     </div>
