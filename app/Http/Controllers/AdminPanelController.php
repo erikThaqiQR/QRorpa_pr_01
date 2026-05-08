@@ -6485,7 +6485,7 @@ EPD
     }
 
     public function plateForAbrufenExecuteAbrufen(Request $req){
-        $tabOrAll = TabOrder::where([['toRes',Auth::user()->sFor],['tableNr',$req->tableNr],['toPlate',$req->plateId],['tabCode','!=','0']])->get();
+        $tabOrAll = TabOrder::where([['toRes',Auth::user()->sFor],['tableNr',$req->tableNr],['toPlate',$req->plateId],['tabCode','!=','0'],['abrufenStat','=','0']])->get();
         foreach($tabOrAll as $tOrder){
             if($tOrder->abrufenStat != 1 && $tOrder->status == 1){
                 $tOrder->abrufenStat = 1;
