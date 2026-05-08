@@ -5623,16 +5623,26 @@ EPD
             $mappedOrderedProducts = [];
             foreach($orderedProducts as $product){
                 $explodedProduct = explode('-8-', $product);
+
+                if($explodedProduct[5] != 'empty'){
+                    $productType = LlojetPro::where('emri', $explodedProduct[5])
+                        ->first();
+
+                    $groupBy = $explodedProduct[7] . '_' . $productType->id;
+                } else {
+                    $groupBy = $explodedProduct[7];
+                }
+
                 if(number_format($explodedProduct[4], 2, '.', '') > 0){
-                    if(isset($mappedOrderedProducts[$explodedProduct[7]])){
-                        $mappedOrderedProducts[$explodedProduct[7]] = [
+                    if(isset($mappedOrderedProducts[$groupBy])){
+                        $mappedOrderedProducts[$groupBy] = [
                             "productId" => $explodedProduct[7],
-                            "quantity" => $explodedProduct[3] ? $mappedOrderedProducts[$explodedProduct[7]]['quantity'] + $explodedProduct[3] : ++$mappedOrderedProducts[$explodedProduct[7]]['quantity'],
-                            "price" => $mappedOrderedProducts[$explodedProduct[7]]['price'] + $explodedProduct[4],
+                            "quantity" => $explodedProduct[3] ? $mappedOrderedProducts[$groupBy]['quantity'] + $explodedProduct[3] : ++$mappedOrderedProducts[$groupBy]['quantity'],
+                            "price" => $mappedOrderedProducts[$groupBy]['price'] + $explodedProduct[4],
                             "name" => $explodedProduct[0]
                         ];
                     } else {
-                        $mappedOrderedProducts[$explodedProduct[7]] = [
+                        $mappedOrderedProducts[$groupBy] = [
                             "productId" => $explodedProduct[7],
                             "quantity" => $explodedProduct[3] ?? 1,
                             "price" => $explodedProduct[4],
@@ -5840,16 +5850,26 @@ EPD
 
             $tabOrders = $tabOrders->get();
 
-            foreach($tabOrders as $produkti){  
-                if(isset($grTabOrdersByProdId[$produkti->prodId])){
-                    $grTabOrdersByProdId[$produkti->prodId] = [
+            foreach($tabOrders as $produkti){ 
+                if($produkti->OrderType != 'empty'){
+                    $splittedType = explode('||', $produkti->OrderType);
+                    $productType = LlojetPro::where('toRes', $produkti->toRes)
+                        ->where('emri', $splittedType[0])
+                        ->where('vlera', $splittedType[1])
+                        ->first();
+                    $groupBy = $produkti->prodId . '_' . $productType->id;
+                } else {
+                    $groupBy = $produkti->prodId;
+                }
+                if(isset($grTabOrdersByProdId[$groupBy])){
+                    $grTabOrdersByProdId[$groupBy] = [
                         "productId" => $produkti->prodId,
-                        "quantity" => $produkti->OrderSasia ? $grTabOrdersByProdId[$produkti->prodId]['quantity'] + $produkti->OrderSasia : ++$grTabOrdersByProdId[$produkti->prodId]['quantity'],
-                        "price" => $grTabOrdersByProdId[$produkti->prodId]['price'] + $produkti->OrderQmimi,
+                        "quantity" => $produkti->OrderSasia ? $grTabOrdersByProdId[$groupBy]['quantity'] + $produkti->OrderSasia : ++$grTabOrdersByProdId[$groupBy]['quantity'],
+                        "price" => $grTabOrdersByProdId[$groupBy]['price'] + $produkti->OrderQmimi,
                         "name" => $produkti->OrderEmri
                     ];
                 }else{
-                    $grTabOrdersByProdId[$produkti->prodId] = [
+                    $grTabOrdersByProdId[$groupBy] = [
                         "productId" => $produkti->prodId,
                         "quantity" => $produkti->OrderSasia ?? 1,
                         "price" => $produkti->OrderQmimi,

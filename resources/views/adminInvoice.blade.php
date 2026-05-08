@@ -91,6 +91,7 @@ use App\emailReceiptFromAdm;
 use App\logOrderPayMChng;
 use App\OPSaferpayReference;
 use App\payTecTransactionLog;
+use App\LlojetPro;
 
     $piketLog = PiketLog::where('order_u',$items->id)->first();
 
@@ -355,6 +356,14 @@ use App\payTecTransactionLog;
 
                 foreach ($products as $product) {
                     $prod = explode('-8-', $product);
+                     if($prod[5] != 'empty'){
+                        $productType = LlojetPro::where('emri', $prod[5])
+                            ->first();
+
+                        $groupBy = $prod[7] . '_' . $productType->id;
+                    } else {
+                        $groupBy = $prod[7];
+                    }
 
                     if(number_format($prod[4], 2, '.', '') > 0){
 
@@ -368,18 +377,18 @@ use App\payTecTransactionLog;
                                 "ex"          => $prod[2] ?? '',
                                 "grouped"     => false
                             ];
-                        } else if(isset($mappedProducts[$prod[7]])){
-                            $mappedProducts[$prod[7]] = [
+                        } else if(isset($mappedProducts[$groupBy])){
+                            $mappedProducts[$groupBy] = [
                                 "productName" => $prod[0] ?? '',
-                                "quantity"    => $prod[3] ? $mappedProducts[$prod[7]]['quantity'] + $prod[3] : ++$mappedProducts[$prod[7]]['quantity'],
-                                "price"       => $mappedProducts[$prod[7]]['price'] + $prod[4],
+                                "quantity"    => $prod[3] ? $mappedProducts[$groupBy]['quantity'] + $prod[3] : ++$mappedProducts[$groupBy]['quantity'],
+                                "price"       => $mappedProducts[$groupBy]['price'] + $prod[4],
                                 "type"        => $prod[5] ?? '',
                                 "prod_id"     => $prod[7] ?? '',
                                 "ex"          => $prod[2] ?? '',
                                 "grouped"     => true
                             ];
                         } else {
-                            $mappedProducts[$prod[7]] = [
+                            $mappedProducts[$groupBy] = [
                                 "productName" => $prod[0] ?? '',
                                 "quantity"    => $prod[3] ?? 1,
                                 "price"       => $prod[4],
@@ -416,7 +425,7 @@ use App\payTecTransactionLog;
                     <td style="width:50%; text-align:left !important; margin:0px !important;">
                         <p style="padding:2px; line-height: 11px !important; margin:0px !important;">
                             {{$produkti['productName']}}
-                            @if($produkti['quantity'] <= 1 && $produkti['type'] != '' && $produkti['type'] != 'empty')
+                            @if($produkti['type'] != '' && $produkti['type'] != 'empty')
                                 <span style="opacity:0.6; ">( {{$produkti['type']}} )</span>
                             @endif  
                             @if($produkti['ex'] != '')
