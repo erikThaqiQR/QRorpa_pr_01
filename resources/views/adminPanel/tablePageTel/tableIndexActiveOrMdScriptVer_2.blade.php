@@ -105,7 +105,7 @@
                 tabOrSelected: $('#closeOrSelected'+tNr).val(),
 				_token: '{{csrf_token()}}'
 			},
-			success: () => {
+			success: (response) => {
                 $("#tabOrderBody"+tNr).load(location.href+" #tabOrderBody"+tNr+">*","");
                 $("#tableIconDiv"+tNr).load(location.href+" #tableIconDiv"+tNr+">*","");
                 
@@ -113,10 +113,116 @@
                 $('#'+theIdBtn).prop('disabled',false);
 
                 $('#closeOrSelected'+tNr).val('0');
+
+                // Print one slip per cook
+                $.each(response, function (cookId, cookData) {
+                    printCookSlip(cookData, tNr, 'Neue BESTELLUNG');
+                });
 			},
 			error: (error) => { console.log(error); }
 		});
     }
+
+    function printCookSlip(cookData, tableNr, title) {
+        var printerIp = cookData.cookPrinterIp;
+        var cookName  = cookData.cookName;
+        var orders    = cookData.cookOrder;
+
+        var address = 'http://' + printerIp + '/cgi-bin/epos/service.cgi?devid=local_printer&timeout=60000';
+        var epos    = new epson.ePOSPrint(address);
+        var builder = new epson.ePOSBuilder();
+
+        epos.onreceive = function (res) {
+            console.log('Print result for ' + cookName + ': ' + res.success);
+        };
+
+        var tableNrShow = (tableNr == 500) ? 'Takeaway' : 'Tisch: ' + tableNr;
+        var now = new Date();
+        var timePrint = now.getHours().toString().padStart(2, '0') + ':'
+                    + now.getMinutes().toString().padStart(2, '0');
+
+        // ─────────────────────────
+        // HEADER
+        // ─────────────────────────
+        builder.addTextAlign(builder.ALIGN_CENTER);
+        builder.addTextSize(2, 2);
+        builder.addText(`${title}\n`);
+
+        builder.addTextSize(1, 1);
+        builder.addTextStyle(false, false, true);
+        builder.addText(cookName + '\n');
+        builder.addTextStyle(false, false, false);
+
+        // builder.addTextFont(builder.FONT_A);
+        builder.addText('================================================\n\n');
+
+        // ─────────────────────────
+        // TABLE + TIME
+        // ─────────────────────────
+        builder.addTextAlign(builder.ALIGN_LEFT);
+
+        var left  = tableNrShow;
+        var right = timePrint;
+        var line  = left + ' '.repeat(Math.max(0, 24 - left.length - right.length)) + right;
+        builder.addTextSize(2, 2);
+        builder.addText(line + '\n\n');
+        // builder.addTextFont(builder.FONT_A);
+        builder.addTextSize(1, 1);
+        builder.addText('================================================\n');
+   
+        // ─────────────────────────
+        // ITEMS
+        // ─────────────────────────
+        builder.addTextSize(1, 1);
+
+        // Ensure orders is a proper array
+        var orderArray = Array.isArray(orders) ? orders : Object.values(orders);
+
+        $.each(orderArray, function (i, item) {
+            if (!item || typeof item !== 'object') return;
+
+            var name = String(item.productName || 'Unknown');
+            var qty  = Number(item.quantity || 0);
+
+            if(item.type){
+                var line = qty + "x " + name + `(${item.type})`;
+            } else {
+                var line = qty + "x " + name;
+            }
+
+            if (qty > 1) {
+                builder.addTextStyle(false, false, true);
+            } else {
+                builder.addTextStyle(false, false, false);
+            }
+
+            builder.addText(line + "\n");
+
+            builder.addTextFont(builder.FONT_B);
+            if(item.extras){
+                builder.addText(`    + Extra: ${item.extras}\n`);
+            }
+            if(item.comment){
+                builder.addText(`    + ${item.comment}\n`);
+            }
+
+            builder.addTextFont(builder.FONT_A);
+            if(i < orderArray.length - 1){
+                builder.addText('------------------------------------------------\n');
+            }
+        });
+
+        builder.addText('------------------------------------------------\n');
+
+        // ─────────────────────────
+        // FOOTER
+        // ─────────────────────────
+        builder.addFeedLine(2);
+        builder.addCut(builder.CUT_FEED);
+
+        epos.send(builder.toString());
+    }
+
     function chStatusTabO(tNr,toId){
         $('#AnnehmenBtn'+toId).html('<img src="storage/gifs/loading2.gif" style="height:23px; width:23px;">');
         $('#AnnehmenBtn'+toId).prop('disabled',true);
@@ -128,9 +234,14 @@
                 tabOrId:toId,
 				_token: '{{csrf_token()}}'
 			},
-			success: () => {
+			success: (response) => {
 			    $("#tabOrderTabInsLi"+toId).load(location.href+" #tabOrderTabInsLi"+toId+">*","");
                 $("#tableIconDiv"+tNr).load(location.href+" #tableIconDiv"+tNr+">*","");
+
+                // Print one slip per cook
+                $.each(response, function (cookId, cookData) {
+                    printCookSlip(cookData, tNr, 'Abgerufen');
+                });
 			},
 			error: (error) => { console.log(error); }
 		});
@@ -786,15 +897,9 @@
 
 
 
-    function printActiveOrdersOnTable(tableNrSend) {
-            const orId = $('#orderQRCodePicDownloadOI').val();
-            let resName = '';
-            let tableNr = '';
-            let tableNrShow = '';
-            let timePrint = '';
-            let theOrderShowProd = '';
-            let resAdrs = '';
-         
+    function printActiveOrdersOnTable(tableNrSend, printerIp = null) {
+            if(!printerIp) return;
+
             $.ajax({
                 url: '{{ route("print.callDataForPrintReceiptActiveTab") }}',
                 method: 'post',
@@ -804,62 +909,113 @@
                     _token: '{{csrf_token()}}'
                 },
                 success: (printData) => {
-                printData = $.trim(printData);
-                printData2D = printData.split('---88---');
-                        
-                resName = printData2D[0];
-                tableNr = printData2D[1];
-                if( tableNr == 500){ tableNrShow = 'Takeaway';      
-                }else{ tableNrShow = 'Tisch: '+printData2D[1]; }
-                timePrint = printData2D[2];
-                theOrderShowProd = printData2D[3];
-                totalToPay = parseFloat(printData2D[4]).toFixed(2);
-                resAdrs = printData2D[5];
-                resAdrs = printData2D[5];
+                    printData = $.trim(printData);
+                    const printData2D = printData.split('---88---');
 
-                let printWindow = window.open('', '', 'height=500, width=1000');
-                
-                    printWindow.document.write(`
-                        <html>
-                        <head>
-                            <style>
-                                body { font-family: Arial, sans-serif; }
-                                h2 { color: #333;}
-                            </style>
-                        </head>
-                        <body>
-                            <h2 style="width:100%; text-align:center; margin-bottom:0px; margin-top:0;">`+resName+`<br>Zwischenrechnung</h2>
+                    const resName      = printData2D[0];
+                    const tableNr      = printData2D[1];
+                    const timePrint    = printData2D[2];
+                    const theProdsHtml = printData2D[3];
+                    const totalToPay   = parseFloat(printData2D[4]).toFixed(2);
+                    const resAdrsHtml  = printData2D[5];
 
-                            `+resAdrs+`
+                    const tableNrShow = (tableNr == 500) ? 'Takeaway' : 'Tisch: ' + tableNr;
 
-                            <div style="width:100%; display:flex; flex-wrap: wrap; justify-content: space-between;">
-                            <p style="width:40%; text-align:center; margin-bottom:0px; margin-top:6px; line-height:1.1;">`+tableNrShow+`</p>
-                            <p style="width:60%; text-align:center; margin-bottom:0px; margin-top:6px; line-height:1.1;">`+timePrint+`</p>
-                            </div>
+                    // Parse products from the HTML string the backend returns
+                    // Backend builds HTML like: <span>2x ProductName </span><span>12.50</span>
+                    // We extract them via DOM parsing
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(theProdsHtml, 'text/html');
+                    const spans = doc.querySelectorAll('span');
 
-                            <hr style="width:100%; margin:4px 0 4px 0;">
+                    const items = [];
+                    for (let i = 0; i < spans.length; i += 2) {
+                        const nameSpan  = spans[i]?.textContent?.trim() || '';
+                        const priceSpan = spans[i + 1]?.textContent?.trim() || '';
+                        if (nameSpan) {
+                            items.push({
+                                label: nameSpan,          // e.g. "2x Schnitzel"
+                                price: priceSpan          // e.g. "12.50"
+                            });
+                        }
+                    }
 
-                            `+theOrderShowProd+`
+                    // ─────────────────────────
+                    // ePOS BUILDER
+                    // ─────────────────────────
+                    const address = 'http://' + printerIp + '/cgi-bin/epos/service.cgi?devid=local_printer&timeout=60000';
+                    const epos    = new epson.ePOSPrint(address);
+                    const builder = new epson.ePOSBuilder();
 
-                            <hr style="width:100%; margin:4px 0 4px 0;">
+                    epos.onreceive = function (res) {
+                        if (!res.success) {
+                            console.error('Print failed:', res.code);
+                        }
+                    };
 
-                            <div style="width:100%; display:flex; flex-wrap: wrap; justify-content: space-between;">
-                            
-                                <p style="width:50%; text-align:left; margin-bottom:0px; margin-top:0; line-height:1;"><strong>Summe: </strong></p>
-                                <p style="width:50%; text-align:RIGHT; margin-bottom:0px; margin-top:0; line-height:1;">`+totalToPay+` CHF</p>
+                    // HEADER
+                    builder.addTextAlign(builder.ALIGN_CENTER);
+                    builder.addTextSize(2, 2);
+                    builder.addText(resName + '\n');
+                    builder.addTextSize(1, 1);
+                    builder.addTextStyle(false, false, true, builder.COLOR_1);
+                    builder.addText('Zwischenrechnung\n');
+                    builder.addTextStyle(false, false, false, builder.COLOR_1);
+                    builder.addText('================================================\n');
 
-                            </div>
-                            <p style="color:white; width:100%;">-</p>
-                            <p style="color:white; width:100%;">-</p>
-                        </body>
-                        </html>
-                    `);
-                
-                                printWindow.document.close();
-                                printWindow.print();
-                },error: (error) => { console.log(error); }
-			});
-          // printWindow.window.close();
+                    // TABLE + TIME
+                    builder.addTextAlign(builder.ALIGN_LEFT);
+                    const left  = tableNrShow;
+                    const right = timePrint;
+                    const line  = left + ' '.repeat(Math.max(0, 48 - left.length - right.length)) + right;
+                    builder.addText(line + '\n');
+                    builder.addText('================================================\n');
+
+                    // COLUMN HEADERS
+                    builder.addTextStyle(false, false, true, builder.COLOR_1);
+                    builder.addText('Produkt'.padEnd(38) + 'Preis\n');
+                    builder.addTextStyle(false, false, false, builder.COLOR_1);
+                    builder.addText('------------------------------------------------\n');
+
+                    // ITEMS
+                    // Backend already combines qty into label ("2x ProductName"), price is the line total
+                    items.forEach(function (item) {
+                        const maxLen   = 36;
+                        let   label    = item.label;
+                        const price    = item.price.padStart(10);
+                        const lines    = [];
+
+                        while (label.length > maxLen) {
+                            lines.push(label.substring(0, maxLen));
+                            label = label.substring(maxLen);
+                        }
+                        lines.push(label);
+
+                        // first line: name + price right-aligned (38 + 10 = 48)
+                        builder.addText(lines[0].padEnd(38) + price + '\n');
+                        for (let n = 1; n < lines.length; n++) {
+                            builder.addText('  ' + lines[n] + '\n');
+                        }
+                    });
+
+                    builder.addText('================================================\n');
+
+                    // TOTAL
+                    builder.addTextStyle(false, false, true, builder.COLOR_1);
+                    const totalLabel = 'Summe:';
+                    const totalValue = totalToPay + ' CHF';
+                    const totalLine  = totalLabel + ' '.repeat(Math.max(0, 48 - totalLabel.length - totalValue.length)) + totalValue;
+                    builder.addText(totalLine + '\n');
+                    builder.addTextStyle(false, false, false, builder.COLOR_1);
+
+                    // FOOTER
+                    builder.addFeedLine(4);
+                    builder.addCut(builder.CUT_FEED);
+
+                    epos.send(builder.toString());
+                },
+                error: (error) => { console.log(error); }
+            });
         }
 
         // function printActiveOrdersOnTable(tableNrSend) {
@@ -1018,6 +1174,11 @@
 
                             $('#closeOrSelected'+tNr).val('0');
                         // -------------------------------------------------------------
+
+                        // Print one slip per cook
+                        $.each(respo, function (cookId, cookData) {
+                            printCookSlip(cookData, tNr, 'Abgerufen');
+                        });
                     },
 					error: (error) => { console.log(error); }
 				});
@@ -1053,6 +1214,10 @@
                     
                     $('body').addClass('modal-open');
                     $('#closeOrSelected'+tNr).val('0');
+
+                    $.each(respo, function (cookId, cookData) {
+                        printCookSlip(cookData, tNr, 'Abgerufen');
+                    });
 				},
 				error: (error) => { console.log(error); }
 			});

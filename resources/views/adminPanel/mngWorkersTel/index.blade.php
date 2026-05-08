@@ -69,6 +69,25 @@ use Illuminate\Support\Facades\Auth;
 </style>
 
 <div class="p-2 pb-5">
+    <div class="d-flex flex-column" style="max-width: 260px;">
+        <label class="form-label mb-1" style="font-size: 13px;">Admin Epson IP-Adresse</label>
+        <div class="input-group">
+            <input type="text" 
+                class="form-control shadow-none epsonIpAddressInput{{ auth()->user()->id }}" 
+                placeholder="IP-Adresse" 
+                value="{{ auth()->user()->epsonPrinterIp }}">
+            <button class="btn btn-danger" type="button" onclick="deleteEpsonIpAddress({{ auth()->user()->id }})">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+            <button class="btn btn-info" type="button" onclick="saveEpsonIpAddress({{ auth()->user()->id }})">
+                <i class="fa-solid fa-check"></i>
+            </button>
+        </div>
+        <div style="display:none" class="alert alert-success mt-1 py-1 successNotifUser{{ auth()->user()->id }}" role="alert"></div>
+        <div style="display:none" class="alert alert-danger mt-1 py-1 errorNotifUser{{ auth()->user()->id }}" role="alert"></div>
+    </div>
+    <hr>
+
     <div class="d-flex flex-wrap flex-wrap justify-content-between" id="orderServingDiv">
         <h4 style="color:rgb(39,190,175); width:100%;"><strong>Kontrollieren Sie Ihre Arbeiter</strong></h4>
         <button style="width:100%;" class="btn btn-dark mt-1 shadow-none" data-toggle="modal" data-target="#addWorker"><strong>Fügen Sie einen Arbeiter hinzu</strong></button>
@@ -109,6 +128,20 @@ use Illuminate\Support\Facades\Auth;
                 <button class="btn btn-outline-dark btn-block shadow-none" onclick="changePassForWoPrep('{{$user->id}}','{{$user->name}}')" data-toggle="modal" data-target="#changePassForWoModal">
                     <strong><i class="fa-solid fa-lock"></i> Änder_Passwort</strong>
                 </button>
+
+                <div class="input-group mt-1">
+                    <input type="text" class="form-control epsonIpAddressInput{{$user->id}}" placeholder="IP address" value="{{ $user->epsonPrinterIp }}">
+                </div>
+                <div class="d-flex justify-content-center align-items-center gap-1 mt-1">
+                    <button class="btn btn-danger w-50" type="button" onclick="deleteEpsonIpAddress({{$user->id}})">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    <button class="btn btn-info w-50" type="button" onclick="saveEpsonIpAddress({{$user->id}})">
+                        <i class="fa-solid fa-check"></i>
+                    </button>
+                </div>
+               <div style="display:none" class="alert alert-success mt-1 successNotifUser{{$user->id}}" role="alert"></div>
+                <div style="display:none" class="alert alert-danger mt-1 errorNotifUser{{$user->id}}" role="alert"></div>
             </div>
 
             <!-- delete worker Modal -->
@@ -215,6 +248,20 @@ use Illuminate\Support\Facades\Auth;
                         </button>
                     @endif
                 </div>
+
+                <div class="input-group mt-1">
+                    <input type="text" class="form-control epsonIpAddressInput{{$user->id}}" placeholder="IP address" value="{{ $user->epsonPrinterIp }}">
+                </div>
+                <div class="d-flex justify-content-center align-items-center gap-1 mt-1">
+                    <button class="btn btn-danger w-50" type="button" onclick="deleteEpsonIpAddress({{$user->id}})">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                    <button class="btn btn-info w-50" type="button" onclick="saveEpsonIpAddress({{$user->id}})">
+                        <i class="fa-solid fa-check"></i>
+                    </button>
+                </div>
+               <div style="display:none" class="alert alert-success mt-1 successNotifUser{{$user->id}}" role="alert"></div>
+                <div style="display:none" class="alert alert-danger mt-1 errorNotifUser{{$user->id}}" role="alert"></div>
 
                 <button class="btn btn-outline-dark btn-block shadow-none mt-1" onclick="changePassForWoPrep('{{$user->id}}','{{$user->name}}')" data-toggle="modal" data-target="#changePassForWoModal">
                     <strong><i class="fa-solid fa-lock"></i> Änder_Passwort</strong>

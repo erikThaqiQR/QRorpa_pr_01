@@ -30,6 +30,7 @@ use App\tabVerificationPNumbers;
 use App\Events\removePaidProduct;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cookie;
+use App\Http\Controllers\AdminPanelController;
 
 class CartController extends Controller
 {
@@ -1253,6 +1254,8 @@ class CartController extends Controller
             ];
             $oneCook->notify(new \App\Notifications\NewOrderNotification($details));
         }
+
+        return AdminPanelController::printConfirmedOrderForCooks($tOrder);
     }
 
 

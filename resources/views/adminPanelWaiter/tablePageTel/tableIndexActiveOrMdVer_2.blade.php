@@ -53,7 +53,7 @@ use App\waiterActivityLog;
                         <span style="font-size:26px; width: fit-content; " class="pl-2"><strong> <span id="tabOrderTotPriceDiv{{$tabelOne->tableNr}}Value">0.00</span></strong></span>
                     @endif
                     <span style="font-size:30px; width:fit-content;" class="pl-1 pr-1"><strong>|</strong></span>
-                    <button style="width: 8%; margin:0px; padding:0px;" type="button" class="btn shadow-none" onclick="printActiveOrdersOnTable('{{$tabelOne->tableNr}}')">
+                    <button style="width: 8%; margin:0px; padding:0px;" type="button" class="btn shadow-none" onclick="printActiveOrdersOnTable('{{$tabelOne->tableNr}}', '{{ auth()->user()->epsonPrinterIp }}')">
                         <i class="pt-2 fa-2x fa-solid fa-receipt"></i>
                     </button>
                     <span style="font-size:30px; width:fit-content;" class="pl-1 pr-1"><strong>|</strong></span>
