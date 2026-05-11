@@ -5624,6 +5624,7 @@ EPD
             foreach($orderedProducts as $product){
                 $explodedProduct = explode('-8-', $product);
 
+                $productType = null;
                 if($explodedProduct[5] != 'empty'){
                     $productType = LlojetPro::where('emri', $explodedProduct[5])
                         ->first();
@@ -5639,14 +5640,16 @@ EPD
                             "productId" => $explodedProduct[7],
                             "quantity" => $explodedProduct[3] ? $mappedOrderedProducts[$groupBy]['quantity'] + $explodedProduct[3] : ++$mappedOrderedProducts[$groupBy]['quantity'],
                             "price" => $mappedOrderedProducts[$groupBy]['price'] + $explodedProduct[4],
-                            "name" => $explodedProduct[0]
+                            "name" => $explodedProduct[0],
+                            "type" => $productType ? $productType->emri : null,
                         ];
                     } else {
                         $mappedOrderedProducts[$groupBy] = [
                             "productId" => $explodedProduct[7],
                             "quantity" => $explodedProduct[3] ?? 1,
                             "price" => $explodedProduct[4],
-                            "name" => $explodedProduct[0]
+                            "name" => $explodedProduct[0],
+                            "type" => $productType ? $productType->emri : null,
                         ];
                     }
                 }
@@ -5655,7 +5658,9 @@ EPD
             $theOrder = '<p style="width:100%; text-align:left; font-size:0.9rem; display:flex; flex-wrap: wrap; justify-content: space-between;">';
             foreach($mappedOrderedProducts as $product){
                 $theOrder .= '<span style="width:80%;">'.$product['quantity'].'x '.$product['name'].' ';
-
+                if (!empty($product['type'])) {
+                    $theOrder .= ' ('.$product['type'].')';
+                }
                 $theOrder .= ' </span>';
                 $theOrder .= ' <span style="width:20%; text-align:right;">'.number_format($product['price'], 2, '.', '');
                 $theOrder .= ' </span><br>';
@@ -5851,6 +5856,7 @@ EPD
             $tabOrders = $tabOrders->get();
 
             foreach($tabOrders as $produkti){ 
+                $productType = null;
                 if($produkti->OrderType != 'empty'){
                     $splittedType = explode('||', $produkti->OrderType);
                     $productType = LlojetPro::where('toRes', $produkti->toRes)
@@ -5866,14 +5872,16 @@ EPD
                         "productId" => $produkti->prodId,
                         "quantity" => $produkti->OrderSasia ? $grTabOrdersByProdId[$groupBy]['quantity'] + $produkti->OrderSasia : ++$grTabOrdersByProdId[$groupBy]['quantity'],
                         "price" => $grTabOrdersByProdId[$groupBy]['price'] + $produkti->OrderQmimi,
-                        "name" => $produkti->OrderEmri
+                        "name" => $produkti->OrderEmri,
+                        "type" => $productType ? $productType->emri : null,
                     ];
                 }else{
                     $grTabOrdersByProdId[$groupBy] = [
                         "productId" => $produkti->prodId,
                         "quantity" => $produkti->OrderSasia ?? 1,
                         "price" => $produkti->OrderQmimi,
-                        "name" => $produkti->OrderEmri
+                        "name" => $produkti->OrderEmri,
+                        "type" => $productType ? $productType->emri : null,
                     ];
                 }
             }
@@ -5881,7 +5889,9 @@ EPD
             $theProdsShow = '<p style="width:100%; text-align:left; font-size:0.9rem; display:flex; flex-wrap: wrap; justify-content: space-between;">';
             foreach($grTabOrdersByProdId as $produkti){  
                 $theProdsShow .= '<span style="width:80%;">'.$produkti['quantity'].'x '.$produkti['name'].' ';
-
+                if (!empty($produkti['type'])) {
+                    $theProdsShow .= ' ('.$produkti['type'].')';
+                }
                 $theProdsShow .= ' </span>';
                 $theProdsShow .= ' <span style="width:20%; text-align:right;">'.number_format($produkti['price'], 2, '.', '');
                 $theProdsShow .= ' </span><br>';
