@@ -4667,6 +4667,7 @@ EPD
             foreach($allTabOrders as $tabOrder){
                 $product = Produktet::find($tabOrder->prodId);
 
+                $plateName = resPlates::find($tabOrder->toPlate)->nameTitle;
 
                 $extraNames = null;
                 $typeName = null;
@@ -4689,24 +4690,26 @@ EPD
                         ->get();
 
                     if($cookAccessExtra && $cookAccessExtra->contains('contentId', $extraModel->id)){
-                        $grouppedOrder[] = [
+                        $grouppedOrder[$tabOrder->toPlate][] = [
                             "productName" => $product->emri,
-                            "quantity" => 1,
+                            "quantity" => $tabOrder->OrderSasia,
                             "price" => $product->qmimi,
                             "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
                             "extras" => $extraNames,
-                            "type" => $typeName ?? null
+                            "type" => $typeName ?? null,
+                            "plateName" => $plateName
                         ];
 
                         continue;
                     } else if(!$cookAccessExtra) {
-                        $grouppedOrder[] = [
+                        $grouppedOrder[$tabOrder->toPlate][] = [
                             "productName" => $product->emri,
-                            "quantity" => 1,
+                            "quantity" => $tabOrder->OrderSasia,
                             "price" => $product->qmimi,
                             "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
                             "extras" => $extraNames,
-                            "type" => $typeName ?? null
+                            "type" => $typeName ?? null,
+                            "plateName" => $plateName
                         ];
                         continue;
                     }
@@ -4727,24 +4730,26 @@ EPD
                         ->get();
 
                     if($cookAccessType && $cookAccessType->contains('contentId', $typesModel->id)){
-                        $grouppedOrder[] = [
+                        $grouppedOrder[$tabOrder->toPlate][] = [
                             "productName" => $product->emri,
-                            "quantity" => 1,
+                            "quantity" => $tabOrder->OrderSasia,
                             "price" => $product->qmimi,
                             "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
                             "extras" => isset($extraNames) ? $extraNames : null,
-                            "type" => $typeName ?? null
+                            "type" => $typeName ?? null,
+                            "plateName" => $plateName
                         ];
 
                         continue;
                     } else if(!$cookAccessType) {
-                        $grouppedOrder[] = [
+                        $grouppedOrder[$tabOrder->toPlate][] = [
                             "productName" => $product->emri,
-                            "quantity" => 1,
+                            "quantity" => $tabOrder->OrderSasia,
                             "price" => $product->qmimi,
                             "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
                             "extras" => isset($extraNames) ? $extraNames : null,
-                            "type" => $typeName ?? null
+                            "type" => $typeName ?? null,
+                            "plateName" => $plateName
                         ];
 
                         continue;
@@ -4758,13 +4763,14 @@ EPD
                         ->first();
 
                 if($cookAccessCategory){
-                    $grouppedOrder[] = [
+                    $grouppedOrder[$tabOrder->toPlate][] = [
                             "productName" => $product->emri,
-                            "quantity" => 1,
+                            "quantity" => $tabOrder->OrderSasia,
                             "price" => $product->qmimi,
                             "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
                             "extras" => isset($extraNames) ? $extraNames : null,
-                            "type" => $typeName ?? null
+                            "type" => $typeName ?? null,
+                            "plateName" => $plateName
                         ];
 
                     continue;
@@ -4775,13 +4781,14 @@ EPD
                         ->get();
 
                     if($cookAccessProduct && $cookAccessProduct->contains('contentId', $product->id)){
-                        $grouppedOrder[] = [
+                         $grouppedOrder[$tabOrder->toPlate][] = [
                             "productName" => $product->emri,
-                            "quantity" => 1,
+                            "quantity" => $tabOrder->OrderSasia,
                             "price" => $product->qmimi,
                             "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
                             "extras" => isset($extraNames) ? $extraNames : null,
-                            "type" => $typeName ?? null
+                            "type" => $typeName ?? null,
+                            "plateName" => $plateName
                         ];
 
                         continue;
@@ -5623,20 +5630,29 @@ EPD
             $mappedOrderedProducts = [];
             foreach($orderedProducts as $product){
                 $explodedProduct = explode('-8-', $product);
+
+                $productType = null;
+                if($explodedProduct[5] != 'empty'){
+                    $productType = LlojetPro::where('emri', $explodedProduct[5])->first();
+                    $groupBy = $explodedProduct[7] . '_' . $productType->id;
+                } else { $groupBy = $explodedProduct[7]; }
+
                 if(number_format($explodedProduct[4], 2, '.', '') > 0){
-                    if(isset($mappedOrderedProducts[$explodedProduct[7]])){
-                        $mappedOrderedProducts[$explodedProduct[7]] = [
+                    if(isset($mappedOrderedProducts[$groupBy])){
+                        $mappedOrderedProducts[$groupBy] = [
                             "productId" => $explodedProduct[7],
-                            "quantity" => $explodedProduct[3] ? $mappedOrderedProducts[$explodedProduct[7]]['quantity'] + $explodedProduct[3] : ++$mappedOrderedProducts[$explodedProduct[7]]['quantity'],
-                            "price" => $mappedOrderedProducts[$explodedProduct[7]]['price'] + $explodedProduct[4],
-                            "name" => $explodedProduct[0]
+                            "quantity" => $explodedProduct[3] ? $mappedOrderedProducts[$groupBy]['quantity'] + $explodedProduct[3] : ++$mappedOrderedProducts[$groupBy]['quantity'],
+                            "price" => $mappedOrderedProducts[$groupBy]['price'] + $explodedProduct[4],
+                            "name" => $explodedProduct[0],
+                            "type" => $productType ? $productType->emri : null,
                         ];
                     } else {
-                        $mappedOrderedProducts[$explodedProduct[7]] = [
+                        $mappedOrderedProducts[$groupBy] = [
                             "productId" => $explodedProduct[7],
                             "quantity" => $explodedProduct[3] ?? 1,
                             "price" => $explodedProduct[4],
-                            "name" => $explodedProduct[0]
+                            "name" => $explodedProduct[0],
+                            "type" => $productType ? $productType->emri : null,
                         ];
                     }
                 }
@@ -5645,6 +5661,10 @@ EPD
             $theOrder = '<p style="width:100%; text-align:left; font-size:0.9rem; display:flex; flex-wrap: wrap; justify-content: space-between;">';
             foreach($mappedOrderedProducts as $product){
                 $theOrder .= '<span style="width:80%;">'.$product['quantity'].'x '.$product['name'].' ';
+
+                if (!empty($product['type'])) {
+                    $theOrder .= '<strong>('.$product['type'].')</strong>';
+                }
 
                 $theOrder .= ' </span>';
                 $theOrder .= ' <span style="width:20%; text-align:right;">'.number_format($product['price'], 2, '.', '');
@@ -5840,20 +5860,33 @@ EPD
 
             $tabOrders = $tabOrders->get();
 
-            foreach($tabOrders as $produkti){  
-                if(isset($grTabOrdersByProdId[$produkti->prodId])){
-                    $grTabOrdersByProdId[$produkti->prodId] = [
+            foreach($tabOrders as $produkti){ 
+                $productType = null;
+                if($produkti->OrderType != 'empty'){
+                    $splittedType = explode('||', $produkti->OrderType);
+                    $productType = LlojetPro::where('toRes', $produkti->toRes)
+                        ->where('emri', $splittedType[0])
+                        ->where('vlera', $splittedType[1])
+                        ->first();
+                    $groupBy = $produkti->prodId . '_' . $productType->id;
+                } else {
+                    $groupBy = $produkti->prodId;
+                }
+                if(isset($grTabOrdersByProdId[$groupBy])){
+                    $grTabOrdersByProdId[$groupBy] = [
                         "productId" => $produkti->prodId,
-                        "quantity" => $produkti->OrderSasia ? $grTabOrdersByProdId[$produkti->prodId]['quantity'] + $produkti->OrderSasia : ++$grTabOrdersByProdId[$produkti->prodId]['quantity'],
-                        "price" => $grTabOrdersByProdId[$produkti->prodId]['price'] + $produkti->OrderQmimi,
-                        "name" => $produkti->OrderEmri
+                        "quantity" => $produkti->OrderSasia ? $grTabOrdersByProdId[$groupBy]['quantity'] + $produkti->OrderSasia : ++$grTabOrdersByProdId[$groupBy]['quantity'],
+                        "price" => $grTabOrdersByProdId[$groupBy]['price'] + $produkti->OrderQmimi,
+                        "name" => $produkti->OrderEmri,
+                        "type" => $productType ? $productType->emri : null,
                     ];
                 }else{
-                    $grTabOrdersByProdId[$produkti->prodId] = [
+                    $grTabOrdersByProdId[$groupBy] = [
                         "productId" => $produkti->prodId,
                         "quantity" => $produkti->OrderSasia ?? 1,
                         "price" => $produkti->OrderQmimi,
-                        "name" => $produkti->OrderEmri
+                        "name" => $produkti->OrderEmri,
+                        "type" => $productType ? $productType->emri : null,
                     ];
                 }
             }
@@ -5861,6 +5894,9 @@ EPD
             $theProdsShow = '<p style="width:100%; text-align:left; font-size:0.9rem; display:flex; flex-wrap: wrap; justify-content: space-between;">';
             foreach($grTabOrdersByProdId as $produkti){  
                 $theProdsShow .= '<span style="width:80%;">'.$produkti['quantity'].'x '.$produkti['name'].' ';
+                if (!empty($produkti['type'])) {
+                    $theProdsShow .= '<strong>('.$produkti['type'].')</strong>';
+                }
 
                 $theProdsShow .= ' </span>';
                 $theProdsShow .= ' <span style="width:20%; text-align:right;">'.number_format($produkti['price'], 2, '.', '');

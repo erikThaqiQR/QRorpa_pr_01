@@ -536,7 +536,7 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:1%;">
 
 
 
-@foreach(Takeaway::where('toRes', '=', Auth::user()->sFor)->get() as $prod)
+@foreach(Takeaway::where('toRes', Auth::user()->sFor)->get() as $prod)
     <div class="modal modalProd" id="ProdNewTATemp{{$prod->id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="false" 
             style="background-color: rgba(0, 0, 0, 0.5); padding-top:1%;">
         <div class="modal-dialog modal-md">
@@ -550,7 +550,7 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:1%;">
                             }else{ $starterPrice = sprintf('%01.2f', $prod->qmimi); }
                         }else{ $starterPrice = sprintf('%01.2f', $prod->qmimi); }
 
-                        $plateNr = kategori::find($prod->kategoria)->forPlate;
+                        $plateNr = kategori::findOrFail($prod->kategoria)->forPlate;
                         if($plateNr != NULL){
                             $plateData = resPlates::where([['toRes',$prod->toRes],['desc2C',$plateNr]])->first();
                         }
