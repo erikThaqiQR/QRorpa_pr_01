@@ -440,7 +440,7 @@ use App\waiterActivityLog;
 @endforeach
 
 <div class="modal" id="selectToPayProds2UpSasi" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="false" 
-style="background-color: rgba(0, 0, 0, 0.5); padding-top:20%;">
+style="background-color: rgba(0, 0, 0, 0.5); padding-top:20%; z-index: 1060 !important;">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-body d-flex flex-wrap justify-content-between">
