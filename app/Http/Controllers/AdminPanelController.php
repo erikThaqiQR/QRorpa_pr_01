@@ -4667,6 +4667,7 @@ EPD
             foreach($allTabOrders as $tabOrder){
                 $product = Produktet::find($tabOrder->prodId);
 
+                $plateName = resPlates::find($tabOrder->toPlate)->nameTitle;
 
                 $extraNames = null;
                 $typeName = null;
@@ -4689,24 +4690,26 @@ EPD
                         ->get();
 
                     if($cookAccessExtra && $cookAccessExtra->contains('contentId', $extraModel->id)){
-                        $grouppedOrder[] = [
+                        $grouppedOrder[$tabOrder->toPlate][] = [
                             "productName" => $product->emri,
-                            "quantity" => 1,
+                            "quantity" => $tabOrder->OrderSasia,
                             "price" => $product->qmimi,
                             "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
                             "extras" => $extraNames,
-                            "type" => $typeName ?? null
+                            "type" => $typeName ?? null,
+                            "plateName" => $plateName
                         ];
 
                         continue;
                     } else if(!$cookAccessExtra) {
-                        $grouppedOrder[] = [
+                        $grouppedOrder[$tabOrder->toPlate][] = [
                             "productName" => $product->emri,
-                            "quantity" => 1,
+                            "quantity" => $tabOrder->OrderSasia,
                             "price" => $product->qmimi,
                             "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
                             "extras" => $extraNames,
-                            "type" => $typeName ?? null
+                            "type" => $typeName ?? null,
+                            "plateName" => $plateName
                         ];
                         continue;
                     }
@@ -4727,24 +4730,26 @@ EPD
                         ->get();
 
                     if($cookAccessType && $cookAccessType->contains('contentId', $typesModel->id)){
-                        $grouppedOrder[] = [
+                        $grouppedOrder[$tabOrder->toPlate][] = [
                             "productName" => $product->emri,
-                            "quantity" => 1,
+                            "quantity" => $tabOrder->OrderSasia,
                             "price" => $product->qmimi,
                             "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
                             "extras" => isset($extraNames) ? $extraNames : null,
-                            "type" => $typeName ?? null
+                            "type" => $typeName ?? null,
+                            "plateName" => $plateName
                         ];
 
                         continue;
                     } else if(!$cookAccessType) {
-                        $grouppedOrder[] = [
+                        $grouppedOrder[$tabOrder->toPlate][] = [
                             "productName" => $product->emri,
-                            "quantity" => 1,
+                            "quantity" => $tabOrder->OrderSasia,
                             "price" => $product->qmimi,
                             "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
                             "extras" => isset($extraNames) ? $extraNames : null,
-                            "type" => $typeName ?? null
+                            "type" => $typeName ?? null,
+                            "plateName" => $plateName
                         ];
 
                         continue;
@@ -4758,13 +4763,14 @@ EPD
                         ->first();
 
                 if($cookAccessCategory){
-                    $grouppedOrder[] = [
+                    $grouppedOrder[$tabOrder->toPlate][] = [
                             "productName" => $product->emri,
-                            "quantity" => 1,
+                            "quantity" => $tabOrder->OrderSasia,
                             "price" => $product->qmimi,
                             "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
                             "extras" => isset($extraNames) ? $extraNames : null,
-                            "type" => $typeName ?? null
+                            "type" => $typeName ?? null,
+                            "plateName" => $plateName
                         ];
 
                     continue;
@@ -4775,13 +4781,14 @@ EPD
                         ->get();
 
                     if($cookAccessProduct && $cookAccessProduct->contains('contentId', $product->id)){
-                        $grouppedOrder[] = [
+                        $grouppedOrder[$tabOrder->toPlate][] = [
                             "productName" => $product->emri,
-                            "quantity" => 1,
+                            "quantity" => $tabOrder->OrderSasia,
                             "price" => $product->qmimi,
                             "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
                             "extras" => isset($extraNames) ? $extraNames : null,
-                            "type" => $typeName ?? null
+                            "type" => $typeName ?? null,
+                            "plateName" => $plateName
                         ];
 
                         continue;

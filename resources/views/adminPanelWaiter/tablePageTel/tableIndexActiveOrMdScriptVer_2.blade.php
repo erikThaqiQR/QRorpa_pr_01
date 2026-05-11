@@ -172,44 +172,49 @@
         // ─────────────────────────
         builder.addTextSize(1, 1);
 
-        // Ensure orders is a proper array
-        var orderArray = Array.isArray(orders) ? orders : Object.values(orders);
+        var plateEntries = Object.entries(orders);
+        plateEntries.forEach(function([plateId, plateItems], plateIndex) {
+            if (!plateItems || !plateItems.length) return;
 
-        $.each(orderArray, function (i, item) {
-            if (!item || typeof item !== 'object') return;
+            // Plate name header (grab from first item)
+            var plateName = plateItems[0].plateName || ('Plate ' + plateId);
+            builder.addTextStyle(false, false, true);
+            builder.addTextSize(1, 2);
+            builder.addText(plateName + '\n');
+            builder.addTextSize(1, 1);
+            builder.addTextStyle(false, false, false);
 
-            var name = String(item.productName || 'Unknown');
-            var qty  = Number(item.quantity || 0);
+            plateItems.forEach(function(item, i) {
+                if (!item || typeof item !== 'object') return;
 
-            if(item.type){
-                var line = qty + "x " + name + `(${item.type})`;
-            } else {
-                var line = qty + "x " + name;
-            }
+                var name = String(item.productName || 'Unknown');
+                var qty  = Number(item.quantity || 0);
+                var line = '    ' + qty + 'x ' + name + (item.type ? ' (' + item.type + ')' : '');
 
-            if (qty > 1) {
-                builder.addTextStyle(false, false, true);
-            } else {
-                builder.addTextStyle(false, false, false);
-            }
+                if (qty > 1) {
+                    builder.addTextStyle(false, false, true);
+                } else {
+                    builder.addTextStyle(false, false, false);
+                }
+                builder.addText(line + '\n');
 
-            builder.addText(line + "\n");
+                builder.addTextFont(builder.FONT_B);
+                if (item.extras) {
+                    builder.addText('        + Extra: ' + item.extras + '\n');
+                }
+                if (item.comment) {
+                    builder.addText('        + ' + item.comment + '\n');
+                }
+                builder.addTextFont(builder.FONT_A);
+                // Separator between products
+                if (i < plateItems.length - 1) {
+                    builder.addText('------------------------------------------------\n');
+                }
+            });
 
-            builder.addTextFont(builder.FONT_B);
-            if(item.extras){
-                builder.addText(`    + Extra: ${item.extras}\n`);
-            }
-            if(item.comment){
-                builder.addText(`    + ${item.comment}\n`);
-            }
-
-            builder.addTextFont(builder.FONT_A);
-            if(i < orderArray.length - 1){
-                builder.addText('------------------------------------------------\n');
-            }
+            builder.addText('================================================\n');
         });
 
-        builder.addText('------------------------------------------------\n');
 
         // ─────────────────────────
         // FOOTER
