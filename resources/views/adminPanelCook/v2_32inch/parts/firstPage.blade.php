@@ -1578,9 +1578,9 @@
         builder.addTextSize(1, 1);
         builder.addText('================================================\n');
 
-        builder.addTextSize(1, 1);
-
+        
         orders.forEach(function(item, i) {
+            builder.addTextSize(1, 2);
             if (!item || typeof item !== 'object') return;
 
             var name = String(item.productName || 'Unknown');
@@ -1598,7 +1598,7 @@
                 builder.addText('        + ' + item.comment + '\n');
             }
             builder.addTextFont(builder.FONT_A);
-
+            builder.addTextSize(1, 1);
             if (i < orders.length - 1) {
                 builder.addText('------------------------------------------------\n');
             }
