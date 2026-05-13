@@ -559,6 +559,7 @@
                 _token: '{{csrf_token()}}'
             },
             success: (respo) => {
+                respo = respo[0];
                 $("#prodOneT"+tOrId).css('background-color','rgba(4,178,89,255)');
 
                 var addSas = parseInt($('#nrDoneT'+tabNr+'P'+plNr).html());

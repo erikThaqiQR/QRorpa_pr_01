@@ -97,6 +97,8 @@
     Route::post('chnGNrBlocksShownCPV232INCH', 'adminMngWorkersController@chnGNrBlocksShownCPV232INCH')->name('cookPnl.chnGNrBlocksShownCPV232INCH');
 
     Route::post('changePlateColorCook', 'adminMngWorkersController@changePlateColorCook')->name('cookPnl.changePlateColorCook');
+
+    Route::post('updatePrintingSettings', 'adminMngWorkersController@updatePrintingSettings')->name('cookPnl.updatePrintingSettings');
     
     //---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     

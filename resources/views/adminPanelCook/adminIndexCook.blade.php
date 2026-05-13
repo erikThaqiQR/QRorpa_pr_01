@@ -65,6 +65,8 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
         <script src="https://cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"></script>
 
+        <script src="{{ asset('js/epos-2.27.0.js') }}"></script>
+
         <style>
         .optionsAnchorPh{
             color:black;

@@ -4781,7 +4781,7 @@ EPD
                         ->get();
 
                     if($cookAccessProduct && $cookAccessProduct->contains('contentId', $product->id)){
-                         $grouppedOrder[$tabOrder->toPlate][] = [
+                        $grouppedOrder[$tabOrder->toPlate][] = [
                             "productName" => $product->emri,
                             "quantity" => $tabOrder->OrderSasia,
                             "price" => $product->qmimi,

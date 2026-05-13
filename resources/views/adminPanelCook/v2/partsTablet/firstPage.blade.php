@@ -574,7 +574,7 @@
                 _token: '{{csrf_token()}}'
             },
             success: (respo) => {
-                respo = $.trim(respo);
+                respo = $.trim(respo[0]);
                 respo2D = respo.split('|||');
                 $("#prodOneT"+tOrId).fadeOut(800, function(){ $(this).remove();});
 

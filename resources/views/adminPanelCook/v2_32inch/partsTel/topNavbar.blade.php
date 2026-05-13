@@ -234,7 +234,9 @@ use App\resPlates;
         <strong>Delivery</strong>
     </a>
     @endif
-
+    <button style="width:49%; background-color:white; color:rgb(39,190,175); font-size:1rem;" class="btn btn-default shadow-none mt-2" data-toggle="modal" data-target="#settingsModal">
+        <strong><i class="fa-solid fa-gear"></i></strong>
+    </button>
 </nav>
 
 
@@ -262,6 +264,48 @@ use App\resPlates;
                     <span aria-hidden="true"><i class="fa-solid fa-x"></i></span>
                 </button>
                 
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Settings Modal (config for cook epson printer ip address and print mode) -->
+<div class="modal" id="settingsModal" tabindex="-1" role="dialog" aria-labelledby="settingsModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="background-color: lightgray;">
+            <div class="modal-body d-flex flex-wrap">
+                <p style="font-size:1.5rem; width:100%; font-weight:bold; color:rgb(72,81,87);" class="text-center">Druckereinstellungen</p>
+
+                <label style="width:100%; font-weight:bold; color:rgb(72,81,87);">Drucker IP-Adresse</label>
+                <input 
+                    type="text" 
+                    id="printerIpAddress" 
+                    class="form-control mb-3 shadow-none" 
+                    placeholder="IP-Adresse"
+                    value="{{ Auth::user()->cookEpsonIpAddress ?? '' }}"
+                />
+
+                <label style="width:100%; font-weight:bold; color:rgb(72,81,87);">Druckmodus</label>
+                <select id="printerPrintMode" class="form-control mb-3 shadow-none">
+                    <option value="item" {{ Auth::user()->printMode === 'item' ? 'selected' : '' }}>Einzeln</option>
+                    <option value="table" {{ Auth::user()->printMode === 'table' ? 'selected' : '' }}>Tabelle</option>
+                </select>
+
+                <button class="btn btn-success shadow-none" style="width:100%; margin:5px 0px 5px 0px;" onclick="updatePrintingSettings()">
+                    <strong>Sparen</strong>
+                </button>
+
+                <div class="mt-1 alert alert-success text-center" style="font-weight: bold; display:none; width:100%;" id="printerSettingsSuccess">
+                    Einstellungen erfolgreich gespeichert!
+                </div>
+
+                <div class="mt-1 alert alert-danger text-center" style="font-weight: bold; display:none; width:100%;" id="printerSettingsError">
+                    Bitte füllen Sie alle Felder korrekt aus!
+                </div>
+
+                <button style="width:100%; color:rgb(72,81,87);" type="button" class="btn close shadow-none mt-5" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true"><i class="fa-solid fa-x"></i></span>
+                </button>
             </div>
         </div>
     </div>
@@ -355,5 +399,31 @@ use App\resPlates;
 
     function closeShowPlateColorSelectModal(){
         location.reload();  
+    }
+
+    function updatePrintingSettings() {
+        const ipAddress = $('#printerIpAddress').val().trim();
+        const printMode = $('#printerPrintMode').val();
+
+        $('#printerSettingsSuccess').hide();
+        $('#printerSettingsError').hide();
+
+        $.ajax({
+            url: "{{ route('cookPnl.updatePrintingSettings') }}",
+            type: "POST",
+            data: {
+                userId: '{{ Auth::user()->id }}',
+                ipAddress: ipAddress,
+                printMode: printMode,
+                _token: '{{ csrf_token() }}'
+            },
+            success: (response) => {
+                $('#printerSettingsSuccess').show();
+            },
+            error: (error) => {
+                $('#printerSettingsError').show();
+                console.log(error);
+            }
+        });
     }
 </script>
