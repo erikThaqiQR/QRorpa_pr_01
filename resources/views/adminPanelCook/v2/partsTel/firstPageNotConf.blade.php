@@ -536,6 +536,7 @@
                 _token: '{{csrf_token()}}'
             },
             success: (respo) => {
+                respo = respo[0];
                 $("#prodOneT"+tOrId).fadeOut(800, function(){ $(this).remove();});
 
                 var addSas = parseInt($('#nrDoneT'+tabNr+'P'+plNr).html());

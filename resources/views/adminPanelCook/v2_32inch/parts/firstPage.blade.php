@@ -1447,7 +1447,9 @@
                 _token: '{{csrf_token()}}'
             },
             success: (respo) => {
-                respo = $.trim(respo);
+                let cookData = respo[1];
+
+                respo = $.trim(respo[0]);
                 respo2D = respo.split('|||');
                 $("#prodOneT"+tOrId).fadeOut(100, function(){ $(this).remove();});
                 var addSas = parseInt($('#nrDoneT'+tabNr+'P'+plNr).html());
@@ -1492,6 +1494,19 @@
                 if(parseInt(respo2D[1]) == 0){
                     $('#plate'+plNr+'OnT'+tabNr).removeClass('cookDivGlowCalled');
                 }
+
+                if(cookData.printerIp){
+                    if (cookData.printMode === 'item') {
+                        var fullOrder = cookData.order;
+                        fullOrder.forEach(function(item) {
+                            cookData.order = [item];
+                            printCookSlip(cookData, tabNr, 'Bestellung ausgeben');
+                        });
+                    } else {
+                        printCookSlip(cookData, tabNr, 'Bestellung ausgeben');
+                    }
+                }
+               
             },
             error: (error) => { console.log(error); }
         });
@@ -1506,10 +1521,93 @@
                 tableNr: tNr,
                 _token: '{{csrf_token()}}'
             },
-            success: () => {
+            success: (response) => {
                 $(".allPlate"+tNr).css('background-color','rgba(4,178,89,255)');
-                $('#TableColumnCookTO'+tNr).fadeOut(300, function(){ $(this).remove();});
-            },error: (error) => { console.log(error); }
+                $('#TableColumnCookTO'+tNr).fadeOut(300, function(){ $(this).remove(); });
+
+                if(response.printerIp){
+                    if (response.printMode === 'item') {
+                        var fullOrder = response.order;
+                        fullOrder.forEach(function(item) {
+                            response.order = [item];
+                            printCookSlip(response, tNr, 'Bestellung ausgeben');
+                        });
+                    } else {
+                        printCookSlip(response, tNr, 'Bestellung ausgeben');
+                    }
+                }
+            },
+            error: (error) => { console.log(error); }
         });
+    }
+
+    function printCookSlip(cookData, tableNr, title) {
+        var printerIp = cookData.printerIp;
+        var cookName  = cookData.cookName;
+        var orders    = cookData.order;
+
+        var address = 'http://' + printerIp + '/cgi-bin/epos/service.cgi?devid=local_printer&timeout=60000';
+        var epos    = new epson.ePOSPrint(address);
+        var builder = new epson.ePOSBuilder();
+
+        epos.onreceive = function (res) {
+            console.log('Print result for ' + cookName + ': ' + res.success);
+        };
+
+        var tableNrShow = 'Tisch: ' + tableNr;
+        var now = new Date();
+        var timePrint = now.getHours().toString().padStart(2, '0') + ':'
+                    + now.getMinutes().toString().padStart(2, '0');
+
+        builder.addTextAlign(builder.ALIGN_CENTER);
+        builder.addTextSize(2, 2);
+        builder.addText(title + '\n');
+
+        builder.addTextSize(1, 1);
+        builder.addTextStyle(false, false, true);
+        builder.addText(cookName + '\n');
+        builder.addTextStyle(false, false, false);
+        builder.addText('================================================\n\n');
+
+        builder.addTextAlign(builder.ALIGN_LEFT);
+        var left  = tableNrShow;
+        var right = timePrint;
+        var line  = left + ' '.repeat(Math.max(0, 24 - left.length - right.length)) + right;
+        builder.addTextSize(2, 2);
+        builder.addText(line + '\n\n');
+        builder.addTextSize(1, 1);
+        builder.addText('================================================\n');
+
+        builder.addTextSize(1, 1);
+
+        orders.forEach(function(item, i) {
+            if (!item || typeof item !== 'object') return;
+
+            var name = String(item.productName || 'Unknown');
+            var qty  = Number(item.quantity || 0);
+            var itemLine = '    ' + qty + 'x ' + name + (item.type ? ' (' + item.type + ')' : '');
+
+            builder.addTextStyle(false, false, qty > 1);
+            builder.addText(itemLine + '\n');
+
+            builder.addTextFont(builder.FONT_B);
+            if (item.extras) {
+                builder.addText('        + Extra: ' + item.extras + '\n');
+            }
+            if (item.comment) {
+                builder.addText('        + ' + item.comment + '\n');
+            }
+            builder.addTextFont(builder.FONT_A);
+
+            if (i < orders.length - 1) {
+                builder.addText('------------------------------------------------\n');
+            }
+        });
+
+        builder.addText('================================================\n');
+        builder.addFeedLine(2);
+        builder.addCut(builder.CUT_FEED);
+
+        epos.send(builder.toString());
     }
 </script>

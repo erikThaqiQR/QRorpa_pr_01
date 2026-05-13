@@ -29,6 +29,7 @@ use App\orderServingDevicesAccess;
 use App\TableQrcode;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\Console\Helper\Table;
+use Illuminate\Support\Collection;
 
 class adminMngWorkersController extends Controller
 {
@@ -805,7 +806,7 @@ class adminMngWorkersController extends Controller
             }
         }
 
-        return $addVal.'|||'.$tabOrCalled;
+        return [$addVal.'|||'.$tabOrCalled, self::printCookedItems($to)];
 
     }
 
@@ -979,12 +980,49 @@ class adminMngWorkersController extends Controller
                 }
             }
         }
+        return self::printCookedItems($allTOrds);
     }
 
 
 
+    public function printCookedItems($tabOrders){
+        // Convert to collection
+        if(!($tabOrders instanceof Collection)) {
+            $tabOrders = collect([$tabOrders]);
+        }
 
+        $groupedOrder = [];
+        foreach($tabOrders as $tabOrder){
+            if($tabOrder->OrderType != 'empty'){
+                $type = explode('||', $tabOrder->OrderType);
+            }
 
+            $extraNames = null;
+            if($tabOrder->OrderExtra != 'empty'){
+                foreach(explode('--0--', $tabOrder->OrderExtra) as $item){
+                    $extraNames[] = explode('||', $item)[0];
+                }
+                $extraNames = implode(', ', $extraNames);
+            }
+
+            $groupedOrder[] = [
+                "productName" => $tabOrder->OrderEmri,
+                "quantity" => $tabOrder->OrderSasia,
+                "comment" => $tabOrder->OrderKomenti ? $tabOrder->OrderKomenti : null,
+                "type" => $type[0] ?? null,
+                "extras" => $extraNames ?? null
+            ];
+        }
+
+        $groupedOrder = [
+            "cookName" => Auth::user()->name,
+            "printerIp" => Auth::user()->cookEpsonIpAddress,
+            "printMode" => Auth::user()->printMode,
+            "order" => $groupedOrder
+        ];
+
+        return $groupedOrder;
+    }
 
 
 
@@ -1843,6 +1881,27 @@ class adminMngWorkersController extends Controller
 
         return response()->json([
             'message' => 'IP address deleted successfully'
+        ], 200);
+    }
+
+    public function updatePrintingSettings(Request $req){
+        $validated = $req->validate([
+            'ipAddress' => 'nullable|ipv4',
+            'userId' => 'required|exists:users,id',
+            'printMode' => 'nullable|in:item,table'
+        ]);
+
+        $ipAddress = $validated['ipAddress'];
+        $userId = $validated['userId'];
+        $printMode = $validated['printMode'];
+
+        $user = User::find($userId);
+        $user->cookEpsonIpAddress = $ipAddress ?? null;
+        $user->printMode = $printMode ?? 'item';
+        $user->save();
+
+        return response()->json([
+            'message' => 'Settings saved successfully'
         ], 200);
     }
 }

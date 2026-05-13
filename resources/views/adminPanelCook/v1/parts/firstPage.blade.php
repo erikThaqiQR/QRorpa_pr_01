@@ -460,6 +460,7 @@
                     _token: '{{csrf_token()}}'
                 },
                 success: (respo) => {
+                    respo = respo[0];
                     $("#productListingCookTO"+prodId).load(location.href+" #productListingCookTO"+prodId+">*","");
                     var statN = $('#prodDoneAll'+prodId).html();
                     var statN2D = statN.split(' ');
