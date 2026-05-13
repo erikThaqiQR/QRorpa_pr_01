@@ -22,6 +22,7 @@
                     time2D = time2D.split(':');
 
                     let isSelected = false;
+                    let selectedSasia = 0;
                     var allSel = $('#closeOrSelected'+value.tableNr).val();
                     var selBuild = '';
                     if(allSel.includes('||')){
@@ -29,12 +30,14 @@
                             allSelOne2D = allSelOne.split('-8-');
                             if(allSelOne2D[0] == value.id){ 
                                 isSelected = true;
+                                selectedSasia = allSel2D[1];
                             }
                         });
                     }else if((allSel.includes('-8-'))){
                         allSel2D = allSel.split('-8-');
                         if(allSel2D[0] == value.id){ 
                             isSelected = true;
+                            selectedSasia = allSel2D[1];
                         }
                     }
 
@@ -61,8 +64,13 @@
                     }
 
                     showNewOrder +=     '<p class="pl-1" style="width:60%; margin:0; padding-top:2px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; line-height:0.9;">'+
-                                            '<strong>'+
-                                            '<span id="tabOrderSasiaSpan'+value.id+'">'+value.OrderSasia+'</span>x'+value.OrderEmri+'';
+                                            '<strong>';
+
+                    if(parseInt(selectedSasia) == 0 || parseInt(selectedSasia) == parseInt(value.OrderSasia)){
+                    showNewOrder +=         '<span id="tabOrderSasiaSpan'+value.id+'">'+value.OrderSasia+'</span>x'+value.OrderEmri+'';
+                    }else{
+                    showNewOrder +=         '<span id="tabOrderSasiaSpan'+value.id+'">'+selectedSasia+'/'+value.OrderSasia+'</span>x'+value.OrderEmri+'';
+                    }
                     if (value.OrderType != 'empty' && value.OrderExtra != 'empty'){
                         const OrderType = value.OrderType;
                         const theTy2D = OrderType.split('||');
