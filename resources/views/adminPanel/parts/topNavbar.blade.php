@@ -18,7 +18,7 @@ use App\Produktet;
     $nowDate = date('Y-m-d');
 
     $ordersLi = Orders::where('Restaurant', '=', $thisRestaurantId)->where([['statusi', '=', 0],['nrTable','!=',500],['nrTable','!=',9000]])
-    ->whereDate('created_at', Carbon::today())->whereIn('nrTable',$myTablesWaiter)->get()->count();
+    ->whereDate('created_at', Carbon::today())->get()->count();
 
     $usrChkIn = checkInOutReg::where([['theStat',0],['userId',Auth::user()->id]])->first();
 ?>

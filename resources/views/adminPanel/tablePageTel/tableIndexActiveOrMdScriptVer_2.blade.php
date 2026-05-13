@@ -184,7 +184,7 @@
             builder.addTextStyle(false, false, true);
             builder.addTextSize(1, 2);
             builder.addText(plateName + '\n');
-            builder.addTextSize(1, 1);
+            builder.addTextSize(1, 2);
             builder.addTextStyle(false, false, false);
 
             plateItems.forEach(function(item, i) {

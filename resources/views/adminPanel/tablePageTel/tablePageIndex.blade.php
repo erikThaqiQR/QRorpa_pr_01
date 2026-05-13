@@ -1,6 +1,6 @@
 <?php
 use Illuminate\Support\Facades\Auth;
-if(Auth::user()->sFor == 45){
+if(in_array(Auth::user()->sFor, [38,39,45])){
     header("Location: ".route('dash.takeaway'));
     exit();
 }

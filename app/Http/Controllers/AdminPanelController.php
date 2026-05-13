@@ -5633,13 +5633,9 @@ EPD
 
                 $productType = null;
                 if($explodedProduct[5] != 'empty'){
-                    $productType = LlojetPro::where('emri', $explodedProduct[5])
-                        ->first();
-
+                    $productType = LlojetPro::where('emri', $explodedProduct[5])->first();
                     $groupBy = $explodedProduct[7] . '_' . $productType->id;
-                } else {
-                    $groupBy = $explodedProduct[7];
-                }
+                } else { $groupBy = $explodedProduct[7]; }
 
                 if(number_format($explodedProduct[4], 2, '.', '') > 0){
                     if(isset($mappedOrderedProducts[$groupBy])){
@@ -5665,9 +5661,11 @@ EPD
             $theOrder = '<p style="width:100%; text-align:left; font-size:0.9rem; display:flex; flex-wrap: wrap; justify-content: space-between;">';
             foreach($mappedOrderedProducts as $product){
                 $theOrder .= '<span style="width:80%;">'.$product['quantity'].'x '.$product['name'].' ';
+
                 if (!empty($product['type'])) {
-                    $theOrder .= ' ('.$product['type'].')';
+                    $theOrder .= '<strong>('.$product['type'].')</strong>';
                 }
+
                 $theOrder .= ' </span>';
                 $theOrder .= ' <span style="width:20%; text-align:right;">'.number_format($product['price'], 2, '.', '');
                 $theOrder .= ' </span><br>';
@@ -5897,8 +5895,9 @@ EPD
             foreach($grTabOrdersByProdId as $produkti){  
                 $theProdsShow .= '<span style="width:80%;">'.$produkti['quantity'].'x '.$produkti['name'].' ';
                 if (!empty($produkti['type'])) {
-                    $theProdsShow .= ' ('.$produkti['type'].')';
+                    $theProdsShow .= '<strong>('.$produkti['type'].')</strong>';
                 }
+
                 $theProdsShow .= ' </span>';
                 $theProdsShow .= ' <span style="width:20%; text-align:right;">'.number_format($produkti['price'], 2, '.', '');
                 $theProdsShow .= ' </span><br>';

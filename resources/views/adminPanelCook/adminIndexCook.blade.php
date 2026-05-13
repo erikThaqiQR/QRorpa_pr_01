@@ -159,6 +159,7 @@
                     @else
                     @include('adminPanelCook.v2_32inch.parts.topNavbar')
                     @endif
+                    
                     @include('adminPanelCook.v2_32inch.parts.njoftimetCook')
                     <div id="contentCook">
                         @if(Request::is('cookPanelIndexCook'))
