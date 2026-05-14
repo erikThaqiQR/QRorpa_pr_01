@@ -818,6 +818,7 @@ class adminMngWorkersController extends Controller
             $allTOrds = TabOrder::where([['tabCode','!=',0],['toRes',Auth::user()->sFor],['tableNr',$req->tableNr]])->get();
         }
         
+        $filteredTOrds = [];
         foreach($allTOrds as $tOrOne){
             if($tOrOne->OrderSasiaDone != $tOrOne->OrderSasia){
                 $theP = Produktet::find($tOrOne->prodId);
@@ -839,6 +840,8 @@ class adminMngWorkersController extends Controller
                     
                     $tOrOne->OrderSasiaDone = $tOrOne->OrderSasia;
                     $tOrOne->save();
+
+                    $filteredTOrds[] = $tOrOne;
             
                     $cookLog = new logCookActivity();
                     $cookLog->cookId = Auth::user()->id;
@@ -980,7 +983,7 @@ class adminMngWorkersController extends Controller
                 }
             }
         }
-        return self::printCookedItems($allTOrds);
+        return self::printCookedItems(collect($filteredTOrds));
     }
 
 
@@ -990,6 +993,8 @@ class adminMngWorkersController extends Controller
         if(!($tabOrders instanceof Collection)) {
             $tabOrders = collect([$tabOrders]);
         }
+
+        $cook = Auth::user();
 
         $groupedOrder = [];
         foreach($tabOrders as $tabOrder){
@@ -1015,9 +1020,9 @@ class adminMngWorkersController extends Controller
         }
 
         $groupedOrder = [
-            "cookName" => Auth::user()->name,
-            "printerIp" => Auth::user()->cookEpsonIpAddress,
-            "printMode" => Auth::user()->printMode,
+            "cookName" => $cook->name,
+            "printerIp" => $cook->cookEpsonIpAddress,
+            "printMode" => $cook->printMode,
             "order" => $groupedOrder
         ];
 
