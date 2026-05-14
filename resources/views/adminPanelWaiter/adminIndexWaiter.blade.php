@@ -248,7 +248,7 @@
                     </script>
 
                     @if(Request::is('admWoMngStatistics01Waiter')) <!-- Statistics -->
-                        @if (Auth::user()->sFor == 64)
+                        @if (Auth::user()->sFor == 6400)
                             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
                             <script>
                                 $('#resBlockModal1').modal('show');
@@ -284,7 +284,7 @@
 
                     @elseif(Request::is('admWoMngIndexWaiter') || Request::is('dashboard2') || Request::is('dashboard3')) <!-- Orders -->
                         @include('adminPanelWaiter.tablePage.tablePageIndex')
-                        @if (Auth::user()->sFor == 64)
+                        @if (Auth::user()->sFor == 6400)
                         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
                         <script>
                             $('#resBlockModal2').modal('show');
@@ -452,7 +452,7 @@
                 <!-- adminPanelWaiter.partsTel.njoftimet -->
 
                 @if(Request::is('admWoMngStatistics01Waiter')) <!-- Statistics-->
-                        @if (Auth::user()->sFor == 64)
+                        @if (Auth::user()->sFor == 6400)
                             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
                             <script>
                                 $('#resBlockModal1').modal('show');
@@ -489,7 +489,7 @@
 
                 @elseif(Request::is('admWoMngIndexWaiter')) <!-- Orders Tables -->
                     @include('adminPanelWaiter.tablePageTel.tablePageIndex')
-                    @if (Auth::user()->sFor == 64)
+                    @if (Auth::user()->sFor == 6400)
                     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
                         <script>
                             $('#resBlockModal2').modal('show');

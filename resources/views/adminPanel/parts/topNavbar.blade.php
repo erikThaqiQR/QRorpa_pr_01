@@ -371,7 +371,7 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:5%;">
  
       <!-- Modal body -->
       <div class="modal-body">
-        @foreach(Orders::where('Restaurant', '=', $thisRestaurantId)->where('statusi', '=', 0)->whereIn('nrTable',$myTablesWaiter)->get()->sortByDesc('created_at') as $order)
+        @foreach(Orders::where('Restaurant', '=', $thisRestaurantId)->where('statusi', '=', 0)->get()->sortByDesc('created_at') as $order)
           @if($nowDate == explode(' ', $order->created_at)[0])
             <p class="p-3" style="border-bottom:1px solid lightgray; font-size:21px;">-> {{count(explode('---8---',$order->porosia))}} {{__('adminP.productsTable')}}: <strong>{{$order->nrTable}} </strong></p>
           @endif

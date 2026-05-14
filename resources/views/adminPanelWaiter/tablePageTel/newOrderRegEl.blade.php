@@ -223,7 +223,7 @@ style="background-color: rgba(0, 0, 0, 0.5); padding:0px;">
                         @endif
                     @endforeach
                     <button class="btn btn-outline-danger mt-3" style="width:100%; margin:0px;" onclick="closeTypeSelect('{{$ketoProd->id}}')">
-                        <strong>Schliessen</strong>
+                        <strong>X</strong>
                     </button>
                 </div>
             </div>
