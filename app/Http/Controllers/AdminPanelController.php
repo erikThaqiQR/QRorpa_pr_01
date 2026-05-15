@@ -723,7 +723,11 @@ EPD
         $newTabOrder->OrderType.'-||-'.$tabOrComm.'-||-'.$waiterDataName.'-||-'.$thePlate.'-||-'.$newTabOrder->tabCode.'-||-'.$extraToShow.'-||-'.
         $newTabOrder->OrderSasiaDone.'-||-'.$newTabOrder->usrPhNr.'-||-'.$newTabOrder->toPlate.'-||-'.$newTabOrder->abrufenStat.'-||-'.$req->prodId.'-||-'.$tabCodeN;
 
-        return $showProdData;
+        if(Auth::user()->tableOrAutoConfirm){
+            return [$showProdData, self::printConfirmedOrderForCooks($newTabOrder)];
+        }else{
+            return [$showProdData, Null ];
+        }
     }
 
 
@@ -2766,7 +2770,11 @@ EPD
         $newTabOrder->OrderType.'-||-'.$tabOrComm.'-||-'.$waiterDataName.'-||-'.$thePlate.'-||-'.$newTabOrder->tabCode.'-||-'.$extraToShow.'-||-'.
         $newTabOrder->OrderSasiaDone.'-||-'.$newTabOrder->usrPhNr.'-||-'.$newTabOrder->toPlate.'-||-'.$newTabOrder->abrufenStat.'-||-'.$requ->pid.'-||-'.$tabCodeN;
 
-        return $showProdData;
+        if(Auth::user()->tableOrAutoConfirm){
+            return [$showProdData, self::printConfirmedOrderForCooks($newTabOrder)];
+        }else{
+            return [$showProdData, Null ];
+        }
     }
 
 
@@ -2970,7 +2978,11 @@ EPD
         $newTabOrder->OrderType.'-||-'.$tabOrComm.'-||-'.$waiterDataName.'-||-'.$thePlate.'-||-'.$newTabOrder->tabCode.'-||-'.$extraToShow.'-||-'.
         $newTabOrder->OrderSasiaDone.'-||-'.$newTabOrder->usrPhNr.'-||-'.$newTabOrder->toPlate.'-||-'.$newTabOrder->abrufenStat.'-||-'.$requ->pid.'-||-'.$tabCodeN;
 
-        return $showProdData;
+        if(Auth::user()->tableOrAutoConfirm){
+            return [$showProdData, self::printConfirmedOrderForCooks($newTabOrder)];
+        }else{
+            return [$showProdData, Null ];
+        }
     }
 
 
@@ -4667,7 +4679,11 @@ EPD
             foreach($allTabOrders as $tabOrder){
                 $product = Produktet::find($tabOrder->prodId);
 
-                $plateName = resPlates::find($tabOrder->toPlate)->nameTitle;
+                if($tabOrder->toPlate != 0){
+                    $plateName = resPlates::find($tabOrder->toPlate)->nameTitle;
+                }else{
+                    $plateName = 'Keine teller';
+                }
 
                 $extraNames = null;
                 $typeName = null;
