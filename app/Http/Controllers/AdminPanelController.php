@@ -5638,7 +5638,15 @@ EPD
                 } else { $groupBy = $explodedProduct[7]; }
 
                 if(number_format($explodedProduct[4], 2, '.', '') > 0){
-                    if(isset($mappedOrderedProducts[$groupBy])){
+                    if(str_contains($explodedProduct[3], '/')){
+                        $mappedOrderedProducts[] = [
+                            "productId" => $explodedProduct[7],
+                            "quantity" => $explodedProduct[3],
+                            "price" => $explodedProduct[4],
+                            "name" => $explodedProduct[0],
+                            "type" => $productType ? $productType->emri : null,
+                        ];
+                    } else if(isset($mappedOrderedProducts[$groupBy])){
                         $mappedOrderedProducts[$groupBy] = [
                             "productId" => $explodedProduct[7],
                             "quantity" => $explodedProduct[3] ? $mappedOrderedProducts[$groupBy]['quantity'] + $explodedProduct[3] : ++$mappedOrderedProducts[$groupBy]['quantity'],
