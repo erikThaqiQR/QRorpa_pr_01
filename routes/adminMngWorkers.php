@@ -206,4 +206,7 @@
     Route::post('saveEpsonIpAddress', 'adminMngWorkersController@saveEpsonIpAddress')->name('admWoMng.saveEpsonIpAddress');
     Route::post('deleteEpsonIpAddress', 'adminMngWorkersController@deleteEpsonIpAddress')->name('admWoMng.deleteEpsonIpAddress');
     // ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    // Update Auto print after payment
+    Route::post('updateAutoPrintingSetting', 'adminMngWorkersController@updateAutoPrintingSetting')->name('admWoMng.updateAutoPrintingSetting')
 ?>

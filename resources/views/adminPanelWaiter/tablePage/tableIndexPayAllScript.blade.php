@@ -985,6 +985,12 @@
                         $('#orderQRCodePicImgTel').attr('src','storage/digitalReceiptQRK/'+res2D[0]);
                         $('#orderQRCodePicDownloadOI').val(resOrId);
                         $('#orderQRCodePicTel').modal('show');
+                        
+                        const autoPrint = '{{ Auth::user()->autoPrintAfterPayment }}';
+                        const printerIp = '{{ Auth::user()->epsonPrinterIp }}';
+                        if(autoPrint == 1 && printerIp){
+                            printOrderDtl(printerIp, resOrId);
+                        }
                     },
                     error: (error) => { console.log(error); }
                 });
