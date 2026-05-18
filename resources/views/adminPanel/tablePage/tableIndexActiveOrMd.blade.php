@@ -488,7 +488,7 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:20%; z-index: 1060 !imp
                     
                 </div>
 
-                <button class="btn btn-outline-danger shadow-none mt-4" onclick="selectToPayProds2UpSasiCancel()" style="width:100%; margin:0px;"><strong>Stornieren</strong></button>
+                <button class="btn btn-outline-danger shadow-none mt-4" onclick="selectToPayProds2UpSasiCancel()" style="width:100%; margin:0px;"><strong>X</strong></button>
             </div>
         </div>
     </div>

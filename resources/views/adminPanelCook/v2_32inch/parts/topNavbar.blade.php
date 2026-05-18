@@ -284,11 +284,11 @@ use Carbon\Carbon;
                 <label style="width:100%; font-weight:bold; color:rgb(72,81,87);">Druckmodus</label>
                 <select id="printerPrintMode" class="form-control mb-3 shadow-none">
                     <option value="item" {{ Auth::user()->printMode === 'item' ? 'selected' : '' }}>Einzeln</option>
-                    <option value="table" {{ Auth::user()->printMode === 'table' ? 'selected' : '' }}>Tabelle</option>
+                    <option value="table" {{ Auth::user()->printMode === 'table' ? 'selected' : '' }}>Zusammen</option>
                 </select>
 
                 <button class="btn btn-success shadow-none" style="width:100%; margin:5px 0px 5px 0px;" onclick="updatePrintingSettings()">
-                    <strong>Sparen</strong>
+                    <strong>Speichern</strong>
                 </button>
 
                 <div class="mt-1 alert alert-success text-center" style="font-weight: bold; display:none; width:100%;" id="printerSettingsSuccess">

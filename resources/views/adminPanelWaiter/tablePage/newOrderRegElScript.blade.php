@@ -62,7 +62,8 @@
                             phoneN: $('#newOrPhNrSelected'+$("#newTabOrderModalActiveTableNr").val()).val(),
                             _token: '{{csrf_token()}}'
                         },
-                        success: (orBuildDt) => {
+                        success: (respo) => {
+                            orBuildDt = respo[0];
                             // $('#success03gif').show(1).delay(1880).hide(1);
                             var tNrWOT = $('#newTabOrderModalActiveTableNr').val();
                             hasNewOrders = 1;
@@ -95,6 +96,11 @@
                                                         '</div>';
                                 $("#tabOrderBody"+orDt2D[0]+'ActiveOrders').append(firstOrderOnTable);
                                 buildTheNewProdInOrderTable(orDt2D[0], orDt2D[1], orDt2D[2], orDt2D[3], orDt2D[4], orDt2D[5], orDt2D[6], orDt2D[7], orDt2D[8], orDt2D[9], orDt2D[10], orDt2D[11], orDt2D[13], orDt2D[14]);
+                            }
+                            if (respo[1] != null){
+                                $.each(respo[1], function (cookId, cookData) {
+                                    printCookSlip(cookData, tNrWOT, 'Neue BESTELLUNG');
+                                });
                             }
                         },
                         error: (error) => { console.log(error); }
@@ -154,7 +160,8 @@
                 phoneN: $('#newOrPhNrSelected'+$("#newTabOrderModalActiveTableNr").val()).val(),
 				_token: '{{csrf_token()}}'
 			},
-			success: (orBuildDt) => {
+			success: (respo) => {
+                orBuildDt = respo[0];
                 hasNewOrders = 1;
                 var tNrWT = $('#newTabOrderModalActiveTableNr').val();
                 // $('#success03gif').show(1).delay(1880).hide(1);
@@ -187,6 +194,11 @@
                                             '</div>';
                     $("#tabOrderBody"+orDt2D[0]+'ActiveOrders').append(firstOrderOnTable);
                     buildTheNewProdInOrderTable(orDt2D[0], orDt2D[1], orDt2D[2], orDt2D[3], orDt2D[4], orDt2D[5], orDt2D[6], orDt2D[7], orDt2D[8], orDt2D[9], orDt2D[10], orDt2D[11], orDt2D[13], orDt2D[14]);
+                }
+                if (respo[1] != null){
+                    $.each(respo[1], function (cookId, cookData) {
+                        printCookSlip(cookData, tNrWT, 'Neue BESTELLUNG');
+                    });
                 }
 			},
 			error: (error) => { console.log(error); }
@@ -701,7 +713,8 @@
                     plate: $('#plateFor').val(),
                     _token: '{{csrf_token()}}'
                 },
-                success: (orBuildDt) => {
+                success: (respo) => {
+                    orBuildDt = respo[0];
                     hasNewOrders = 1;
                     var tNrDetailed = $('#newTabOrderModalActiveTableNr').val();
 
@@ -740,6 +753,11 @@
                                                 '</div>';
                         $("#tabOrderBody"+orDt2D[0]+'ActiveOrders').append(firstOrderOnTable);
                         buildTheNewProdInOrderTable(orDt2D[0], orDt2D[1], orDt2D[2], orDt2D[3], orDt2D[4], orDt2D[5], orDt2D[6], orDt2D[7], orDt2D[8], orDt2D[9], orDt2D[10], orDt2D[11], orDt2D[13], orDt2D[14]);
+                    }
+                    if (respo[1] != null){
+                        $.each(respo[1], function (cookId, cookData) {
+                            printCookSlip(cookData, tNrDetailed, 'Neue BESTELLUNG');
+                        });
                     }
                 },
                 error: (error) => { console.log(error); }
