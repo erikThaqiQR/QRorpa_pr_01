@@ -5648,7 +5648,7 @@ EPD
                 $explodedProduct = explode('-8-', $product);
 
                 $productType = null;
-                if($explodedProduct[5] != 'empty'){
+                if(!empty($explodedProduct[5]) && $explodedProduct[5] != 'empty'){
                     $productType = LlojetPro::where('emri', $explodedProduct[5])->first();
                     $groupBy = $explodedProduct[7] . '_' . $productType->id;
                 } else { $groupBy = $explodedProduct[7]; }
