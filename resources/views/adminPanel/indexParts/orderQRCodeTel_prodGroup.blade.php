@@ -217,7 +217,7 @@ use Illuminate\Support\Facades\Auth;
                     const resComment          = (typeof d[31] !== 'undefined') ? d[31] : '';
 
                     // ── FALLBACK: no printer IP → original browser print ─────────
-                    if (!printerIp) {
+                    if (tableNr == 500 || !printerIp) {
                         let printWindow = window.open('', '', 'height=500, width=1000');
                         if (hasPOSData == 'Yes') {
                             printWindow.document.write(`
