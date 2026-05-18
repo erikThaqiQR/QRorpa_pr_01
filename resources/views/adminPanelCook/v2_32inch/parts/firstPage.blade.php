@@ -1551,7 +1551,7 @@
         var builder = new epson.ePOSBuilder();
 
         epos.onreceive = function (res) {
-            console.log('Print result for ' + cookName + ': ' + res.success);
+            // console.log('Print result for ' + cookName + ': ' + res.success);
         };
 
         var tableNrShow = 'Tisch: ' + tableNr;

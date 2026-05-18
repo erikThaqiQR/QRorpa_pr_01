@@ -397,7 +397,8 @@ use Illuminate\Support\Facades\Auth;
                   // HEADER
                   builder.addTextAlign(builder.ALIGN_CENTER);
                   builder.addTextSize(2, 2);
-                  builder.addText(resName + '\n');
+                  const nameLines = wrapWords(resName, Math.floor(W / 2));
+                  nameLines.forEach(line => builder.addText(line + '\n'));
                   builder.addTextSize(1, 1);
                   builder.addTextStyle(false, false, true, builder.COLOR_1);
                   builder.addText('Rechnung\n');
@@ -513,6 +514,22 @@ use Illuminate\Support\Facades\Auth;
           });
       }
 
+      function wrapWords(text, maxChars) {
+          const words = text.split(' ');
+          const lines = [];
+          let current = '';
+          words.forEach(word => {
+              if ((current + (current ? ' ' : '') + word).length > maxChars) {
+                  if (current) lines.push(current);
+                  current = word;
+              } else {
+                  current = current ? current + ' ' + word : word;
+              }
+          });
+          if (current) lines.push(current);
+          return lines;
+        }
+        
         function addImageToPrint(builder, imageUrl, callback) {
           const img = new Image();
           img.crossOrigin = 'Anonymous';
@@ -577,6 +594,10 @@ use Illuminate\Support\Facades\Auth;
             });
           }else if($('#splitTheBillInitiateModal').hasClass('show') && $('#splitTheBillInitiateModal').hasClass('modal')){
             // splitTheBillInitiateModal is open
+            $('body').addClass('modal-open');
+          }
+
+          if($('#orderQRCodeTel').hasClass('show')){
             $('body').addClass('modal-open');
           }
         }

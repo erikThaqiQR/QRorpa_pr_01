@@ -432,6 +432,7 @@ use App\LlojetPro;
                         }
                     }
                 }
+            ?>
             @foreach($mappedProducts as $produkti)
                 <?php
                     $countProdsDs++;

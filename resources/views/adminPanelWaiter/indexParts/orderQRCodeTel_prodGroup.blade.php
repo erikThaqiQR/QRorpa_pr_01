@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Auth;
   $resClock1_2D = explode(':',$resClock[0]);
   $resClock2_2D = explode(':',$resClock[1]);
 
-  $today_str = Carbon::create($nowDate2D[0], $nowDate2D[1], $nowDate2D[2], $resClock1_2D[0], $resClock1_2D[1], 00);
+  $today_str = Carbon::create($nowDate2D[0], $nowDate2D[1], $nowDate2D[2] - 1, $resClock1_2D[0], $resClock1_2D[1], 00);
   $today_end = Carbon::create($nowDate2D[0], $nowDate2D[1], $nowDate2D[2], $resClock2_2D[0], $resClock2_2D[1], 59);
   if($theRes->reportTimeOtherDay == 1){
       // diff day
@@ -423,7 +423,8 @@ use Illuminate\Support\Facades\Auth;
                   // HEADER
                   builder.addTextAlign(builder.ALIGN_CENTER);
                   builder.addTextSize(2, 2);
-                  builder.addText(resName + '\n');
+                  const nameLines = wrapWords(resName, Math.floor(W / 2));
+                  nameLines.forEach(line => builder.addText(line + '\n'));
                   builder.addTextSize(1, 1);
                   builder.addTextStyle(false, false, true, builder.COLOR_1);
                   builder.addText('Rechnung\n');
@@ -539,6 +540,21 @@ use Illuminate\Support\Facades\Auth;
           });
       }
 
+      function wrapWords(text, maxChars) {
+          const words = text.split(' ');
+          const lines = [];
+          let current = '';
+          words.forEach(word => {
+              if ((current + (current ? ' ' : '') + word).length > maxChars) {
+                  if (current) lines.push(current);
+                  current = word;
+              } else {
+                  current = current ? current + ' ' + word : word;
+              }
+          });
+          if (current) lines.push(current);
+          return lines;
+      }
       
       function addImageToPrint(builder, imageUrl, callback) {
           const img = new Image();
@@ -603,6 +619,10 @@ use Illuminate\Support\Facades\Auth;
             });
           }else if($('#splitTheBillInitiateModal').hasClass('show') && $('#splitTheBillInitiateModal').hasClass('modal')){
             // splitTheBillInitiateModal is open
+            $('body').addClass('modal-open');
+          }
+
+          if($('#orderQRCodeTel').hasClass('show')){
             $('body').addClass('modal-open');
           }
         }
