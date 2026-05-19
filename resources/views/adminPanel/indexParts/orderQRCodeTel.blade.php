@@ -146,8 +146,11 @@ use Illuminate\Support\Facades\Auth;
 
       <script>
 
-        function printOrderDtl(printerIp = null) {
-          const orId = $('#orderQRCodePicDownloadOI').val();
+        
+        function printOrderDtl(printerIp = null, orId = null) {
+          if(!orId){
+            orId = $('#orderQRCodePicDownloadOI').val();
+          }
 
           $.ajax({
               url: '{{ route("print.callDataForPrintReceipt") }}',

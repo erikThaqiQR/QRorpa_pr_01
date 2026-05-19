@@ -208,6 +208,10 @@ use App\LlojetPro;
     $orDt2d = explode('-',explode(' ',$items->created_at)[0]);
     $orTi2d = explode(':',explode(' ',$items->created_at)[1]);
 
+    $pdfname = 'storage/rechnungBillsFirst/rechnungBillFirst'.$theRes->emri.'_'.$items->id.'.pdf';
+    $pdftext = file_get_contents($pdfname);
+    $pages = preg_match_all("/\/Page\W/", $pdftext, $dummy);
+    
     $startDt = $orDt2d[2].'.'.$orDt2d[1].'.'.$orDt2d[0];
     $endPayDt = date('d.m.Y', strtotime($startDt. ' + '.$exInfo->exInfoDaysToPay.' day'));
     
@@ -247,7 +251,7 @@ use App\LlojetPro;
 
 <body id="pageCounter">
     <footer id="footerPC">
-        <p style="margin: 0px; padding:0px;  font-size:14px; text-align:right !important;"> <span  class="pageNumbers"></span>xxxx</p>
+        <p style="margin: 0px; padding:0px;  font-size:14px; text-align:right !important;"> <span  class="pageNumbers"></span>{{$pages}}</p>
     </footer>
 
     <div class="invoice-box">

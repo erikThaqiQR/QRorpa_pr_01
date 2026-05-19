@@ -86,6 +86,14 @@ use Illuminate\Support\Facades\Auth;
         <div style="display:none" class="alert alert-success mt-1 py-1 successNotifUser{{ auth()->user()->id }}" role="alert"></div>
         <div style="display:none" class="alert alert-danger mt-1 py-1 errorNotifUser{{ auth()->user()->id }}" role="alert"></div>
     </div>
+    <div style="text-align:center;" class="mb-1">
+        <p style="margin:0;">Automatischer Druck nach der Zahlung</p>
+        @if(auth()->user()->autoPrintAfterPayment == 1)
+            <input checked type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="xs" data-on="Ja" data-off="Nein" onchange="updateAutoPrintSettings('{{ auth()->user()->id }}', 0)" id="autoAcceptOrdersToggle">
+        @else   
+            <input type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="xs" data-on="Ja" data-off="Nein" onchange="updateAutoPrintSettings('{{ auth()->user()->id }}', 1)" id="autoAcceptOrdersToggle">
+        @endif
+    </div>
     <hr>
 
     <div class="d-flex flex-wrap flex-wrap justify-content-between" id="orderServingDiv">
@@ -114,6 +122,14 @@ use Illuminate\Support\Facades\Auth;
                     <p class="card-text" style="margin-bottom:2px; font-size:0.65rem;"><strong><i class="fas fa-phone"></i> {{$user->phoneNr}}</strong></p>
                     @else
                     <p class="card-text" style="margin-bottom:2px; font-size:0.65rem;"><strong><i class="fas fa-phone-slash"></i></strong></p>
+                    @endif
+                </div>
+                <div style="text-align:center;" class="mb-1">
+                    <p style="margin:0;">Automatischer Druck nach der Zahlung</p>
+                    @if($user->autoPrintAfterPayment == 1)
+                        <input checked type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="xs" data-on="Ja" data-off="Nein" onchange="updateAutoPrintSettings('{{ $user->id }}', 0)" id="autoAcceptOrdersToggle">
+                    @else   
+                        <input type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="xs" data-on="Ja" data-off="Nein" onchange="updateAutoPrintSettings('{{ $user->id }}', 1)" id="autoAcceptOrdersToggle">
                     @endif
                 </div>
                 <button class="btn btn-outline-dark btn-block shadow-none" data-toggle="modal" data-target="#setTablesForWo{{$user->id}}Modal">

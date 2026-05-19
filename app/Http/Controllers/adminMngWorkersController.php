@@ -1909,4 +1909,14 @@ class adminMngWorkersController extends Controller
             'message' => 'Settings saved successfully'
         ], 200);
     }
+
+    public function updateAutoPrintingSetting(Request $req){
+        $user = User::find($req->userId);
+        $user->autoPrintAfterPayment = $req->autoPrint;
+        $user->save();
+
+        return response()->json([
+            'message' => 'IP address deleted successfully'
+        ], 200);
+    }
 }

@@ -71,22 +71,32 @@
 <div class="p-2 pb-5">
     <hr style="margin:5px 0px 5px 0px;">
 
-    <div class="d-flex flex-column" style="max-width: 260px;">
-        <label class="form-label mb-1" style="font-size: 13px;">Admin Epson IP-Adresse</label>
-        <div class="input-group">
-            <input type="text" 
-                class="form-control shadow-none epsonIpAddressInput{{ auth()->user()->id }}" 
-                placeholder="IP-Adresse" 
-                value="{{ auth()->user()->epsonPrinterIp }}">
-            <button class="btn btn-danger" type="button" onclick="deleteEpsonIpAddress({{ auth()->user()->id }})">
-                <i class="fas fa-trash-alt"></i>
-            </button>
-            <button class="btn btn-info" type="button" onclick="saveEpsonIpAddress({{ auth()->user()->id }})">
-                <i class="fa-solid fa-check"></i>
-            </button>
+    <div class="d-flex">
+        <div class="d-flex flex-column" style="max-width: 260px;">
+            <label class="form-label mb-1" style="font-size: 13px;">Admin Epson IP-Adresse</label>
+            <div class="input-group">
+                <input type="text" 
+                    class="form-control shadow-none epsonIpAddressInput{{ auth()->user()->id }}" 
+                    placeholder="IP-Adresse" 
+                    value="{{ auth()->user()->epsonPrinterIp }}">
+                <button class="btn btn-danger" type="button" onclick="deleteEpsonIpAddress('{{ auth()->user()->id }}')">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+                <button class="btn btn-info" type="button" onclick="saveEpsonIpAddress('{{ auth()->user()->id }}')">
+                    <i class="fa-solid fa-check"></i>
+                </button>
+            </div>
+            <div style="display:none" class="alert alert-success mt-1 py-1 successNotifUser{{ auth()->user()->id }}" role="alert"></div>
+            <div style="display:none" class="alert alert-danger mt-1 py-1 errorNotifUser{{ auth()->user()->id }}" role="alert"></div>
         </div>
-        <div style="display:none" class="alert alert-success mt-1 py-1 successNotifUser{{ auth()->user()->id }}" role="alert"></div>
-        <div style="display:none" class="alert alert-danger mt-1 py-1 errorNotifUser{{ auth()->user()->id }}" role="alert"></div>
+        <div style="text-align:center;" class="mb-1 ml-3">
+            <p style="margin:0;">Automatischer Druck nach der Zahlung</p>
+            @if(auth()->user()->autoPrintAfterPayment == 1)
+                <input checked type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="xs" data-on="Ja" data-off="Nein" onchange="updateAutoPrintSettings('{{ auth()->user()->id }}', 0)" id="autoAcceptOrdersToggle">
+            @else   
+                <input type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="xs" data-on="Ja" data-off="Nein" onchange="updateAutoPrintSettings('{{ auth()->user()->id }}', 1)" id="autoAcceptOrdersToggle">
+            @endif
+        </div>
     </div>
     <hr style="margin:5px 0px 5px 0px;">
 
@@ -116,6 +126,14 @@
                     <p class="card-text" style="margin-bottom:2px; font-size:0.9rem;"><strong><i class="fas fa-phone"></i> {{$user->phoneNr}}</strong></p>
                     @else
                     <p class="card-text" style="margin-bottom:2px; font-size:0.9rem;"><strong><i class="fas fa-phone-slash"></i></strong></p>
+                    @endif
+                </div>
+                <div style="text-align:center;" class="mb-1">
+                    <p style="margin:0;">Automatischer Druck nach der Zahlung</p>
+                    @if($user->autoPrintAfterPayment == 1)
+                        <input checked type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="xs" data-on="Ja" data-off="Nein" onchange="updateAutoPrintSettings('{{ $user->id }}', 0)" id="autoAcceptOrdersToggle">
+                    @else   
+                        <input type="checkbox" data-toggle="toggle" data-onstyle="success" data-offstyle="danger" data-size="xs" data-on="Ja" data-off="Nein" onchange="updateAutoPrintSettings('{{ $user->id }}', 1)" id="autoAcceptOrdersToggle">
                     @endif
                 </div>
                 <button class="btn btn-outline-dark btn-block shadow-none" data-toggle="modal" data-target="#setTablesForWo{{$user->id}}Modal">

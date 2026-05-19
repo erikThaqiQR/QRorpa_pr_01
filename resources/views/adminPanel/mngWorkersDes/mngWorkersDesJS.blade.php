@@ -670,4 +670,23 @@
                 }
         });
     }
+
+    function updateAutoPrintSettings(userId, autoPrint){
+        $.ajax({
+            url: '{{ route("admWoMng.updateAutoPrintingSetting") }}',
+            method: 'post',
+            data: {
+                userId: userId,
+                autoPrint: autoPrint,
+                _token: '{{csrf_token()}}'
+            },
+            success: (respo) => {
+                //
+            },
+            error: (error) => { 
+                let errorMsg = 'An error occurred';
+                $(`.errorNotifUser${userId}`).text(errorMsg).show();
+            }
+        });
+    }
 </script>
