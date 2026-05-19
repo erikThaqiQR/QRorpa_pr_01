@@ -964,6 +964,12 @@
                         $('#orderQRCodePicTel').modal('show');
 
                         $('#OrQRCodePayIsSelectiveTNr').val(tNr);
+
+                        const autoPrint = '{{ Auth::user()->autoPrintAfterPayment }}';
+                        const printerIp = '{{ Auth::user()->epsonPrinterIp }}';
+                        if(autoPrint == 1 && printerIp){
+                            printOrderDtl(printerIp, resOrId2D[1]);
+                        }
                     },
                     error: (error) => { console.log(error); }
                 });
