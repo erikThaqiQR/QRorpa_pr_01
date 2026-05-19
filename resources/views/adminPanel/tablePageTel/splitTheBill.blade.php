@@ -645,6 +645,12 @@ style="background-color: rgba(0, 0, 0, 0.5); padding-top:5px;">
                         if(respo2D[2] == 1 || respo2D[2] == 0){
                             $('#OrQRCodeModalStillOpen').val(1);
                         }
+
+                        const autoPrint = '{{ Auth::user()->autoPrintAfterPayment }}';
+                        const printerIp = '{{ Auth::user()->epsonPrinterIp }}';
+                        if(autoPrint == 1 && printerIp){
+                            printOrderDtl(printerIp, respo2D[0]);
+                        }
                     },
                     error: (error) => { console.log(error); }
                 });
